@@ -3,11 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace StudyHub.Entities;
 
-public class Assignment
+public class Assignment : EntityBase
 {
-    [Key]
-    public Guid Id { get; set; }
-
     [ForeignKey(nameof(Subject))]
     public Guid SubjectId { get; set; }
     public string Title { get; set; } = string.Empty;

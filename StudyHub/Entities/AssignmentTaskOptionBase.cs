@@ -3,11 +3,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace StudyHub.Entities;
 
-public class AssignmentTaskOptionBase
+public class AssignmentTaskOptionBase : EntityBase
 {
-    [Key]
-    public Guid Id { get; set; }
-
     [ForeignKey(nameof(Task))]
     public Guid AssignmentTaskId { get; set; }
     public string Label { get; set; } = string.Empty;

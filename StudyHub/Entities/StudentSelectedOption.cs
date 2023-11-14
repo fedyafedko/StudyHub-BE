@@ -3,11 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace StudyHub.Entities;
 
-public class StudentSelectedOption
+public class StudentSelectedOption : EntityBase
 {
-    [Key]
-    public Guid Id { get; set; }
-
     [ForeignKey(nameof(Student))]
     public Guid StudentId { get; set; }
 

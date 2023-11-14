@@ -7,7 +7,7 @@ using System.Linq.Expressions;
 
 namespace StudyHub.DAL.Repositories;
 public class Repository<TEntity> : IRepository<TEntity>
-    where TEntity : EntityBase
+    where TEntity : class
 {
     private readonly ApplicationDbContext _context;
     private readonly DbSet<TEntity> _table;

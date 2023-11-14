@@ -1,5 +1,3 @@
 ﻿namespace StudyHub.Entities;
 
-public class OpenEndedOption : AssignmentTaskOptionBase
-{
-}
+public class OpenEndedOption : AssignmentTaskOptionBase { }

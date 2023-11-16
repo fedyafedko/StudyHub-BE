@@ -1,6 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
-using NuGet.Protocol.Core.Types;
-using NuGet.Protocol.Plugins;
+﻿using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using StudyHub.BLL.Services.Interface;
 using StudyHub.Common.DTO;
 using StudyHub.Common.Models;
@@ -16,18 +15,26 @@ namespace StudyHub.BLL.Services;
 
 public class AuthService : IAuthService
 {
-    private readonly IRepository<User> _userRepository;
+    private readonly IUserRepository _userRepository;
     private readonly IPasswordHasher _passwordHasher;
     private readonly JwtSettings _settings;
+
+    public AuthService (IUserRepository repo, IPasswordHasher hasher, IOptions<JwtSettings> settings)
+    {
+        _userRepository = repo;
+        _passwordHasher = hasher;
+        _settings = settings.Value;
+    }
+
     public async Task<AuthSuccessDTO> LoginAsync(LoginUserDTO user)
     {
         string hashedPassword = _passwordHasher.Hash(user.Password);
-        var existingUser = await _userRepository.FirstOrDefaultAsync(u => u.Email == user.Email);
+        var existingUser = await _userRepository.FindByLoginAsync(user.Email);
 
         if (existingUser == null)
             throw new KeyNotFoundException(user.Email);
 
-        if (existingUser.PasswordHash != hashedPassword)
+        if (BCrypt.Net.BCrypt.Verify(hashedPassword, existingUser.PasswordHash))
             throw new UnauthorizedAccessException(user.Email);
 
         return new AuthSuccessDTO(GenerateJwtToken(existingUser));
@@ -37,7 +44,7 @@ public class AuthService : IAuthService
     public async Task<AuthSuccessDTO> RegisterAsync(RegisterUserDTO user)
     {
         string hashedPassword = _passwordHasher.Hash(user.Password);
-        var existingUser = await _userRepository.FirstOrDefaultAsync(u => u.Email == user.Email);
+        var existingUser = await _userRepository.FindByLoginAsync(user.Email);
 
         if (existingUser != null)
             throw new InvalidOperationException(user.Email);

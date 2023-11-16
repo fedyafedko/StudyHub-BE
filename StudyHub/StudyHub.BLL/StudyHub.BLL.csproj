@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="JWT" Version="10.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Entities\StudyHub.Entities.csproj" />
+    <ProjectReference Include="..\StudyHub.Common\StudyHub.Common.csproj" />
+    <ProjectReference Include="..\StudyHub.DAL\StudyHub.DAL.csproj" />
+    <ProjectReference Include="..\StudyHub\StudyHub.csproj" />
+  </ItemGroup>
+
+</Project>

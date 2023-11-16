@@ -7,7 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StudyHub", "StudyHub\StudyH
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StudyHub.Entities", "Entities\StudyHub.Entities.csproj", "{012D10CE-DC43-4915-90A8-7CDE65BAA52B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudyHub.DAL", "StudyHub.DAL\StudyHub.DAL.csproj", "{EF1DA920-AC1A-45E8-A82C-A0820B53AA00}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StudyHub.DAL", "StudyHub.DAL\StudyHub.DAL.csproj", "{EF1DA920-AC1A-45E8-A82C-A0820B53AA00}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudyHub.BLL", "StudyHub.BLL\StudyHub.BLL.csproj", "{75437CAB-B798-4DAE-AFFA-4F69D5F01766}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudyHub.Common", "StudyHub.Common\StudyHub.Common.csproj", "{75D32F27-9BB3-4E87-B20D-498F4DFEF2ED}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +31,14 @@ Global
 		{EF1DA920-AC1A-45E8-A82C-A0820B53AA00}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EF1DA920-AC1A-45E8-A82C-A0820B53AA00}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EF1DA920-AC1A-45E8-A82C-A0820B53AA00}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75437CAB-B798-4DAE-AFFA-4F69D5F01766}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75437CAB-B798-4DAE-AFFA-4F69D5F01766}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75437CAB-B798-4DAE-AFFA-4F69D5F01766}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75437CAB-B798-4DAE-AFFA-4F69D5F01766}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75D32F27-9BB3-4E87-B20D-498F4DFEF2ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75D32F27-9BB3-4E87-B20D-498F4DFEF2ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75D32F27-9BB3-4E87-B20D-498F4DFEF2ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75D32F27-9BB3-4E87-B20D-498F4DFEF2ED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -13,11 +13,11 @@ public class AssignmentTaskService : IAssignmentTaskService
     private readonly IOptionsService _optionsService;
     private readonly IMapper _mapper;
 
-    public AssignmentTaskService(IRepository<AssignmentTask> repositoryAssignmentTask, 
+    public AssignmentTaskService(
+        IRepository<AssignmentTask> repositoryAssignmentTask, 
         IRepository<Assignment> repositoryAssignment,
         IOptionsService optionsService,
-        IMapper mapper 
-        )
+        IMapper mapper)
     {
         _repositoryAssignmentTask = repositoryAssignmentTask;
         _repositoryAssignment = repositoryAssignment;

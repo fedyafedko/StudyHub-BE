@@ -21,38 +21,20 @@ public class OptionsService : IOptionsService
         _mapper = mapper;
     }
 
-    public async Task<List<AssignmentTaskOptionDTO>> AddOptions(Guid assignmentTaskId, List<AssignmentTaskOptionDTO> taskOption)
+    public async Task<List<AssignmentTaskOptionDTO>> AddOptions(Guid assignmentTaskId, List<AssignmentTaskOptionDTO> taskOptions)
     {
         // ToDo: move this validation to validators?
-        if (taskOption.All(option => option.IsCorrect == null))
-            return await SeparationOptions(assignmentTaskId,
-                taskOption,
-                _openEndedOptionRepository);
-        else if (taskOption.All(option => option.IsCorrect != null))
-            return await SeparationOptions(assignmentTaskId,
-                taskOption,
-                _choiceOptionRepository);
+        if (taskOptions.All(option => option.IsCorrect == null))
+        {
+            return await SeparationOptions(assignmentTaskId, taskOptions, _openEndedOptionRepository);
+        }
+        else if (taskOptions.All(option => option.IsCorrect != null))
+        {
+            return await SeparationOptions(assignmentTaskId, taskOptions, _choiceOptionRepository);
+        }
         else
         {
-            var nullOptions = taskOption
-                .Where(option => option.IsCorrect == null)
-                .ToList();
-            var boolOptions = taskOption
-                .Where(option => option.IsCorrect.HasValue)
-                .ToList();
-
-            var choiceOptionsTask = await SeparationOptions(assignmentTaskId, 
-                boolOptions, 
-                _choiceOptionRepository);
-            var openEndedOptionsTask = await SeparationOptions(assignmentTaskId, 
-                nullOptions, 
-                _openEndedOptionRepository);
-
-            var result = openEndedOptionsTask
-                .Concat(choiceOptionsTask)
-                .ToList();
-
-            return result;
+            throw new ArgumentException(nameof(taskOptions));
         }
     }
 

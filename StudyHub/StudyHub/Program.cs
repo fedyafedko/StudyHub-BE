@@ -8,7 +8,7 @@ using StudyHub.BLL.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddAutoMapper(typeof(AssignmentTaskProfile).Assembly, typeof(OptionsProfile).Assembly);
+builder.Services.AddAutoMapper(typeof(AssignmentTaskProfile));
 
 builder.Services.AddControllers();
 

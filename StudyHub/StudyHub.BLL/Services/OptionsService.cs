@@ -34,7 +34,6 @@ public class OptionsService : IOptionsService
                 _choiceOptionRepository);
         else
         {
-
             var nullOptions = taskOption
                 .Where(option => option.IsCorrect == null)
                 .ToList();

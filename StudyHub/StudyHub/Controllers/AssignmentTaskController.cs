@@ -16,7 +16,7 @@ public class AssignmentTaskController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> InsretTask(CreateAssignmentTaskDTO dto)
+    public async Task<IActionResult> InsertAssigmentTask(CreateAssignmentTaskDTO dto)
     {
         try
         {

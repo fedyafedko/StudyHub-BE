@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using StudyHub.BLL.Interfaces;
 using StudyHub.Common.DTO.AssignmentTask;
 using StudyHub.DAL.Repositories.Interfaces;
@@ -33,7 +34,7 @@ public class AssignmentTaskService : IAssignmentTaskService
 
         var entity = _mapper.Map<AssignmentTask>(dto);
 
-        if (_repositoryAssignment.FirstOrDefault(option => option.Id == dto.AssignmentId) == null)
+        if (await _repositoryAssignment.FirstOrDefaultAsync(assignment => assignment.Id == dto.AssignmentId) == null)
         {
             throw new Exception($"This assingment not in database with this FK: {dto.AssignmentId}");
         }

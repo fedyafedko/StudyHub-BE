@@ -9,7 +9,7 @@ public class Repository<TEntity> : IRepository<TEntity>
     where TEntity : class
 {
     private readonly ApplicationDbContext _context;
-    private readonly DbSet<TEntity> _table; 
+    private readonly DbSet<TEntity> _table;
 
     public Repository(ApplicationDbContext context)
     {

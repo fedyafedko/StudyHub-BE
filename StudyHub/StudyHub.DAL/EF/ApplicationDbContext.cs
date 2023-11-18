@@ -21,14 +21,20 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        builder.Entity<Student>()
-            .HasMany(a => a.Subjects)
-            .WithMany();
+        builder.Entity<Student>(e =>
+        {
+            e.HasKey(e => e.UserId);
 
-        builder.Entity<Teacher>()
-            .HasMany(a => a.Subjects)
-            .WithOne(a => a.Teacher)
-            .OnDelete(DeleteBehavior.NoAction);
+            e.HasMany(e => e.Subjects)
+                .WithMany();
+        });
+
+        builder.Entity<Teacher>(e =>
+        {
+            e.HasKey(e => e.UserId);
+            e.HasMany(e => e.Subjects)
+                .WithOne();
+        });
 
         base.OnModelCreating(builder);
     }

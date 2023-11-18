@@ -4,8 +4,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace StudyHub.Entities;
 public class Subject : EntityBase
 {
-    [ForeignKey(nameof(Teacher))]
+    [ForeignKey(nameof(User))]
     public Guid TeacherId { get; set; }
     public string Title { get; set; } = string.Empty;
-    public Teacher Teacher { get; set; } = null!;
+    public User User { get; set; } = null!;
 }

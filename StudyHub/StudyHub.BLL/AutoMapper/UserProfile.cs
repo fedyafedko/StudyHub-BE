@@ -3,10 +3,11 @@ using AutoMapper;
 using StudyHub.Common.DTO;
 
 namespace StudyHub.BLL.AutoMapper;
-internal class UserProfile : Profile
+public class UserProfile : Profile
 {
     public UserProfile()
     {
-        CreateMap<User, RegisterUserDTO>();
+        CreateMap<RegisterUserDTO, User>();
+        CreateMap<LoginUserDTO, User>();
     }
 }

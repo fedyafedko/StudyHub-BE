@@ -5,8 +5,12 @@ using StudyHub.DAL.Repositories;
 using StudyHub.Common.Models;
 using StudyHub.BLL.Services.Interface;
 using StudyHub.BLL.Services;
+using StudyHub.Entities;
+using Microsoft.AspNetCore.Identity;
+using StudyHub.BLL.AutoMapper;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddAutoMapper(typeof(UserProfile));
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
 builder.Services.AddControllers();
@@ -17,11 +21,14 @@ builder.Services.AddDbContext<ApplicationDbContext>(opt =>
 
 // Repository
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-builder.Services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Service
+builder.Services.AddIdentity<User, IdentityRole<Guid>>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddTokenProvider<DataProtectorTokenProvider<User>>(TokenOptions.DefaultProvider);
+
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 

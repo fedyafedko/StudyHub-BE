@@ -1,9 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
 
 namespace StudyHub.Entities;
 
-public class AssignmentTaskOptionBase : EntityBase
+public abstract class AssignmentTaskOptionBase : EntityBase
 {
     [ForeignKey(nameof(Task))]
     public Guid AssignmentTaskId { get; set; }

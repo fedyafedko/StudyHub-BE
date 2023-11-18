@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using StudyHub.DAL.EF;
 using StudyHub.DAL.Repositories.Interfaces;
-using StudyHub.Entities;
 using System.Collections;
 using System.Linq.Expressions;
 

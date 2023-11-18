@@ -3,5 +3,5 @@
 namespace StudyHub.BLL.Interfaces;
 public interface IOptionsService
 {
-    Task<List<AssignmentTaskOptionDTO>> AddOptions(Guid taskId, List<AssignmentTaskOptionDTO> taskOption);
+    Task<List<AssignmentTaskOptionDTO>> AddOptions(Guid taskId, List<CreateAssignmentTaskOptionDTO> taskOption);
 }

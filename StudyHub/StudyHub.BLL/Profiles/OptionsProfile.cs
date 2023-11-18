@@ -12,7 +12,9 @@ public class OptionsProfile : Profile
 {
     public OptionsProfile()
     {
-        CreateMap<AssignmentTaskOptionDTO, ChoiceOption>().ReverseMap();
-        CreateMap<AssignmentTaskOptionDTO, OpenEndedOption>().ReverseMap();
+        CreateMap<CreateAssignmentTaskOptionDTO, ChoiceOption>();
+        CreateMap<CreateAssignmentTaskOptionDTO, OpenEndedOption>();
+        CreateMap<ChoiceOption, AssignmentTaskOptionDTO>();
+        CreateMap<OpenEndedOption, AssignmentTaskOptionDTO>();
     }
 }

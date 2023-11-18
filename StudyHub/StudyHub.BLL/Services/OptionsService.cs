@@ -21,7 +21,7 @@ public class OptionsService : IOptionsService
         _mapper = mapper;
     }
 
-    public async Task<List<AssignmentTaskOptionDTO>> AddOptions(Guid assignmentTaskId, List<AssignmentTaskOptionDTO> taskOptions)
+    public async Task<List<AssignmentTaskOptionDTO>> AddOptions(Guid assignmentTaskId, List<CreateAssignmentTaskOptionDTO> taskOptions)
     {
         // ToDo: move this validation to validators?
         if (taskOptions.All(option => option.IsCorrect == null))
@@ -40,7 +40,7 @@ public class OptionsService : IOptionsService
 
     private async Task<List<AssignmentTaskOptionDTO>> SeparationOptions<T>(
         Guid assignmentTaskId,
-        List<AssignmentTaskOptionDTO> taskOptions,
+        List<CreateAssignmentTaskOptionDTO> taskOptions,
         IRepository<T> repository)
             where T : AssignmentTaskOptionBase
     {

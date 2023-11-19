@@ -3,8 +3,8 @@ using StudyHub.DAL.EF;
 using StudyHub.DAL.Repositories.Interfaces;
 using StudyHub.DAL.Repositories;
 using StudyHub.BLL.Profiles;
-using StudyHub.BLL.Interfaces;
 using StudyHub.BLL.Services;
+using StudyHub.BLL.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 

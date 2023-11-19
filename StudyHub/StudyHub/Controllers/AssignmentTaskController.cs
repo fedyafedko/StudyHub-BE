@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using StudyHub.BLL.Interfaces;
+using StudyHub.BLL.Services.Interfaces;
 using StudyHub.Common.DTO.AssignmentTask;
 
 namespace StudyHub.Controllers;

@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using StudyHub.BLL.Interfaces;
+using StudyHub.BLL.Services.Interfaces;
 using StudyHub.Common.DTO.AssignmentTask;
 using StudyHub.DAL.Repositories.Interfaces;
 using StudyHub.Entities;

@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using StudyHub.BLL.Interfaces;
+using StudyHub.BLL.Services.Interfaces;
 using StudyHub.Common.DTO.AssignmentTaskOption;
 using StudyHub.DAL.Repositories.Interfaces;
 using StudyHub.Entities;

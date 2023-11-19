@@ -7,10 +7,8 @@ using StudyHub.BLL.Services.Interface;
 using StudyHub.BLL.Services;
 using StudyHub.Entities;
 using Microsoft.AspNetCore.Identity;
-using StudyHub.BLL.AutoMapper;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddAutoMapper(typeof(UserProfile));
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
 builder.Services.AddControllers();
@@ -29,7 +27,6 @@ builder.Services.AddIdentity<User, IdentityRole<Guid>>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddTokenProvider<DataProtectorTokenProvider<User>>(TokenOptions.DefaultProvider);
 
-builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
 var app = builder.Build();

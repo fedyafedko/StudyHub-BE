@@ -28,9 +28,10 @@ public class AuthService : IAuthService
 
         if (existingUser == null)
             throw new KeyNotFoundException(user.Email);
-        var result = _userManager.PasswordHasher.VerifyHashedPassword(existingUser, existingUser.PasswordHash!, user.Password!);
 
-        if(result != PasswordVerificationResult.Success)
+        var result = await _userManager.CheckPasswordAsync(existingUser, user.Password!);
+
+        if(!result)
             throw new UnauthorizedAccessException(user.Email);
 
         return new AuthSuccessDTO(GenerateJwtToken(existingUser));
@@ -48,10 +49,9 @@ public class AuthService : IAuthService
         {
             Email = user.Email,
             UserName = user.Email,
-            PasswordHash = user.Password,
         };
 
-        var result = await _userManager.CreateAsync(newUser, newUser.PasswordHash!);
+        var result = await _userManager.CreateAsync(newUser, user.Password!);
         if (!result.Succeeded)
             throw new Exception("no validation");
 

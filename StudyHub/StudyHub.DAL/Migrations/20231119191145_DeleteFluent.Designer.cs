@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StudyHub.DAL.EF;
 
@@ -11,9 +12,11 @@ using StudyHub.DAL.EF;
 namespace StudyHub.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231119191145_DeleteFluent")]
+    partial class DeleteFluent
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -153,21 +156,6 @@ namespace StudyHub.DAL.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("StudentSubject", b =>
-                {
-                    b.Property<Guid>("StudentsUserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("SubjectsId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("StudentsUserId", "SubjectsId");
-
-                    b.HasIndex("SubjectsId");
-
-                    b.ToTable("StudentSubject");
-                });
-
             modelBuilder.Entity("StudyHub.Entities.Assignment", b =>
                 {
                     b.Property<Guid>("Id")
@@ -291,6 +279,9 @@ namespace StudyHub.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("StudentUserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("TeacherId")
                         .HasColumnType("uniqueidentifier");
 
@@ -299,6 +290,8 @@ namespace StudyHub.DAL.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("StudentUserId");
 
                     b.HasIndex("TeacherId");
 
@@ -472,21 +465,6 @@ namespace StudyHub.DAL.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("StudentSubject", b =>
-                {
-                    b.HasOne("StudyHub.Entities.Student", null)
-                        .WithMany()
-                        .HasForeignKey("StudentsUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("StudyHub.Entities.Subject", null)
-                        .WithMany()
-                        .HasForeignKey("SubjectsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("StudyHub.Entities.Assignment", b =>
                 {
                     b.HasOne("StudyHub.Entities.Subject", "Subject")
@@ -541,6 +519,10 @@ namespace StudyHub.DAL.Migrations
 
             modelBuilder.Entity("StudyHub.Entities.Subject", b =>
                 {
+                    b.HasOne("StudyHub.Entities.Student", null)
+                        .WithMany("Subjects")
+                        .HasForeignKey("StudentUserId");
+
                     b.HasOne("StudyHub.Entities.Teacher", "Teacher")
                         .WithMany("Subjects")
                         .HasForeignKey("TeacherId")
@@ -591,6 +573,8 @@ namespace StudyHub.DAL.Migrations
             modelBuilder.Entity("StudyHub.Entities.Student", b =>
                 {
                     b.Navigation("SelectedOptions");
+
+                    b.Navigation("Subjects");
                 });
 
             modelBuilder.Entity("StudyHub.Entities.Teacher", b =>

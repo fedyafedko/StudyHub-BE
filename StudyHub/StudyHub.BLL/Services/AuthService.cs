@@ -24,12 +24,12 @@ public class AuthService : IAuthService
 
     public async Task<AuthSuccessDTO> LoginAsync(LoginUserDTO user)
     {
-        var existingUser = await _userManager.FindByEmailAsync(user.Email!);
+        var existingUser = await _userManager.FindByEmailAsync(user.Email);
 
         if (existingUser == null)
             throw new KeyNotFoundException(user.Email);
 
-        var result = await _userManager.CheckPasswordAsync(existingUser, user.Password!);
+        var result = await _userManager.CheckPasswordAsync(existingUser, user.Password);
 
         if(!result)
             throw new UnauthorizedAccessException(user.Email);
@@ -39,8 +39,7 @@ public class AuthService : IAuthService
 
     public async Task<AuthSuccessDTO> RegisterAsync(RegisterUserDTO user)
     {
-
-        var existingUser = await _userManager.FindByEmailAsync(user.Email!);
+        var existingUser = await _userManager.FindByEmailAsync(user.Email);
 
         if (existingUser != null)
             throw new InvalidOperationException(user.Email);
@@ -51,7 +50,7 @@ public class AuthService : IAuthService
             UserName = user.Email,
         };
 
-        var result = await _userManager.CreateAsync(newUser, user.Password!);
+        var result = await _userManager.CreateAsync(newUser, user.Password);
         if (!result.Succeeded)
             throw new Exception("no validation");
 

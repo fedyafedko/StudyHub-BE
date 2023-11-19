@@ -18,24 +18,4 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
     public DbSet<StudentSelectedOption> StudentSelectedOptions { get; set; } = null!;
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
-
-    protected override void OnModelCreating(ModelBuilder builder)
-    {
-        builder.Entity<Student>(e =>
-        {
-            e.HasKey(e => e.UserId);
-
-            e.HasMany(e => e.Subjects)
-                .WithMany();
-        });
-
-        builder.Entity<Teacher>(e =>
-        {
-            e.HasKey(e => e.UserId);
-            e.HasMany(e => e.Subjects)
-                .WithOne();
-        });
-
-        base.OnModelCreating(builder);
-    }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StudyHub.DAL.EF;
 
@@ -11,9 +12,11 @@ using StudyHub.DAL.EF;
 namespace StudyHub.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231116184251_FixedTypeOf")]
+    partial class FixedTypeOf
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -155,13 +158,13 @@ namespace StudyHub.DAL.Migrations
 
             modelBuilder.Entity("StudentSubject", b =>
                 {
-                    b.Property<Guid>("StudentsUserId")
+                    b.Property<Guid>("StudentId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("SubjectsId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("StudentsUserId", "SubjectsId");
+                    b.HasKey("StudentId", "SubjectsId");
 
                     b.HasIndex("SubjectsId");
 
@@ -246,24 +249,6 @@ namespace StudyHub.DAL.Migrations
                     b.UseTphMappingStrategy();
                 });
 
-            modelBuilder.Entity("StudyHub.Entities.Student", b =>
-                {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Course")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Group")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("UserId");
-
-                    b.ToTable("Students");
-                });
-
             modelBuilder.Entity("StudyHub.Entities.StudentSelectedOption", b =>
                 {
                     b.Property<Guid>("Id")
@@ -303,20 +288,6 @@ namespace StudyHub.DAL.Migrations
                     b.HasIndex("TeacherId");
 
                     b.ToTable("Subjects");
-                });
-
-            modelBuilder.Entity("StudyHub.Entities.Teacher", b =>
-                {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Telegram")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("UserId");
-
-                    b.ToTable("Teachers");
                 });
 
             modelBuilder.Entity("StudyHub.Entities.User", b =>
@@ -421,6 +392,32 @@ namespace StudyHub.DAL.Migrations
                     b.HasDiscriminator().HasValue("Admin");
                 });
 
+            modelBuilder.Entity("StudyHub.Entities.Student", b =>
+                {
+                    b.HasBaseType("StudyHub.Entities.User");
+
+                    b.Property<string>("Course")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Group")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasDiscriminator().HasValue("Student");
+                });
+
+            modelBuilder.Entity("StudyHub.Entities.Teacher", b =>
+                {
+                    b.HasBaseType("StudyHub.Entities.User");
+
+                    b.Property<string>("Telegram")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasDiscriminator().HasValue("Teacher");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
@@ -476,7 +473,7 @@ namespace StudyHub.DAL.Migrations
                 {
                     b.HasOne("StudyHub.Entities.Student", null)
                         .WithMany()
-                        .HasForeignKey("StudentsUserId")
+                        .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -509,17 +506,6 @@ namespace StudyHub.DAL.Migrations
                     b.Navigation("Assignment");
                 });
 
-            modelBuilder.Entity("StudyHub.Entities.Student", b =>
-                {
-                    b.HasOne("StudyHub.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("StudyHub.Entities.StudentSelectedOption", b =>
                 {
                     b.HasOne("StudyHub.Entities.AssignmentTaskOptionBase", "Option")
@@ -544,21 +530,10 @@ namespace StudyHub.DAL.Migrations
                     b.HasOne("StudyHub.Entities.Teacher", "Teacher")
                         .WithMany("Subjects")
                         .HasForeignKey("TeacherId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Teacher");
-                });
-
-            modelBuilder.Entity("StudyHub.Entities.Teacher", b =>
-                {
-                    b.HasOne("StudyHub.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("StudyHub.Entities.ChoiceOption", b =>

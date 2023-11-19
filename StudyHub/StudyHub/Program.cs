@@ -5,11 +5,15 @@ using StudyHub.DAL.Repositories;
 using StudyHub.Common.Models;
 using StudyHub.BLL.Services.Interface;
 using StudyHub.BLL.Services;
+using StudyHub.BLL.Profiles;
+using StudyHub.BLL.Interfaces;
 using StudyHub.Entities;
 using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+
+builder.Services.AddAutoMapper(typeof(AssignmentTaskProfile));
 
 builder.Services.AddControllers();
 
@@ -19,15 +23,20 @@ builder.Services.AddDbContext<ApplicationDbContext>(opt =>
 
 // Repository
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
 // Service
+builder.Services.AddScoped<IAssignmentTaskService, AssignmentTaskService>();
+builder.Services.AddScoped<IOptionsService, OptionsService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+
+// Identity
 builder.Services.AddIdentity<User, IdentityRole<Guid>>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddTokenProvider<DataProtectorTokenProvider<User>>(TokenOptions.DefaultProvider);
 
-builder.Services.AddScoped<IAuthService, AuthService>();
+// Swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 

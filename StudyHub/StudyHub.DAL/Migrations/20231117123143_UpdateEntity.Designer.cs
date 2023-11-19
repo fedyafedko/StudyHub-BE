@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StudyHub.DAL.EF;
 
@@ -11,9 +12,11 @@ using StudyHub.DAL.EF;
 namespace StudyHub.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231117123143_UpdateEntity")]
+    partial class UpdateEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -155,13 +158,13 @@ namespace StudyHub.DAL.Migrations
 
             modelBuilder.Entity("StudentSubject", b =>
                 {
-                    b.Property<Guid>("StudentsUserId")
+                    b.Property<Guid>("StudentUserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("SubjectsId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("StudentsUserId", "SubjectsId");
+                    b.HasKey("StudentUserId", "SubjectsId");
 
                     b.HasIndex("SubjectsId");
 
@@ -206,7 +209,7 @@ namespace StudyHub.DAL.Migrations
                     b.Property<Guid>("AssignmentId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Label")
+                    b.Property<string>("Lable")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -249,6 +252,7 @@ namespace StudyHub.DAL.Migrations
             modelBuilder.Entity("StudyHub.Entities.Student", b =>
                 {
                     b.Property<Guid>("UserId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Course")
@@ -259,7 +263,12 @@ namespace StudyHub.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("UserId1")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("UserId");
+
+                    b.HasIndex("UserId1");
 
                     b.ToTable("Students");
                 });
@@ -294,6 +303,9 @@ namespace StudyHub.DAL.Migrations
                     b.Property<Guid>("TeacherId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("TeacherUserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -302,19 +314,27 @@ namespace StudyHub.DAL.Migrations
 
                     b.HasIndex("TeacherId");
 
+                    b.HasIndex("TeacherUserId");
+
                     b.ToTable("Subjects");
                 });
 
             modelBuilder.Entity("StudyHub.Entities.Teacher", b =>
                 {
                     b.Property<Guid>("UserId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Telegram")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("UserId1")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("UserId");
+
+                    b.HasIndex("UserId1");
 
                     b.ToTable("Teachers");
                 });
@@ -476,7 +496,7 @@ namespace StudyHub.DAL.Migrations
                 {
                     b.HasOne("StudyHub.Entities.Student", null)
                         .WithMany()
-                        .HasForeignKey("StudentsUserId")
+                        .HasForeignKey("StudentUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -513,7 +533,7 @@ namespace StudyHub.DAL.Migrations
                 {
                     b.HasOne("StudyHub.Entities.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("UserId1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -541,20 +561,24 @@ namespace StudyHub.DAL.Migrations
 
             modelBuilder.Entity("StudyHub.Entities.Subject", b =>
                 {
-                    b.HasOne("StudyHub.Entities.Teacher", "Teacher")
-                        .WithMany("Subjects")
+                    b.HasOne("StudyHub.Entities.User", "User")
+                        .WithMany()
                         .HasForeignKey("TeacherId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Teacher");
+                    b.HasOne("StudyHub.Entities.Teacher", null)
+                        .WithMany("Subjects")
+                        .HasForeignKey("TeacherUserId");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("StudyHub.Entities.Teacher", b =>
                 {
                     b.HasOne("StudyHub.Entities.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("UserId1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

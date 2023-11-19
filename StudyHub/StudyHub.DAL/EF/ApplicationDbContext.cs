@@ -18,18 +18,4 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
     public DbSet<StudentSelectedOption> StudentSelectedOptions { get; set; } = null!;
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
-
-    protected override void OnModelCreating(ModelBuilder builder)
-    {
-        builder.Entity<Student>()
-            .HasMany(a => a.Subjects)
-            .WithMany();
-
-        builder.Entity<Teacher>()
-            .HasMany(a => a.Subjects)
-            .WithOne(a => a.Teacher)
-            .OnDelete(DeleteBehavior.NoAction);
-
-        base.OnModelCreating(builder);
-    }
 }

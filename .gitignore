@@ -397,4 +397,3 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 /StudyHub/StudyHub/appsettings.Development.json
-/StudyHub/StudyHub/appsettings.develop.json

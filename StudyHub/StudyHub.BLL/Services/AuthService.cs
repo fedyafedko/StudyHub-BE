@@ -28,12 +28,12 @@ public class AuthService : IAuthService
         var existingUser = await _userManager.FindByEmailAsync(user.Email);
 
         if (existingUser == null)
-            throw new UserNotFoundException($"Unable to find user by specified email. Email: {user.Email}");
+            throw new NotFoundException($"Unable to find user by specified email. Email: {user.Email}");
 
         var result = await _userManager.CheckPasswordAsync(existingUser, user.Password);
 
         if(!result)
-            throw new UserUnauthorizationException($"User input incorrect password. Password: {user.Password}");
+            throw new InvalidCredentialsException($"User input incorrect password. Password: {user.Password}");
 
         return new AuthSuccessDTO(GenerateJwtToken(existingUser));
     }
@@ -43,7 +43,7 @@ public class AuthService : IAuthService
         var existingUser = await _userManager.FindByEmailAsync(user.Email);
 
         if (existingUser != null)
-            throw new UserNotFoundException($"User with specified email already exists. Email: {user.Email}");
+            throw new NotFoundException($"User with specified email already exists. Email: {user.Email}");
 
         var newUser = new User()
         {

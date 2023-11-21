@@ -33,10 +33,8 @@ public class AssignmentTaskService : IAssignmentTaskService
         var assignment = await _assignmentRepository.FirstOrDefaultAsync(assignment => assignment.Id == dto.AssignmentId);
 
         if (assignment == null)
-        {
-            throw new AssignmentNotFoundException($"Assignment not found in the database with this ID: {dto.AssignmentId}");
-        }
-
+            throw new NotFoundException($"Assignment not found in the database with this ID: {dto.AssignmentId}");
+        
         await _assignmentTaskRepository.InsertAsync(entity);
         var options = await _optionsService.AddOptions(entity.Id, dto.Options);
 

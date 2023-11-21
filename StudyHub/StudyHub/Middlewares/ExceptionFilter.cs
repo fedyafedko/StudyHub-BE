@@ -13,8 +13,8 @@ public class ExceptionFilter : IExceptionFilter
         {
             AssignmentNotFoundException => new NotFoundObjectResult(context.Exception.Message),
             UserManagerException => new BadRequestObjectResult(context.Exception.Message),
-            UserNotFoundException => new NotFoundObjectResult(context.Exception.Message),
-            UserUnauthorizationException => new UnauthorizedObjectResult(context.Exception.Message),
+            NotFoundException => new NotFoundObjectResult(context.Exception.Message),
+            InvalidCredentialsException => new UnauthorizedObjectResult(context.Exception.Message),
             FluentValidation.ValidationException => new BadRequestObjectResult(context.Exception.Message),
             _ => new ObjectResult(new { error = "An unexpected error occurred" })
             {

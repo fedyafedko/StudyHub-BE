@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using StudyHub.BLL.Services.Interface;
+using StudyHub.BLL.Services.Interfaces;
 using StudyHub.Common.DTO;
+using StudyHub.Common.Exceptions;
 using StudyHub.Common.Models;
 using StudyHub.Entities;
 using System.IdentityModel.Tokens.Jwt;
@@ -27,12 +28,12 @@ public class AuthService : IAuthService
         var existingUser = await _userManager.FindByEmailAsync(user.Email);
 
         if (existingUser == null)
-            throw new KeyNotFoundException(user.Email);
+            throw new UserNotFoundException($"Unable to find user by specified email. Email: {user.Email}");
 
         var result = await _userManager.CheckPasswordAsync(existingUser, user.Password);
 
         if(!result)
-            throw new UnauthorizedAccessException(user.Email);
+            throw new UserUnauthorizationException($"User input incorrect password. Password: {user.Password}");
 
         return new AuthSuccessDTO(GenerateJwtToken(existingUser));
     }
@@ -42,7 +43,7 @@ public class AuthService : IAuthService
         var existingUser = await _userManager.FindByEmailAsync(user.Email);
 
         if (existingUser != null)
-            throw new InvalidOperationException(user.Email);
+            throw new UserNotFoundException($"User with specified email already exists. Email: {user.Email}");
 
         var newUser = new User()
         {
@@ -51,8 +52,9 @@ public class AuthService : IAuthService
         };
 
         var result = await _userManager.CreateAsync(newUser, user.Password);
+
         if (!result.Succeeded)
-            throw new Exception("no validation");
+            throw new UserManagerException($"User manager operation failed:\n", result.Errors);
 
         return new AuthSuccessDTO(GenerateJwtToken(newUser));
     }

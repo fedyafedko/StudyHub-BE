@@ -2,14 +2,15 @@
 using Microsoft.EntityFrameworkCore;
 using StudyHub.BLL.Services.Interfaces;
 using StudyHub.Common.DTO.AssignmentTask;
+using StudyHub.Common.Exceptions;
 using StudyHub.DAL.Repositories.Interfaces;
 using StudyHub.Entities;
 
 namespace StudyHub.BLL.Services;
 public class AssignmentTaskService : IAssignmentTaskService
 {
-    private readonly IRepository<AssignmentTask> _repositoryAssignmentTask;
-    private readonly IRepository<Assignment> _repositoryAssignment;
+    private readonly IRepository<AssignmentTask> _assignmentTaskRepository;
+    private readonly IRepository<Assignment> _assignmentRepository;
     private readonly IOptionsService _optionsService;
     private readonly IMapper _mapper;
 
@@ -19,27 +20,24 @@ public class AssignmentTaskService : IAssignmentTaskService
         IOptionsService optionsService,
         IMapper mapper)
     {
-        _repositoryAssignmentTask = repositoryAssignmentTask;
-        _repositoryAssignment = repositoryAssignment;
+        _assignmentTaskRepository = repositoryAssignmentTask;
+        _assignmentRepository = repositoryAssignment;
         _optionsService = optionsService;
         _mapper = mapper;
     }
 
     public async Task<AssignmentTaskDTO> AddTask(CreateAssignmentTaskDTO dto)
     {   
-        if (dto.Options.Count == 0)
-        {
-            throw new Exception("No options");
-        }
-
         var entity = _mapper.Map<AssignmentTask>(dto);
 
-        if (await _repositoryAssignment.FirstOrDefaultAsync(assignment => assignment.Id == dto.AssignmentId) == null)
+        var assignment = await _assignmentRepository.FirstOrDefaultAsync(assignment => assignment.Id == dto.AssignmentId);
+
+        if (assignment == null)
         {
-            throw new Exception($"This assingment not in database with this FK: {dto.AssignmentId}");
+            throw new AssignmentNotFoundException($"Assignment not found in the database with this ID: {dto.AssignmentId}");
         }
 
-        await _repositoryAssignmentTask.InsertAsync(entity);
+        await _assignmentTaskRepository.InsertAsync(entity);
         var options = await _optionsService.AddOptions(entity.Id, dto.Options);
 
         var result = _mapper.Map<AssignmentTaskDTO>(entity);

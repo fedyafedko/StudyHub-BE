@@ -23,31 +23,23 @@ public class OptionsService : IOptionsService
 
     public async Task<List<AssignmentTaskOptionDTO>> AddOptions(Guid assignmentTaskId, List<CreateAssignmentTaskOptionDTO> taskOptions)
     {
-        // ToDo: move this validation to validators?
-        if (taskOptions.All(option => option.IsCorrect == null))
-        {
-            return await SeparationOptions(assignmentTaskId, taskOptions, _openEndedOptionRepository);
-        }
-        else if (taskOptions.All(option => option.IsCorrect != null))
-        {
-            return await SeparationOptions(assignmentTaskId, taskOptions, _choiceOptionRepository);
-        }
-        else
-        {
-            throw new ArgumentException(nameof(taskOptions));
-        }
+        return await SeparationOptions(assignmentTaskId, taskOptions);
     }
-
-    private async Task<List<AssignmentTaskOptionDTO>> SeparationOptions<T>(
+    private async Task<List<AssignmentTaskOptionDTO>> SeparationOptions(
         Guid assignmentTaskId,
-        List<CreateAssignmentTaskOptionDTO> taskOptions,
-        IRepository<T> repository)
-            where T : AssignmentTaskOptionBase
+        List<CreateAssignmentTaskOptionDTO> taskOptions)
     {
-        var options = _mapper.Map<List<T>>(taskOptions);
+        bool isOpenEnded = taskOptions.All(option => option.IsCorrect != null);
+
+        var options = isOpenEnded
+            ? _mapper.Map<List<OpenEndedOption>>(taskOptions).Cast<AssignmentTaskOptionBase>().ToList()
+            : _mapper.Map<List<ChoiceOption>>(taskOptions).Cast<AssignmentTaskOptionBase>().ToList();
+
         options.ForEach(opt => opt.AssignmentTaskId = assignmentTaskId);
 
-        await repository.InsertManyAsync(options);
+        var res = isOpenEnded
+            ? await _openEndedOptionRepository.InsertManyAsync(options.OfType<OpenEndedOption>())
+            : await _choiceOptionRepository.InsertManyAsync(options.OfType<ChoiceOption>());
 
         return _mapper.Map<List<AssignmentTaskOptionDTO>>(options);
     }

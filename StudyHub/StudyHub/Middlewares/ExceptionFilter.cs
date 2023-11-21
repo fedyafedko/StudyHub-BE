@@ -11,7 +11,6 @@ public class ExceptionFilter : IExceptionFilter
     {
         context.Result = context.Exception switch
         {
-            AssignmentNotFoundException => new NotFoundObjectResult(context.Exception.Message),
             UserManagerException => new BadRequestObjectResult(context.Exception.Message),
             NotFoundException => new NotFoundObjectResult(context.Exception.Message),
             InvalidCredentialsException => new UnauthorizedObjectResult(context.Exception.Message),

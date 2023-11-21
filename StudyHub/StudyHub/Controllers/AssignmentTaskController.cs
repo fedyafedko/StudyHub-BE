@@ -11,20 +11,20 @@ namespace StudyHub.Controllers;
 public class AssignmentTaskController : Controller
 {
     private readonly IAssignmentTaskService _serviceTask;
-    private readonly AssignmentTaskOptionValidator _optionsValidator;
+    private readonly AssignmentTaskValidator _assignmentTaskValidator;
 
     public AssignmentTaskController(
         IAssignmentTaskService serviceTask,
-        AssignmentTaskOptionValidator optionsValidator)
+        AssignmentTaskValidator assignmentTaskValidator)
     {
         _serviceTask = serviceTask;
-        _optionsValidator = optionsValidator;
+        _assignmentTaskValidator = assignmentTaskValidator;
     }
 
     [HttpPost]
     public async Task<IActionResult> InsertAssigmentTask(CreateAssignmentTaskDTO dto)
     {
-        _optionsValidator.ValidateAndThrow(dto.Options);
+        _assignmentTaskValidator.ValidateAndThrow(dto);
 
         var result = await _serviceTask.AddTask(dto);
         return Ok(result);

@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using StudyHub.BLL.Services.Interface;
+using StudyHub.BLL.Services.Interfaces;
 using StudyHub.Common.DTO;
 
 namespace StudyHub.Controllers;
@@ -18,28 +18,14 @@ public class AuthController : ControllerBase
     [HttpPost("[action]")]
     public async Task<IActionResult> Register(RegisterUserDTO userDTO)
     {
-        try
-        {
-            var result = await _authService.RegisterAsync(userDTO);
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        var result = await _authService.RegisterAsync(userDTO);
+        return Ok(result);
     }
 
     [HttpPost("[action]")]
     public async Task<IActionResult> Login(LoginUserDTO userDTO)
     {
-        try
-        {
-            var result = await _authService.LoginAsync(userDTO);
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        var result = await _authService.LoginAsync(userDTO);
+        return Ok(result);
     }
 }

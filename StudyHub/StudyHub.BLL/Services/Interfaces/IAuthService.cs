@@ -1,6 +1,6 @@
 ﻿using StudyHub.Common.DTO;
 
-namespace StudyHub.BLL.Services.Interface;
+namespace StudyHub.BLL.Services.Interfaces;
 public interface IAuthService
 {
     Task<AuthSuccessDTO> LoginAsync(LoginUserDTO user);

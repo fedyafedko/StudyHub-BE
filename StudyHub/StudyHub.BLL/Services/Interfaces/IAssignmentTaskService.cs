@@ -3,5 +3,9 @@
 namespace StudyHub.BLL.Services.Interfaces;
 public interface IAssignmentTaskService
 {
-    Task<AssignmentTaskDTO> AddTask(CreateAssignmentTaskDTO task);
+    Task<AssignmentTaskDTO> AddAssignmentTask(CreateAssignmentTaskDTO task);
+    Task<List<AssignmentTaskDTO>> GetAssignmentTask(Guid assignmentId);
+    Task<AssignmentTaskDTO> UpdateAssignmentTask(Guid assignmentTaskId, UpdateAssignmentTaskDTO dto);
+    Task<bool> DeleteAssignmentTask(Guid assignmentTaskId);
+
 }

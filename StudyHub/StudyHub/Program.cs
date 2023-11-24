@@ -40,7 +40,7 @@ builder.Services.AddIdentity<User, IdentityRole<Guid>>()
 // Validators
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
-builder.Services.AddValidatorsFromAssemblyContaining<AssignmentTaskOptionValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateAssignmentTaskOptionValidator>();
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();

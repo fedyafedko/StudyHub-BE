@@ -10,5 +10,3 @@ public class AssignmentTaskDTO
     public int Mark { get; set; }
     public List<AssignmentTaskOptionDTO> Options { get; set; } = new List<AssignmentTaskOptionDTO>();
 }
-
-

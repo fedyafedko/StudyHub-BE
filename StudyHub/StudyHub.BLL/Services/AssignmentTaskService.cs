@@ -26,10 +26,9 @@ public class AssignmentTaskService : IAssignmentTaskService
         _mapper = mapper;
     }
 
-    public async Task<AssignmentTaskDTO> AddTask(CreateAssignmentTaskDTO dto)
-    {   
+    public async Task<AssignmentTaskDTO> AddAssignmentTask(CreateAssignmentTaskDTO dto)
+    {
         var entity = _mapper.Map<AssignmentTask>(dto);
-
         var assignment = await _assignmentRepository.FirstOrDefaultAsync(assignment => assignment.Id == dto.AssignmentId);
 
         if (assignment == null)
@@ -42,5 +41,47 @@ public class AssignmentTaskService : IAssignmentTaskService
         result.Options = options;
 
         return result;
+    }
+
+    public async Task<bool> DeleteAssignmentTask(Guid assignmentTaskId)
+    {
+        var entity = await _assignmentTaskRepository
+            .Include(assignmentTask => assignmentTask.Options)
+            .FirstOrDefaultAsync(assignmentTask => assignmentTask.Id == assignmentTaskId);
+
+        if (entity == null)
+            throw new KeyNotFoundException($"Unable to find entity with such key {assignmentTaskId}");
+
+        return await _assignmentTaskRepository.DeleteAsync(entity);
+    }
+
+    public async Task<List<AssignmentTaskDTO>> GetAssignmentTask(Guid assignmentId)
+    {
+        var result = await _assignmentTaskRepository
+            .Include(assignmentTask => assignmentTask.Options)
+            .Where(assignmentTask => assignmentTask.AssignmentId == assignmentId)
+            .ToListAsync();
+
+        if (result.Count < 1)
+            throw new NotFoundException($"Unable to find entity with such key {assignmentId}");
+
+        return _mapper.Map<List<AssignmentTaskDTO>>(result);
+    }
+
+    public async Task<AssignmentTaskDTO> UpdateAssignmentTask(Guid assignmentTaskId, UpdateAssignmentTaskDTO dto)
+    {
+        var entity = await _assignmentTaskRepository
+            .Include(assignmentTask => assignmentTask.Options)
+            .FirstOrDefaultAsync(assignmentTask => assignmentTask.Id == assignmentTaskId);
+
+        if (entity == null)
+            throw new NotFoundException($"Unable to find entity with such key {assignmentTaskId}");
+
+        _mapper.Map(dto, entity);
+
+        await _assignmentTaskRepository.UpdateAsync(entity);
+        await _optionsService.UpdateApartmentTaskOption(entity.Id, dto.Options);
+
+        return _mapper.Map<AssignmentTaskDTO>(entity);
     }
 }

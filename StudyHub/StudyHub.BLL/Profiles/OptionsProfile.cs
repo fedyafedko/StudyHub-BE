@@ -1,11 +1,6 @@
 ﻿using AutoMapper;
 using StudyHub.Common.DTO.AssignmentTaskOption;
 using StudyHub.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace StudyHub.BLL.Profiles;
 public class OptionsProfile : Profile
@@ -16,5 +11,7 @@ public class OptionsProfile : Profile
         CreateMap<CreateAssignmentTaskOptionDTO, OpenEndedOption>();
         CreateMap<ChoiceOption, AssignmentTaskOptionDTO>();
         CreateMap<OpenEndedOption, AssignmentTaskOptionDTO>();
+        CreateMap<UpdateAssignmentTaskOptionDTO, ChoiceOption>();
+        CreateMap<UpdateAssignmentTaskOptionDTO, OpenEndedOption>();
     }
 }

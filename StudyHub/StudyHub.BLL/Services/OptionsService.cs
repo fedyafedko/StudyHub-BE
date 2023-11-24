@@ -29,7 +29,7 @@ public class OptionsService : IOptionsService
         return await AddSeparationOptions(assignmentTaskId, taskOptions);
     }
 
-    public async Task<List<AssignmentTaskOptionDTO>> UpdateApartmentTaskOption(Guid taskId, List<UpdateAssignmentTaskOptionDTO> dto)
+    public async Task<List<AssignmentTaskOptionDTO>> UpdateAssignmentTaskOption(Guid taskId, List<UpdateAssignmentTaskOptionDTO> dto)
     {
         return await UpdateSeparationOptions(taskId, dto);
     }
@@ -43,8 +43,8 @@ public class OptionsService : IOptionsService
         if (isOpenEnded)
         {
             var entity = _openEndedOptionRepository
-            .Where(x => x.AssignmentTaskId == assignmentTaskId)
-            .ToList();
+                .Where(x => x.AssignmentTaskId == assignmentTaskId)
+                .ToList();
 
             for (var i = 0; i < entity.Count; i++)
             {
@@ -58,8 +58,8 @@ public class OptionsService : IOptionsService
         else
         {
             var entity = _choiceOptionRepository
-            .Where(x => x.AssignmentTaskId == assignmentTaskId)
-            .ToList();
+                .Where(x => x.AssignmentTaskId == assignmentTaskId)
+                .ToList();
 
             for (var i = 0; i < entity.Count; i++)
             {

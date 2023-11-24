@@ -34,14 +34,14 @@ public class AssignmentTaskController : Controller
         return Ok(result);
     }
 
-    [HttpGet]
+    [HttpGet("{assignmentId}")]
     public async Task<IActionResult> GetAll([Required] Guid assignmentId)
     {
         var result = await _assignmentTaskService.GetAssignmentTask(assignmentId);
         return Ok(result);
     }
 
-    [HttpPut]
+    [HttpPut("{assignmentTaskId}")]
     public async Task<IActionResult> UpdateAssigmentTask(Guid assignmentTaskId, UpdateAssignmentTaskDTO dto)
     {
         _updateAssignmentTaskValidator.ValidateAndThrow(dto);
@@ -50,7 +50,7 @@ public class AssignmentTaskController : Controller
         return Ok(result);
     }
 
-    [HttpDelete]
+    [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAssignmentTask(Guid id)
     {
         return await _assignmentTaskService.DeleteAssignmentTask(id) ? Ok() : NotFound();

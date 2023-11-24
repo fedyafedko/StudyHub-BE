@@ -80,7 +80,7 @@ public class AssignmentTaskService : IAssignmentTaskService
         _mapper.Map(dto, entity);
 
         await _assignmentTaskRepository.UpdateAsync(entity);
-        await _optionsService.UpdateApartmentTaskOption(entity.Id, dto.Options);
+        await _optionsService.UpdateAssignmentTaskOption(entity.Id, dto.Options);
 
         return _mapper.Map<AssignmentTaskDTO>(entity);
     }

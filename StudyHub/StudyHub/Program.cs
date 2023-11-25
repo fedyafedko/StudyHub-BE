@@ -10,8 +10,8 @@ using StudyHub.Entities;
 using Microsoft.AspNetCore.Identity;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using StudyHub.Validators;
 using StudyHub.Middlewares;
+using StudyHub.Validators.AssignmentTaskOptionValidators;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));

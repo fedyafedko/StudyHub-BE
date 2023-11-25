@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using StudyHub.BLL.Services.Interfaces;
 using StudyHub.Common.DTO.AssignmentTask;
-using StudyHub.Validators;
+using StudyHub.Validators.AssignmentTaskValidators;
 using System.ComponentModel.DataAnnotations;
 
 namespace StudyHub.Controllers;

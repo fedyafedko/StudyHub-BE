@@ -35,14 +35,14 @@ public class AssignmentTaskController : Controller
     }
 
     [HttpGet("{assignmentId}")]
-    public async Task<IActionResult> GetAll([Required] Guid assignmentId)
+    public async Task<IActionResult> GetAll(Guid assignmentId)
     {
         var result = await _assignmentTaskService.GetAssignmentTask(assignmentId);
         return Ok(result);
     }
 
     [HttpPut("{assignmentTaskId}")]
-    public async Task<IActionResult> UpdateAssigmentTask(Guid assignmentTaskId, UpdateAssignmentTaskDTO dto)
+    public async Task<IActionResult> UpdateAssigmentTask(Guid assignmentTaskId, [FromBody] UpdateAssignmentTaskDTO dto)
     {
         _updateAssignmentTaskValidator.ValidateAndThrow(dto);
 

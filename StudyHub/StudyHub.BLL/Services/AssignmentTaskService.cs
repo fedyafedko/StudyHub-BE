@@ -62,7 +62,7 @@ public class AssignmentTaskService : IAssignmentTaskService
             .Where(assignmentTask => assignmentTask.AssignmentId == assignmentId)
             .ToListAsync();
 
-        if (result.Count < 1)
+        if (result.Count == 0)
             throw new NotFoundException($"Unable to find entity with such key {assignmentId}");
 
         return _mapper.Map<List<AssignmentTaskDTO>>(result);

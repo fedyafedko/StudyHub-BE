@@ -15,7 +15,7 @@ public class ExceptionFilter : IExceptionFilter
             NotFoundException => new NotFoundObjectResult(context.Exception.Message),
             InvalidCredentialsException => new UnauthorizedObjectResult(context.Exception.Message),
             FluentValidation.ValidationException => new BadRequestObjectResult(context.Exception.Message),
-            _ => new ObjectResult(new { error = "An unexpected error occurred" })
+            _ => new ObjectResult(new { error = $"An unexpected error occurred: {context.Exception.Message}" })
             {
                 StatusCode = (int)HttpStatusCode.InternalServerError
             }

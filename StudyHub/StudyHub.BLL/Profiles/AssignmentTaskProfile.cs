@@ -10,6 +10,9 @@ public class AssignmentTaskProfile : Profile
     public AssignmentTaskProfile()
     {
         CreateMap<AssignmentTask, AssignmentTaskDTO>();
-        CreateMap<CreateAssignmentTaskDTO, AssignmentTask>();
+        CreateMap<CreateAssignmentTaskDTO, AssignmentTask>()
+            .ForMember(dest => dest.Options, source => source.Ignore());
+        CreateMap<UpdateAssignmentTaskDTO, AssignmentTask>()
+            .ForMember(dest => dest.Options, source => source.Ignore());
     }
 }

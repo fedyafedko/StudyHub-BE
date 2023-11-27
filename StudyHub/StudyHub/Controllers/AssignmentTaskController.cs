@@ -2,7 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using StudyHub.BLL.Services.Interfaces;
 using StudyHub.Common.DTO.AssignmentTask;
-using StudyHub.Validators;
+using StudyHub.Validators.AssignmentTaskValidators;
+using System.ComponentModel.DataAnnotations;
 
 namespace StudyHub.Controllers;
 
@@ -10,23 +11,48 @@ namespace StudyHub.Controllers;
 [ApiController]
 public class AssignmentTaskController : Controller
 {
-    private readonly IAssignmentTaskService _serviceTask;
-    private readonly AssignmentTaskValidator _assignmentTaskValidator;
+    private readonly IAssignmentTaskService _assignmentTaskService;
+    private readonly CreateAssignmentTaskValidator _createAssignmentTaskValidator;
+    private readonly UpdateAssignmentTaskValidator _updateAssignmentTaskValidator;
 
     public AssignmentTaskController(
         IAssignmentTaskService serviceTask,
-        AssignmentTaskValidator assignmentTaskValidator)
+        CreateAssignmentTaskValidator createAssignmentTaskValidator,
+        UpdateAssignmentTaskValidator updateAssignmentValidator)
     {
-        _serviceTask = serviceTask;
-        _assignmentTaskValidator = assignmentTaskValidator;
+        _assignmentTaskService = serviceTask;
+        _createAssignmentTaskValidator = createAssignmentTaskValidator;
+        _updateAssignmentTaskValidator = updateAssignmentValidator;
     }
 
     [HttpPost]
     public async Task<IActionResult> InsertAssigmentTask(CreateAssignmentTaskDTO dto)
     {
-        _assignmentTaskValidator.ValidateAndThrow(dto);
+        _createAssignmentTaskValidator.ValidateAndThrow(dto);
 
-        var result = await _serviceTask.AddTask(dto);
+        var result = await _assignmentTaskService.AddAssignmentTask(dto);
         return Ok(result);
+    }
+
+    [HttpGet("{assignmentId}")]
+    public async Task<IActionResult> GetAll(Guid assignmentId)
+    {
+        var result = await _assignmentTaskService.GetAssignmentTask(assignmentId);
+        return Ok(result);
+    }
+
+    [HttpPut("{assignmentTaskId}")]
+    public async Task<IActionResult> UpdateAssigmentTask(Guid assignmentTaskId, [FromBody] UpdateAssignmentTaskDTO dto)
+    {
+        _updateAssignmentTaskValidator.ValidateAndThrow(dto);
+
+        var result = await _assignmentTaskService.UpdateAssignmentTask(assignmentTaskId, dto);
+        return Ok(result);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteAssignmentTask(Guid id)
+    {
+        return await _assignmentTaskService.DeleteAssignmentTask(id) ? Ok() : NotFound();
     }
 }

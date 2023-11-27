@@ -10,8 +10,8 @@ using StudyHub.Entities;
 using Microsoft.AspNetCore.Identity;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using StudyHub.Validators;
 using StudyHub.Middlewares;
+using StudyHub.Validators.AssignmentTaskOptionValidators;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
@@ -40,7 +40,7 @@ builder.Services.AddIdentity<User, IdentityRole<Guid>>()
 // Validators
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
-builder.Services.AddValidatorsFromAssemblyContaining<AssignmentTaskOptionValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateAssignmentTaskOptionValidator>();
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();

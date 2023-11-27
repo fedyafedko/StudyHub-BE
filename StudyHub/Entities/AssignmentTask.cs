@@ -11,4 +11,5 @@ public class AssignmentTask : EntityBase
     public string Label { get; set; } = string.Empty;
     public int Mark { get; set; }
     public Assignment Assignment { get; set; } = null!;
+    public List<AssignmentTaskOptionBase> Options { get; set; } = null!;
 }

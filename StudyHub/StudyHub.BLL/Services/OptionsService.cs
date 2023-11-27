@@ -7,29 +7,76 @@ using StudyHub.Entities;
 namespace StudyHub.BLL.Services;
 public class OptionsService : IOptionsService
 {
+    private readonly IRepository<AssignmentTaskOptionBase> _optionRepository;
     private readonly IRepository<ChoiceOption> _choiceOptionRepository;
     private readonly IRepository<OpenEndedOption> _openEndedOptionRepository;
     private readonly IMapper _mapper;
 
     public OptionsService(
+        IRepository<AssignmentTaskOptionBase> optionRepository,
         IRepository<ChoiceOption> choiceOptionsRepository,
-        IRepository<OpenEndedOption> openEndedOptionsRepository,
+        IRepository<OpenEndedOption> openEndedOptionRepository,
         IMapper mapper)
     {
+        _optionRepository = optionRepository;
         _choiceOptionRepository = choiceOptionsRepository;
-        _openEndedOptionRepository = openEndedOptionsRepository;
+        _openEndedOptionRepository = openEndedOptionRepository;
         _mapper = mapper;
     }
 
     public async Task<List<AssignmentTaskOptionDTO>> AddOptions(Guid assignmentTaskId, List<CreateAssignmentTaskOptionDTO> taskOptions)
     {
-        return await SeparationOptions(assignmentTaskId, taskOptions);
+        return await AddSeparationOptions(assignmentTaskId, taskOptions);
     }
-    private async Task<List<AssignmentTaskOptionDTO>> SeparationOptions(
+
+    public async Task<List<AssignmentTaskOptionDTO>> UpdateAssignmentTaskOption(Guid taskId, List<UpdateAssignmentTaskOptionDTO> dto)
+    {
+        return await UpdateSeparationOptions(taskId, dto);
+    }
+
+    private async Task<List<AssignmentTaskOptionDTO>> UpdateSeparationOptions(
+        Guid assignmentTaskId,
+        List<UpdateAssignmentTaskOptionDTO> taskOptions)
+    {
+        bool isOpenEnded = taskOptions.All(option => option.IsCorrect == null);
+
+        if (isOpenEnded)
+        {
+            var entity = _openEndedOptionRepository
+                .Where(x => x.AssignmentTaskId == assignmentTaskId)
+                .ToList();
+
+            for (var i = 0; i < entity.Count; i++)
+            {
+                _mapper.Map(taskOptions[i], entity[i]);
+            }
+
+            await _optionRepository.UpdateManyAsync(entity);
+
+            return _mapper.Map<List<AssignmentTaskOptionDTO>>(entity);
+        }
+        else
+        {
+            var entity = _choiceOptionRepository
+                .Where(x => x.AssignmentTaskId == assignmentTaskId)
+                .ToList();
+
+            for (var i = 0; i < entity.Count; i++)
+            {
+                _mapper.Map(taskOptions[i], entity[i]);
+            }
+
+            await _choiceOptionRepository.UpdateManyAsync(entity);
+
+            return _mapper.Map<List<AssignmentTaskOptionDTO>>(entity);
+        }
+    }
+
+    private async Task<List<AssignmentTaskOptionDTO>> AddSeparationOptions(
         Guid assignmentTaskId,
         List<CreateAssignmentTaskOptionDTO> taskOptions)
     {
-        bool isOpenEnded = taskOptions.All(option => option.IsCorrect != null);
+        bool isOpenEnded = taskOptions.All(option => option.IsCorrect == null);
 
         var options = isOpenEnded
             ? _mapper.Map<List<OpenEndedOption>>(taskOptions).Cast<AssignmentTaskOptionBase>().ToList()

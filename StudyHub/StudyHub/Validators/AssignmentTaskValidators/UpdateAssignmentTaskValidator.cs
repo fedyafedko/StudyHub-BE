@@ -10,6 +10,7 @@ public class UpdateAssignmentTaskValidator : AbstractValidator<UpdateAssignmentT
     {
         RuleFor(x => x.Label).NotEmpty();
         RuleFor(x => x.Mark).GreaterThan(0);
-        RuleFor(x => x.Options).SetValidator(new UpdateAssignmentTaskOptionValidator());
+        RuleFor(x => x.Options)
+            .SetValidator(new UpdateAssignmentTaskOptionValidator());
     }
 }

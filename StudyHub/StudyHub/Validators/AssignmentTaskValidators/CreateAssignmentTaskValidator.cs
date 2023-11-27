@@ -8,7 +8,9 @@ public class CreateAssignmentTaskValidator : AbstractValidator<CreateAssignmentT
 {
     public CreateAssignmentTaskValidator()
     {
-        RuleFor(x => x.Label).NotEmpty();
+        RuleFor(x => x.Label)
+            .NotEmpty();
+            
         RuleFor(x => x.Mark).GreaterThan(0);
         RuleFor(x => x.Options).SetValidator(new CreateAssignmentTaskOptionValidator());
     }

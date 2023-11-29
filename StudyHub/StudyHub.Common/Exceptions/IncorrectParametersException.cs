@@ -5,8 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace StudyHub.Common.Exceptions;
-public class ExpiredError : Exception
+public class IncorrectParametersException : Exception
 {
-    public ExpiredError(string? message) 
+    public IncorrectParametersException(string? message) 
         : base(message) { }
 }

@@ -16,8 +16,8 @@ public class ExceptionFilter : IExceptionFilter
             InvalidCredentialsException => new UnauthorizedObjectResult(context.Exception.Message),
             InvalidSecurityAlgorithmException => new BadRequestObjectResult(context.Exception.Message),
             TokenValidatorException => new BadRequestObjectResult(context.Exception.Message),
-            ExpiredError => new BadRequestObjectResult(context.Exception.Message),
-            IncorrectParametersError => new BadRequestObjectResult(context.Exception.Message),
+            ExpiredException => new BadRequestObjectResult(context.Exception.Message),
+            IncorrectParametersException => new BadRequestObjectResult(context.Exception.Message),
             FluentValidation.ValidationException => new BadRequestObjectResult(context.Exception.Message),
             _ => new ObjectResult(new { error = $"An unexpected error occurred: {context.Exception.Message}" })
             {

@@ -79,7 +79,7 @@ public class AuthService : IAuthService
             .AddSeconds(expiryDateUnix);
 
         if (expiryDateTimeUtc > DateTime.UtcNow)
-            throw new IncorrectParametersError("Access token is not expired yet");
+            throw new IncorrectParametersException("Access token is not expired yet");
 
         var jti = validatedToken!.Claims.Single(x => x.Type == JwtRegisteredClaimNames.Exp).Value;
 
@@ -89,10 +89,10 @@ public class AuthService : IAuthService
             throw new NotFoundException("User with this id does not exist");
 
         if (DateTimeOffset.UtcNow > user.RefreshToken.ExpiryDate)
-            throw new ExpiredError("Refresh token is expired");
+            throw new ExpiredException("Refresh token is expired");
 
         if (user.RefreshToken.Token != refreshToken)
-            throw new IncorrectParametersError("Refresh token is invalid");
+            throw new IncorrectParametersException("Refresh token is invalid");
 
         return new AuthSuccessDTO(GenerateJwtToken(user!), GenerateRefreshTokenAsync(user!));
     }

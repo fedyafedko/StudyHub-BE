@@ -7,6 +7,6 @@ using System.Threading.Tasks;
 namespace StudyHub.Common.Exceptions;
 public class ExpiredError : Exception
 {
-    public ExpiredError
-        (string? message) : base(message) { }
+    public ExpiredError(string? message) 
+        : base(message) { }
 }

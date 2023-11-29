@@ -23,17 +23,13 @@ public class AuthService : IAuthService
     private readonly Microsoft.AspNetCore.Identity.UserManager<User> _userManager;
     private readonly JwtSettings _settings;
     private readonly TokenValidationParameters _tokenValidationParametrs;
-    private readonly IRepository<RefreshToken> _repo;
-
     public AuthService(
         Microsoft.AspNetCore.Identity.UserManager<User> userManager,
         IOptions<JwtSettings> settings,
-        TokenValidationParameters tokenValidationParameters,
-        IRepository<RefreshToken> repo)
+        TokenValidationParameters tokenValidationParameters)
     {
         _userManager = userManager;
         _settings = settings.Value;
-        _repo = repo;
         _tokenValidationParametrs = tokenValidationParameters;
     }
 
@@ -75,7 +71,6 @@ public class AuthService : IAuthService
 
     public async Task<AuthSuccessDTO> RefreshTokenAsync(string accessToken, string refreshToken)
     {
-
         var validatedToken = GetPrincipalFromToken(accessToken);
 
         var expiryDateUnix = long.Parse(validatedToken!.Claims.Single(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
@@ -112,10 +107,8 @@ public class AuthService : IAuthService
             var principal = jwtTokenHandler.ValidateToken(token, validationParametrs, out var validatedToken);
 
             if (!IsJwtWithValidSecurityAlgorithm(validatedToken))
-            {
                 throw new InvalidSecurityAlgorithmException("Current token does not have right security algorithm");
-            }
-            
+
             return principal;
         }
         catch
@@ -127,8 +120,9 @@ public class AuthService : IAuthService
     private bool IsJwtWithValidSecurityAlgorithm(SecurityToken validatedToken)
     {
         return validatedToken is JwtSecurityToken jwtSecurityToken &&
-            jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256,
-            StringComparison.InvariantCultureIgnoreCase);
+            jwtSecurityToken.Header.Alg.Equals(
+                SecurityAlgorithms.HmacSha256,
+                StringComparison.InvariantCultureIgnoreCase);
     }
 
     private string GenerateJwtToken(User user)
@@ -151,7 +145,7 @@ public class AuthService : IAuthService
             Audience = _settings.Audience
         };
 
-        var token = jwtTokenHandler.CreateToken(tokenDescriptor);   
+        var token = jwtTokenHandler.CreateToken(tokenDescriptor);
         var jwtToken = jwtTokenHandler.WriteToken(token);
         return jwtToken;
     }

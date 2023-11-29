@@ -7,6 +7,6 @@ using System.Threading.Tasks;
 namespace StudyHub.Common.Exceptions;
 public class IncorrectParametersError : Exception
 {
-    public IncorrectParametersError
-        (string? message) : base(message) { }
+    public IncorrectParametersError(string? message) 
+        : base(message) { }
 }

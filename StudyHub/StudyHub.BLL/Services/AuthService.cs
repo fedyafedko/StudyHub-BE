@@ -40,9 +40,9 @@ public class AuthService : IAuthService
         if (existingUser == null)
             throw new NotFoundException($"Unable to find user by specified email. Email: {user.Email}");
 
-        var result = await _userManager.CheckPasswordAsync(existingUser, user.Password);
+        var isPasswordValid = await _userManager.CheckPasswordAsync(existingUser, user.Password);
 
-        if (!result)
+        if (!isPasswordValid)
             throw new InvalidCredentialsException($"User input incorrect password. Password: {user.Password}");
 
         return new AuthSuccessDTO(GenerateJwtToken(existingUser), GenerateRefreshTokenAsync(existingUser));
@@ -138,7 +138,7 @@ public class AuthService : IAuthService
                 new Claim(JwtRegisteredClaimNames.Email, user.Email!),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             }),
-            Expires = DateTime.UtcNow.Add(_settings.TokenLifeTime),
+            Expires = DateTime.UtcNow.Add(_settings.AccessTokenLifeTime),
             SigningCredentials =
                 new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
             Issuer = _settings.Issuer,
@@ -156,7 +156,7 @@ public class AuthService : IAuthService
             UserId = user.Id,
             Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
             CreationDate = DateTime.UtcNow,
-            ExpiryDate = DateTime.Now.AddDays(7),
+            ExpiryDate = DateTime.Now.Add(_settings.RefreshTokenLifeTime),
             Used = true,
             Invalidated = false,
         };

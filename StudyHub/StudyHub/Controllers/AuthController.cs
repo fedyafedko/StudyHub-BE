@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using StudyHub.BLL.Services.Interfaces;
-using StudyHub.Common.DTO;
+using StudyHub.Common.DTO.AuthDTO;
 
 namespace StudyHub.Controllers;
 
@@ -26,6 +26,13 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Login(LoginUserDTO userDTO)
     {
         var result = await _authService.LoginAsync(userDTO);
+        return Ok(result);
+    }
+
+    [HttpPost("[action]")]
+    public async Task<IActionResult> RefreshToken(RefreshTokenRequest request)
+    {
+        var result = await _authService.RefreshTokenAsync(request.Token, request.RefreshToken);
         return Ok(result);
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace StudyHub.Common.DTO;
+﻿namespace StudyHub.Common.DTO.AuthDTO;
 public class LoginUserDTO
 {
     public string Email { get; set; } = string.Empty;

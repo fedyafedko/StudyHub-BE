@@ -16,6 +16,7 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
     public DbSet<ChoiceOption> ChoiceAnswers { get; set; } = null!;
     public DbSet<OpenEndedOption> OpenEndedAnswers { get; set; } = null!;
     public DbSet<StudentSelectedOption> StudentSelectedOptions { get; set; } = null!;
+    public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 }

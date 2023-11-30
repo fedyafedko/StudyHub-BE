@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using RealtorAPI.Extensions;
 using StudyHub.BLL.Services.Interfaces;
 using StudyHub.Common.DTO.Subject;
 
 namespace StudyHub.Controllers;
 
-[Route("[controller]")]
+[Route("[controller]/[action]")]
 [ApiController]
 public class SubjectController : Controller
 {
@@ -21,24 +23,46 @@ public class SubjectController : Controller
         var result = await _subjectService.AddSubjectAsync(dto);
         return Ok(result);
     }
-
+    
     [HttpPut("{subjectId}")]
+    [Authorize]
     public async Task<IActionResult> UpdateSubject(Guid subjectId, UpdateSubjectDTO dto)
     {
-        var result = await _subjectService.UpdateSubjectAsync(subjectId, dto);
+        var userId = HttpContext.GetUserId();
+        var result = await _subjectService.UpdateSubjectAsync(userId, subjectId, dto);
         return Ok(result);
     }
 
     [HttpDelete("{subjectId}")]
+    [Authorize]
     public async Task<IActionResult> DeleteSubject(Guid subjectId)
     {
-        return await _subjectService.DeleteSubjectAsync(subjectId) ? Ok() : NotFound();
+        var userId = HttpContext.GetUserId();
+        return await _subjectService.DeleteSubjectAsync(userId, subjectId) ? Ok() : NotFound();
     }
 
     [HttpGet("{subjectId}")]
     public async Task<IActionResult> GetSubject(Guid subjectId)
     {
         var result = await _subjectService.GetSubjectAsync(subjectId);
+        return Ok(result);
+    }
+
+    [HttpGet]
+    [Authorize]
+    public IActionResult GetSubjectForTeacher()
+    {
+        var teacherId = HttpContext.GetUserId();
+        var result = _subjectService.GetSubjectsForTeacher(teacherId);
+        return Ok(result);
+    }
+
+    [HttpGet]
+    [Authorize]
+    public IActionResult GetSubjectForStudent()
+    {
+        var studentId = HttpContext.GetUserId();
+        var result = _subjectService.GetSubjectsForStudent(studentId);
         return Ok(result);
     }
 }

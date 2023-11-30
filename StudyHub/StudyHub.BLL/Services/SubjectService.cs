@@ -11,15 +11,18 @@ public class SubjectService : ISubjectService
 {
     private readonly IRepository<Subject> _subjectRepository;
     private readonly IRepository<Teacher> _teacherRepository;
+    private readonly IRepository<Student> _studentRepository;
     private readonly IMapper _mapper;
 
     public SubjectService(
         IRepository<Subject> subjectRepository,
         IRepository<Teacher> teacherRepository,
+        IRepository<Student> studentRepository,
         IMapper mapper)
     {
         _subjectRepository = subjectRepository;
         _teacherRepository = teacherRepository;
+        _studentRepository = studentRepository;
         _mapper = mapper;
     }
 
@@ -35,16 +38,18 @@ public class SubjectService : ISubjectService
 
         var result = _mapper.Map<SubjectDTO>(entity);
         return result;
-
     }
 
-    public async Task<bool> DeleteSubjectAsync(Guid subjectId)
+    public async Task<bool> DeleteSubjectAsync(Guid userId, Guid subjectId)
     {
         var entity = await _subjectRepository
             .FirstOrDefaultAsync(subject => subject.Id == subjectId);
 
         if (entity == null)
             throw new NotFoundException($"Unable to find entity with such key: {subjectId}");
+
+        if (entity.TeacherId != userId)
+            throw new NotOwnerException("You are not the owner and do not have permission to perform this action.");
 
         return await _subjectRepository.DeleteAsync(entity);
     }
@@ -60,13 +65,35 @@ public class SubjectService : ISubjectService
         return _mapper.Map<SubjectDTO>(entity);
     }
 
-    public async Task<SubjectDTO> UpdateSubjectAsync(Guid subjectId, UpdateSubjectDTO dto)
+    public List<SubjectDTO> GetSubjectsForStudent(Guid studentId)
+    {
+        var subjects = _mapper
+            .Map<List<SubjectDTO>>(
+            _studentRepository
+            .Where(student => student.UserId == studentId)
+            .SelectMany(student => student.Subjects));
+        return subjects.ToList();
+    }
+
+    public List<SubjectDTO> GetSubjectsForTeacher(Guid teacherId)
+    {
+        var subjects =_mapper
+            .Map<List<SubjectDTO>>(_subjectRepository
+            .Where(x => x.TeacherId == teacherId));
+
+        return subjects.ToList();
+    }
+
+    public async Task<SubjectDTO> UpdateSubjectAsync(Guid userId, Guid subjectId, UpdateSubjectDTO dto)
     {
         var entity = await _subjectRepository
             .FirstOrDefaultAsync(subject => subject.Id == subjectId);
 
         if (entity == null)
             throw new NotFoundException($"Unable to find entity with such key: {subjectId}");
+
+        if (entity.TeacherId != userId)
+            throw new NotOwnerException("You are not the owner and do not have permission to perform this action.");
 
         _mapper.Map(dto, entity);
 

@@ -6,7 +6,7 @@ using StudyHub.Common.DTO.Subject;
 
 namespace StudyHub.Controllers;
 
-[Route("[controller]/[action]")]
+[Route("[controller]")]
 [ApiController]
 public class SubjectController : Controller
 {
@@ -48,7 +48,7 @@ public class SubjectController : Controller
         return Ok(result);
     }
 
-    [HttpGet]
+    [HttpGet("teacher")]
     [Authorize]
     public IActionResult GetSubjectForTeacher()
     {
@@ -57,7 +57,7 @@ public class SubjectController : Controller
         return Ok(result);
     }
 
-    [HttpGet]
+    [HttpGet("student")]
     [Authorize]
     public IActionResult GetSubjectForStudent()
     {

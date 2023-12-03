@@ -29,7 +29,7 @@ public class SubjectService : ISubjectService
     public async Task<SubjectDTO> AddSubjectAsync(CreateSubjectDTO dto)
     {
         var entity = _mapper.Map<Subject>(dto);
-        var teacher = await _teacherRepository.FirstOrDefaultAsync(assignment => assignment.UserId == dto.TeacherId);
+        var teacher = await _teacherRepository.FirstOrDefaultAsync(teacher => teacher.UserId == dto.TeacherId);
 
         if (teacher == null)
             throw new NotFoundException($"Teacher not found in the database with this ID: {dto.TeacherId}");
@@ -49,7 +49,7 @@ public class SubjectService : ISubjectService
             throw new NotFoundException($"Unable to find entity with such key: {subjectId}");
 
         if (entity.TeacherId != userId)
-            throw new NotOwnerException("You are not the owner and do not have permission to perform this action.");
+            throw new RestrictedAccessException("You are not the owner and do not have permission to perform this action.");
 
         return await _subjectRepository.DeleteAsync(entity);
     }
@@ -68,8 +68,7 @@ public class SubjectService : ISubjectService
     public List<SubjectDTO> GetSubjectsForStudent(Guid studentId)
     {
         var subjects = _mapper
-            .Map<List<SubjectDTO>>(
-            _studentRepository
+            .Map<List<SubjectDTO>>(_studentRepository
             .Where(student => student.UserId == studentId)
             .SelectMany(student => student.Subjects));
         return subjects.ToList();
@@ -93,7 +92,7 @@ public class SubjectService : ISubjectService
             throw new NotFoundException($"Unable to find entity with such key: {subjectId}");
 
         if (entity.TeacherId != userId)
-            throw new NotOwnerException("You are not the owner and do not have permission to perform this action.");
+            throw new RestrictedAccessException("You are not the owner and do not have permission to perform this action.");
 
         _mapper.Map(dto, entity);
 

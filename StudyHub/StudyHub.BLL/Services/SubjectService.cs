@@ -69,8 +69,8 @@ public class SubjectService : ISubjectService
     {
         var subjects = _mapper
             .Map<List<SubjectDTO>>(_studentRepository
-            .Where(student => student.UserId == studentId)
-            .SelectMany(student => student.Subjects));
+                .Where(student => student.UserId == studentId)
+                .SelectMany(student => student.Subjects));
         return subjects.ToList();
     }
 
@@ -78,7 +78,7 @@ public class SubjectService : ISubjectService
     {
         var subjects =_mapper
             .Map<List<SubjectDTO>>(_subjectRepository
-            .Where(x => x.TeacherId == teacherId));
+                .Where(x => x.TeacherId == teacherId));
 
         return subjects.ToList();
     }

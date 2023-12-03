@@ -38,7 +38,7 @@ public class SubjectController : Controller
     public async Task<IActionResult> DeleteSubject(Guid subjectId)
     {
         var userId = HttpContext.GetUserId();
-        return await _subjectService.DeleteSubjectAsync(userId, subjectId) ? Ok() : NotFound();
+        return await _subjectService.DeleteSubjectAsync(userId, subjectId) ? NoContent() : NotFound();
     }
 
     [HttpGet("{subjectId}")]

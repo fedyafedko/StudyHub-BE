@@ -33,6 +33,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(opt =>
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
 // Service
+builder.Services.AddScoped<ISubjectService, SubjectService>();
 builder.Services.AddScoped<IAssignmentTaskService, AssignmentTaskService>();
 builder.Services.AddScoped<IOptionsService, OptionsService>();
 builder.Services.AddScoped<IAuthService, AuthService>();

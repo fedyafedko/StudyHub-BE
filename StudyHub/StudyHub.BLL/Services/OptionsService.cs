@@ -24,12 +24,12 @@ public class OptionsService : IOptionsService
         _mapper = mapper;
     }
 
-    public async Task<List<AssignmentTaskOptionDTO>> AddOptions(Guid assignmentTaskId, List<CreateAssignmentTaskOptionDTO> taskOptions)
+    public async Task<List<AssignmentTaskOptionDTO>> AddAssignmentTaskOptionsAsync(Guid assignmentTaskId, List<CreateAssignmentTaskOptionDTO> taskOptions)
     {
         return await AddSeparationOptions(assignmentTaskId, taskOptions);
     }
 
-    public async Task<List<AssignmentTaskOptionDTO>> UpdateAssignmentTaskOption(Guid taskId, List<UpdateAssignmentTaskOptionDTO> dto)
+    public async Task<List<AssignmentTaskOptionDTO>> UpdateAssignmentTaskOptionsAsync(Guid taskId, List<UpdateAssignmentTaskOptionDTO> dto)
     {
         return await UpdateSeparationOptions(taskId, dto);
     }

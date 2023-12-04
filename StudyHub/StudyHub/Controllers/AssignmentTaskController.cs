@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using StudyHub.BLL.Services.Interfaces;
 using StudyHub.Common.DTO.AssignmentTask;
 using StudyHub.Validators.AssignmentTaskValidators;
-using System.ComponentModel.DataAnnotations;
 
 namespace StudyHub.Controllers;
 
@@ -30,14 +29,14 @@ public class AssignmentTaskController : Controller
     {
         _createAssignmentTaskValidator.ValidateAndThrow(dto);
 
-        var result = await _assignmentTaskService.AddAssignmentTask(dto);
+        var result = await _assignmentTaskService.AddAssignmentTaskAsync(dto);
         return Ok(result);
     }
 
     [HttpGet("{assignmentId}")]
     public async Task<IActionResult> GetAll(Guid assignmentId)
     {
-        var result = await _assignmentTaskService.GetAssignmentTask(assignmentId);
+        var result = await _assignmentTaskService.GetAssignmentTaskAsync(assignmentId);
         return Ok(result);
     }
 
@@ -46,13 +45,13 @@ public class AssignmentTaskController : Controller
     {
         _updateAssignmentTaskValidator.ValidateAndThrow(dto);
 
-        var result = await _assignmentTaskService.UpdateAssignmentTask(assignmentTaskId, dto);
+        var result = await _assignmentTaskService.UpdateAssignmentTaskAsync(assignmentTaskId, dto);
         return Ok(result);
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAssignmentTask(Guid id)
     {
-        return await _assignmentTaskService.DeleteAssignmentTask(id) ? Ok() : NotFound();
+        return await _assignmentTaskService.DeleteAssignmentTaskAsync(id) ? Ok() : NotFound();
     }
 }

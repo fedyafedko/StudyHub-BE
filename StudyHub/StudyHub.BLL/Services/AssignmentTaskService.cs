@@ -26,7 +26,7 @@ public class AssignmentTaskService : IAssignmentTaskService
         _mapper = mapper;
     }
 
-    public async Task<AssignmentTaskDTO> AddAssignmentTask(CreateAssignmentTaskDTO dto)
+    public async Task<AssignmentTaskDTO> AddAssignmentTaskAsync(CreateAssignmentTaskDTO dto)
     {
         var entity = _mapper.Map<AssignmentTask>(dto);
         var assignment = await _assignmentRepository.FirstOrDefaultAsync(assignment => assignment.Id == dto.AssignmentId);
@@ -35,7 +35,7 @@ public class AssignmentTaskService : IAssignmentTaskService
             throw new NotFoundException($"Assignment not found in the database with this ID: {dto.AssignmentId}");
         
         await _assignmentTaskRepository.InsertAsync(entity);
-        var options = await _optionsService.AddOptions(entity.Id, dto.Options);
+        var options = await _optionsService.AddAssignmentTaskOptionsAsync(entity.Id, dto.Options);
 
         var result = _mapper.Map<AssignmentTaskDTO>(entity);
         result.Options = options;
@@ -43,7 +43,7 @@ public class AssignmentTaskService : IAssignmentTaskService
         return result;
     }
 
-    public async Task<bool> DeleteAssignmentTask(Guid assignmentTaskId)
+    public async Task<bool> DeleteAssignmentTaskAsync(Guid assignmentTaskId)
     {
         var entity = await _assignmentTaskRepository
             .Include(assignmentTask => assignmentTask.Options)
@@ -55,7 +55,7 @@ public class AssignmentTaskService : IAssignmentTaskService
         return await _assignmentTaskRepository.DeleteAsync(entity);
     }
 
-    public async Task<List<AssignmentTaskDTO>> GetAssignmentTask(Guid assignmentId)
+    public async Task<List<AssignmentTaskDTO>> GetAssignmentTaskAsync(Guid assignmentId)
     {
         var result = await _assignmentTaskRepository
             .Include(assignmentTask => assignmentTask.Options)
@@ -68,7 +68,7 @@ public class AssignmentTaskService : IAssignmentTaskService
         return _mapper.Map<List<AssignmentTaskDTO>>(result);
     }
 
-    public async Task<AssignmentTaskDTO> UpdateAssignmentTask(Guid assignmentTaskId, UpdateAssignmentTaskDTO dto)
+    public async Task<AssignmentTaskDTO> UpdateAssignmentTaskAsync(Guid assignmentTaskId, UpdateAssignmentTaskDTO dto)
     {
         var entity = await _assignmentTaskRepository
             .Include(assignmentTask => assignmentTask.Options)
@@ -80,7 +80,7 @@ public class AssignmentTaskService : IAssignmentTaskService
         _mapper.Map(dto, entity);
 
         await _assignmentTaskRepository.UpdateAsync(entity);
-        await _optionsService.UpdateAssignmentTaskOption(entity.Id, dto.Options);
+        await _optionsService.UpdateAssignmentTaskOptionsAsync(entity.Id, dto.Options);
 
         return _mapper.Map<AssignmentTaskDTO>(entity);
     }

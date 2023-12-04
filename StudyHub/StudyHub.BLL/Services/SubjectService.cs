@@ -67,10 +67,16 @@ public class SubjectService : ISubjectService
 
     public List<SubjectDTO> GetSubjectsForStudent(Guid studentId)
     {
+        var student =  _studentRepository
+                .Include(subject => subject.Subjects)
+                .FirstOrDefault(s => s.UserId == studentId);
+
+        if (student == null)
+            throw new NotFoundException($"Unable to find entity with such key: {studentId}");
+
         var subjects = _mapper
-            .Map<List<SubjectDTO>>(_studentRepository
-                .Where(student => student.UserId == studentId)
-                .SelectMany(student => student.Subjects));
+            .Map<List<SubjectDTO>>(student.Subjects);
+                
         return subjects.ToList();
     }
 

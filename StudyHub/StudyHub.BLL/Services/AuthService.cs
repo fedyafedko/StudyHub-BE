@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNet.Identity;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using StudyHub.BLL.Services.Interfaces;
@@ -9,8 +7,6 @@ using StudyHub.Common.Exceptions;
 using StudyHub.Common.Models;
 using StudyHub.DAL.Repositories.Interfaces;
 using StudyHub.Entities;
-using System.CodeDom;
-using System.Data.Entity;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -20,14 +16,18 @@ namespace StudyHub.BLL.Services;
 
 public class AuthService : IAuthService
 {
-    private readonly Microsoft.AspNetCore.Identity.UserManager<User> _userManager;
+    private readonly UserManager<User> _userManager;
     private readonly JwtSettings _settings;
     private readonly TokenValidationParameters _tokenValidationParametrs;
+    private readonly IRepository<InvitedUsers> _repoInvitedUsers;
+
     public AuthService(
-        Microsoft.AspNetCore.Identity.UserManager<User> userManager,
+        UserManager<User> userManager,
         IOptions<JwtSettings> settings,
-        TokenValidationParameters tokenValidationParameters)
+        TokenValidationParameters tokenValidationParameters,
+        IRepository<InvitedUsers> repoInvitedUsers)
     {
+        _repoInvitedUsers = repoInvitedUsers;
         _userManager = userManager;
         _settings = settings.Value;
         _tokenValidationParametrs = tokenValidationParameters;
@@ -45,11 +45,18 @@ public class AuthService : IAuthService
         if (!isPasswordValid)
             throw new InvalidCredentialsException($"User input incorrect password. Password: {user.Password}");
 
-        return new AuthSuccessDTO(GenerateJwtToken(existingUser), GenerateRefreshTokenAsync(existingUser));
+        return new AuthSuccessDTO(GenerateJwtToken(existingUser, (await _userManager.GetRolesAsync(existingUser)).ToArray()), GenerateRefreshTokenAsync(existingUser));
     }
 
     public async Task<AuthSuccessDTO> RegisterAsync(RegisterUserDTO user)
     {
+        var userInvited = _repoInvitedUsers.FirstOrDefault(a => a.Token == user.Token);
+        if (userInvited == null)
+            throw new NotFoundException($"You doesn't invited by this token:{user.Token}");
+
+        if(userInvited.Email != user.Email)
+            throw new IncorrectParametersException("Not correct email");
+
         var existingUser = await _userManager.FindByEmailAsync(user.Email);
 
         if (existingUser != null)
@@ -66,7 +73,29 @@ public class AuthService : IAuthService
         if (!result.Succeeded)
             throw new UserManagerException($"User manager operation failed:\n", result.Errors);
 
-        return new AuthSuccessDTO(GenerateJwtToken(newUser), GenerateRefreshTokenAsync(newUser));
+        if (userInvited.Role == "Teacher")
+        {
+            var newTeacher = new Teacher()
+            {
+                User = newUser,
+                UserId = newUser.Id,
+            };
+            var roleresult = await _userManager.AddToRoleAsync(newUser, "Teacher");
+            if (!roleresult.Succeeded)
+                throw new UserManagerException($"User manager operation failed:\n", result.Errors);
+        }
+
+        if (userInvited.Role == "Student")
+        {
+            var newStudent = new Student()
+            {
+                User = newUser,
+                UserId = newUser.Id,
+            };
+            await _userManager.AddToRoleAsync(newUser, "Student");
+        }
+
+        return new AuthSuccessDTO(GenerateJwtToken(newUser , (await _userManager.GetRolesAsync(newUser)).ToArray()), GenerateRefreshTokenAsync(newUser));
     }
 
     public async Task<AuthSuccessDTO> RefreshTokenAsync(string accessToken, string refreshToken)
@@ -94,7 +123,7 @@ public class AuthService : IAuthService
         if (user.RefreshToken.Token != refreshToken)
             throw new IncorrectParametersException("Refresh token is invalid");
 
-        return new AuthSuccessDTO(GenerateJwtToken(user!), GenerateRefreshTokenAsync(user!));
+        return new AuthSuccessDTO(GenerateJwtToken(user!, (await _userManager.GetRolesAsync(user)).ToArray()), GenerateRefreshTokenAsync(user!));
     }
 
     private ClaimsPrincipal GetPrincipalFromToken(string token)
@@ -125,19 +154,26 @@ public class AuthService : IAuthService
                 StringComparison.InvariantCultureIgnoreCase);
     }
 
-    private string GenerateJwtToken(User user)
+    private string GenerateJwtToken(User user, string[] roles)
     {
         var jwtTokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.UTF8.GetBytes(_settings.Secret);
+        var claims = new List<Claim>
+        {
+            new Claim("id", user.Id.ToString()),
+            new Claim(JwtRegisteredClaimNames.Sub, user.Email!),
+            new Claim(JwtRegisteredClaimNames.Email, user.Email!),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+        };
+
+        foreach (var role in roles)
+        {
+            claims.Add(new Claim(ClaimTypes.Role, role));
+        }
+
         var tokenDescriptor = new SecurityTokenDescriptor
         {
-            Subject = new ClaimsIdentity(new[]
-            {
-                new Claim("id", user.Id.ToString()),
-                new Claim(JwtRegisteredClaimNames.Sub, user.Email!),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email!),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-            }),
+            Subject = new ClaimsIdentity(claims),
             Expires = DateTime.UtcNow.Add(_settings.AccessTokenLifeTime),
             SigningCredentials =
                 new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),

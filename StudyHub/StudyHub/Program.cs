@@ -13,7 +13,6 @@ using FluentValidation.AspNetCore;
 using StudyHub.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.Extensions.DependencyInjection;
 using System.Text;
 using StudyHub.Validators.AssignmentTaskOptionValidators;
 using Microsoft.OpenApi.Models;
@@ -37,9 +36,11 @@ builder.Services.AddScoped<ISubjectService, SubjectService>();
 builder.Services.AddScoped<IAssignmentTaskService, AssignmentTaskService>();
 builder.Services.AddScoped<IOptionsService, OptionsService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserInvitedService, UserInvitedService>();
 
 // Identity
 builder.Services.AddIdentity<User, IdentityRole<Guid>>()
+    .AddRoles<IdentityRole<Guid>>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddTokenProvider<DataProtectorTokenProvider<User>>(TokenOptions.DefaultProvider);
 
@@ -101,6 +102,8 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
+//ApplicationDbContext.Seed(app);
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -114,5 +117,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+DBInitializer.Initialize(app);
 
 app.Run();

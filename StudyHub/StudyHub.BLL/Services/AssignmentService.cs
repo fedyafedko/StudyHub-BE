@@ -61,13 +61,13 @@ public class AssignmentService : IAssignmentService
     public async Task<List<AssignmentDTO>> GetAssignmentsBySubjectIdAsync(Guid subjectId)
     {
         var entity = await _subjectRepository
-            .Include(x => x.Assignment)
+            .Include(x => x.Assignments)
             .FirstOrDefaultAsync(x => x.Id == subjectId);
 
         if (entity == null)
             throw new NotFoundException($"Unable to find entity with such key: {subjectId}");
 
-        return _mapper.Map<List<AssignmentDTO>>(entity.Assignment);
+        return _mapper.Map<List<AssignmentDTO>>(entity.Assignments);
     }
 
     public async Task<AssignmentDTO> UpdateAssignmentAsync(Guid assignmentId, UpdateAssignmentDTO dto)

@@ -41,11 +41,4 @@ public class AssignmentController : Controller
         var result = await _assignmentService.GetAssignmentByIdAsync(assignmentId);
         return Ok(result);
     }
-
-    [HttpGet("subject/{subjectId}")]
-    public async Task<IActionResult> GetAssignmentBySubjectId(Guid subjectId)
-    {
-        var result = await _assignmentService.GetAssignmentsBySubjectIdAsync(subjectId);
-        return Ok(result);
-    }
 }

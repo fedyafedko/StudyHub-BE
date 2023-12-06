@@ -43,9 +43,6 @@ public class SubjectService : ISubjectService
     public async Task<bool> DeleteSubjectAsync(Guid userId, Guid subjectId)
     {
         var entity = await _subjectRepository
-            .Include(subject => subject.Assignment)
-                .ThenInclude(assignment => assignment.Tasks)
-                    .ThenInclude(tasks => tasks.Options)
             .FirstOrDefaultAsync(subject => subject.Id == subjectId);
 
         if (entity == null)

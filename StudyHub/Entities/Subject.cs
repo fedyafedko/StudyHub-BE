@@ -8,5 +8,5 @@ public class Subject : EntityBase
     public string Title { get; set; } = string.Empty;
     public Teacher Teacher { get; set; } = null!;
     public List<Student> Students { get; set; } = null!;
-    public List<Assignment> Assignment { get; set; } = null!;
+    public List<Assignment> Assignments { get; set; } = null!;
 }

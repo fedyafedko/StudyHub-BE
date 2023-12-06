@@ -9,8 +9,8 @@ using StudyHub.Entities;
 namespace StudyHub.BLL.Services;
 public class AssignmentService : IAssignmentService
 {
-    public readonly IRepository<Assignment> _assignmentRepository;
-    public readonly IRepository<Subject> _subjectRepository;
+    private readonly IRepository<Assignment> _assignmentRepository;
+    private readonly IRepository<Subject> _subjectRepository;
     private readonly IMapper _mapper;
 
     public AssignmentService(
@@ -39,8 +39,6 @@ public class AssignmentService : IAssignmentService
     public async Task<bool> DeleteAssignmentAsync(Guid assignmentId)
     {
         var entity = await _assignmentRepository
-            .Include(assignment => assignment.Tasks)
-                .ThenInclude(tasks => tasks.Options)
             .FirstOrDefaultAsync(x => x.Id == assignmentId);
 
         if (entity == null)

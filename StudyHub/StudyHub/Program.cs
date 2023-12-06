@@ -13,7 +13,6 @@ using FluentValidation.AspNetCore;
 using StudyHub.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.Extensions.DependencyInjection;
 using System.Text;
 using StudyHub.Validators.AssignmentTaskOptionValidators;
 using Microsoft.OpenApi.Models;
@@ -35,6 +34,7 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 // Service
 builder.Services.AddScoped<ISubjectService, SubjectService>();
 builder.Services.AddScoped<IAssignmentTaskService, AssignmentTaskService>();
+builder.Services.AddScoped<IAssignmentService, AssignmentService>();
 builder.Services.AddScoped<IOptionsService, OptionsService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 

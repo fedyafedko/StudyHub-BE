@@ -46,7 +46,6 @@ public class AssignmentTaskService : IAssignmentTaskService
     public async Task<bool> DeleteAssignmentTaskAsync(Guid assignmentTaskId)
     {
         var entity = await _assignmentTaskRepository
-            .Include(assignmentTask => assignmentTask.Options)
             .FirstOrDefaultAsync(assignmentTask => assignmentTask.Id == assignmentTaskId);
 
         if (entity == null)

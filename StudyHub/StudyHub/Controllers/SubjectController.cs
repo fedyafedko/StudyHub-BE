@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RealtorAPI.Extensions;
+using StudyHub.BLL.Services;
 using StudyHub.BLL.Services.Interfaces;
 using StudyHub.Common.DTO.Subject;
 
@@ -11,10 +12,14 @@ namespace StudyHub.Controllers;
 public class SubjectController : Controller
 {
     private readonly ISubjectService _subjectService;
+    private readonly IAssignmentService _assignmentService;
 
-    public SubjectController(ISubjectService subjectService)
+    public SubjectController(
+        ISubjectService subjectService, 
+        IAssignmentService assignmentService)
     {
         _subjectService = subjectService;
+        _assignmentService = assignmentService;
     }
 
     [HttpPost]
@@ -63,6 +68,13 @@ public class SubjectController : Controller
     {
         var studentId = HttpContext.GetUserId();
         var result = _subjectService.GetSubjectsForStudent(studentId);
+        return Ok(result);
+    }
+
+    [HttpGet("{subjectId}/assignments")]
+    public async Task<IActionResult> GetAssignmentBySubjectId(Guid subjectId)
+    {
+        var result = await _assignmentService.GetAssignmentsBySubjectIdAsync(subjectId);
         return Ok(result);
     }
 }

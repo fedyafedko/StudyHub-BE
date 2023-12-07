@@ -52,6 +52,6 @@ public class AssignmentTaskController : Controller
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAssignmentTask(Guid id)
     {
-        return await _assignmentTaskService.DeleteAssignmentTaskAsync(id) ? Ok() : NotFound();
+        return await _assignmentTaskService.DeleteAssignmentTaskAsync(id) ? NoContent() : NotFound();
     }
 }

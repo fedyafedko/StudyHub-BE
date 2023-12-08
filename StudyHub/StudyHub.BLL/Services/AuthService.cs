@@ -19,15 +19,15 @@ public class AuthService : IAuthService
     private readonly UserManager<User> _userManager;
     private readonly JwtSettings _settings;
     private readonly TokenValidationParameters _tokenValidationParametrs;
-    private readonly IRepository<InvitedUsers> _repoInvitedUsers;
+    private readonly IRepository<InvitedUsers> _invitedUserRepository;
 
     public AuthService(
         UserManager<User> userManager,
         IOptions<JwtSettings> settings,
         TokenValidationParameters tokenValidationParameters,
-        IRepository<InvitedUsers> repoInvitedUsers)
+        IRepository<InvitedUsers> invitedUserRepository)
     {
-        _repoInvitedUsers = repoInvitedUsers;
+        _invitedUserRepository = invitedUserRepository;
         _userManager = userManager;
         _settings = settings.Value;
         _tokenValidationParametrs = tokenValidationParameters;
@@ -50,12 +50,12 @@ public class AuthService : IAuthService
 
     public async Task<AuthSuccessDTO> RegisterAsync(RegisterUserDTO user)
     {
-        var userInvited = _repoInvitedUsers.FirstOrDefault(a => a.Token == user.Token);
-        if (userInvited == null)
-            throw new NotFoundException($"You doesn't invited by this token:{user.Token}");
+        var invitedUser = _invitedUserRepository.FirstOrDefault(e => e.Email == user.Email);
+        if (invitedUser == null)
+            throw new NotFoundException($"You doesn't invited by this email:{user.Email}");
 
-        if(userInvited.Email != user.Email)
-            throw new IncorrectParametersException("Not correct email");
+        if(invitedUser.Token != user.Token)
+            throw new IncorrectParametersException("Token does not exist");
 
         var existingUser = await _userManager.FindByEmailAsync(user.Email);
 
@@ -73,7 +73,7 @@ public class AuthService : IAuthService
         if (!result.Succeeded)
             throw new UserManagerException($"User manager operation failed:\n", result.Errors);
 
-        if (userInvited.Role == "Teacher")
+        if (invitedUser.Role == "Teacher")
         {
             var newTeacher = new Teacher()
             {
@@ -85,7 +85,7 @@ public class AuthService : IAuthService
                 throw new UserManagerException($"User manager operation failed:\n", result.Errors);
         }
 
-        if (userInvited.Role == "Student")
+        if (invitedUser.Role == "Student")
         {
             var newStudent = new Student()
             {

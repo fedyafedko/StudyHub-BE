@@ -8,5 +8,5 @@ using System.Threading.Tasks;
 namespace StudyHub.BLL.Services.Interfaces;
 public interface IUserInvitedService
 {
-    Task<bool> CreateRegistrationUrl(string email, string role);
+    Task CreateRegistrationUrl(string email, string role);
 }

@@ -18,19 +18,13 @@ public class UserInvitedController : Controller
     [Authorize(Roles = "Teacher, Admin")]
     public async Task<IActionResult> CreateRegistrationUrlAsync(string email)
     {
-        if (User.IsInRole("Teacher"))
+        var role = User.IsInRole("Teacher") switch
         {
-            var result = await _adminService.CreateRegistrationUrl(email, "Teacher");
-            if (result)
-                return Ok();
-        }
-        else if (User.IsInRole("Admin"))
-        {
-            var result = await _adminService.CreateRegistrationUrl(email, "Admin");
-            if (result)
-                return Ok();
-        }
+            true => "Teacher",
+            false => "Admin"
+        };
 
-        return BadRequest();
+        await _adminService.CreateRegistrationUrl(email, role);
+        return Ok();
     }
 }

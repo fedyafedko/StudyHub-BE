@@ -16,6 +16,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using StudyHub.Validators.AssignmentTaskOptionValidators;
 using Microsoft.OpenApi.Models;
+using StudyHub.Extensions;
+using StudyHub.BLL.Seeding.Behaviours;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
@@ -38,6 +40,12 @@ builder.Services.AddScoped<IOptionsService, OptionsService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserInvitedService, UserInvitedService>();
 
+// Fluent Email
+builder.Services.AddFluentEmail(builder.Configuration);
+
+// Seeding 
+builder.Services.AddSeeding();
+ 
 // Identity
 builder.Services.AddIdentity<User, IdentityRole<Guid>>()
     .AddRoles<IdentityRole<Guid>>()
@@ -102,8 +110,6 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-//ApplicationDbContext.Seed(app);
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -111,13 +117,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+await app.ApplySeedingAsync();
+
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
-DBInitializer.Initialize(app);
 
 app.Run();

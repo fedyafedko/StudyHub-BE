@@ -18,7 +18,9 @@ using StudyHub.Validators.AssignmentTaskOptionValidators;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+builder.Services.Configure<GoogleAuthConfig>(builder.Configuration.GetSection("GoogleAuth"));
 
 builder.Services.AddAutoMapper(typeof(AssignmentTaskProfile));
 
@@ -37,6 +39,8 @@ builder.Services.AddScoped<IAssignmentTaskService, AssignmentTaskService>();
 builder.Services.AddScoped<IAssignmentService, AssignmentService>();
 builder.Services.AddScoped<IOptionsService, OptionsService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
+builder.Services.AddScoped<IJwtTokenManagementService, JwtTokenManagementService>();
 
 // Identity
 builder.Services.AddIdentity<User, IdentityRole<Guid>>()
@@ -99,6 +103,13 @@ builder.Services.AddSwaggerGen(c =>
     );
 });
 
+// CORS
+builder.Services.AddCors(options => options
+    .AddDefaultPolicy(build => build
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader()));
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -109,6 +120,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors(
+    opt => opt.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 
 app.UseAuthentication();
 app.UseAuthorization();

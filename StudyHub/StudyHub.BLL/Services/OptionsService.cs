@@ -26,11 +26,13 @@ public class OptionsService : IOptionsService
 
     public async Task<List<AssignmentTaskOptionDTO>> AddAssignmentTaskOptionsAsync(Guid assignmentTaskId, List<CreateAssignmentTaskOptionDTO> taskOptions)
     {
+        // ToDo: remove unnecessary call
         return await AddSeparationOptions(assignmentTaskId, taskOptions);
     }
 
     public async Task<List<AssignmentTaskOptionDTO>> UpdateAssignmentTaskOptionsAsync(Guid taskId, List<UpdateAssignmentTaskOptionDTO> dto)
     {
+        // ToDo: remove unnecessary call
         return await UpdateSeparationOptions(taskId, dto);
     }
 

@@ -5,21 +5,22 @@ using StudyHub.Common.Exceptions;
 using StudyHub.Entities;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
 
 namespace StudyHub.BLL.Services;
 
 public class AuthService : IAuthService
 {
-    private readonly Microsoft.AspNetCore.Identity.UserManager<User> _userManager;
-    private readonly IJwtTokenManagementService _jwtTokenManagementService;
+    private readonly UserManager<User> _userManager;
+    private readonly ITokenService _tokenService;
     private readonly TokenValidationParameters _tokenValidationParametrs;
     public AuthService(
-        Microsoft.AspNetCore.Identity.UserManager<User> userManager,
-        IJwtTokenManagementService jwtTokenManagementService,
+        UserManager<User> userManager,
+        ITokenService tokenService,
         TokenValidationParameters tokenValidationParameters)
     {
         _userManager = userManager;
-        _jwtTokenManagementService = jwtTokenManagementService;
+        _tokenService = tokenService;
         _tokenValidationParametrs = tokenValidationParameters;
     }
 
@@ -36,8 +37,8 @@ public class AuthService : IAuthService
             throw new InvalidCredentialsException($"User input incorrect password. Password: {user.Password}");
 
         return new AuthSuccessDTO(
-            _jwtTokenManagementService.GenerateJwtToken(existingUser), 
-            _jwtTokenManagementService.GenerateRefreshTokenAsync(existingUser));
+            _tokenService.GenerateJwtToken(existingUser), 
+            _tokenService.GenerateRefreshTokenAsync(existingUser));
     }
 
     public async Task<AuthSuccessDTO> RegisterAsync(RegisterUserDTO user)
@@ -59,8 +60,8 @@ public class AuthService : IAuthService
             throw new UserManagerException($"User manager operation failed:\n", result.Errors);
 
         return new AuthSuccessDTO(
-            _jwtTokenManagementService.GenerateJwtToken(newUser), 
-            _jwtTokenManagementService.GenerateRefreshTokenAsync(newUser));
+            _tokenService.GenerateJwtToken(newUser), 
+            _tokenService.GenerateRefreshTokenAsync(newUser));
     }
 
     public async Task<AuthSuccessDTO> RefreshTokenAsync(string accessToken, string refreshToken)
@@ -89,8 +90,8 @@ public class AuthService : IAuthService
             throw new IncorrectParametersException("Refresh token is invalid");
 
         return new AuthSuccessDTO(
-            _jwtTokenManagementService.GenerateJwtToken(user!), 
-            _jwtTokenManagementService.GenerateRefreshTokenAsync(user!));
+            _tokenService.GenerateJwtToken(user!), 
+            _tokenService.GenerateRefreshTokenAsync(user!));
     }
 
     private ClaimsPrincipal GetPrincipalFromToken(string token)

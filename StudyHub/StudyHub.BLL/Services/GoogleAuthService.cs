@@ -14,16 +14,16 @@ namespace StudyHub.BLL.Services;
 public class GoogleAuthService : IGoogleAuthService
 {
     private readonly UserManager<User> _userManager;
-    private readonly IJwtTokenManagementService _jwtTokenManagementService;
+    private readonly ITokenService _tokenService;
     private readonly GoogleAuthConfig _googleConfig;
 
     public GoogleAuthService(
         UserManager<User> userManager,
-        IJwtTokenManagementService jwtTokenManagementService,
+        ITokenService tokenService,
         IOptions<GoogleAuthConfig> googleConfig)
     {
         _userManager = userManager;
-        _jwtTokenManagementService = jwtTokenManagementService;
+        _tokenService = tokenService;
         _googleConfig = googleConfig.Value;
     }
     public async Task<AuthSuccessDTO> GoogleLogin(string oauthToken)
@@ -36,8 +36,8 @@ public class GoogleAuthService : IGoogleAuthService
             throw new NotFoundException($"Unable to find user by specified email. Email: {user!.Email}");
 
         return new AuthSuccessDTO(
-            _jwtTokenManagementService.GenerateJwtToken(user), 
-            _jwtTokenManagementService.GenerateRefreshTokenAsync(user));
+            _tokenService.GenerateJwtToken(user), 
+            _tokenService.GenerateRefreshTokenAsync(user));
     }
 
     private async Task<GoogleJsonWebSignature.Payload> GetUserInfoAsync(string oauthToken)

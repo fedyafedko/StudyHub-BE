@@ -1,7 +1,7 @@
 ﻿using StudyHub.Entities;
 
 namespace StudyHub.BLL.Services.Interfaces;
-public interface IJwtTokenManagementService
+public interface ITokenService
 {
     string GenerateJwtToken(User user);
     string GenerateRefreshTokenAsync(User user);

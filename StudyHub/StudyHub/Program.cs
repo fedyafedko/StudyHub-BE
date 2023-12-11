@@ -40,7 +40,7 @@ builder.Services.AddScoped<IAssignmentService, AssignmentService>();
 builder.Services.AddScoped<IOptionsService, OptionsService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
-builder.Services.AddScoped<IJwtTokenManagementService, JwtTokenManagementService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 // Identity
 builder.Services.AddIdentity<User, IdentityRole<Guid>>()

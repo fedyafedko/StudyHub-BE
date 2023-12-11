@@ -4,17 +4,16 @@ using StudyHub.BLL.Services.Interfaces;
 using StudyHub.Common.Models;
 using StudyHub.Entities;
 using System.IdentityModel.Tokens.Jwt;
-using System.Runtime;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
 namespace StudyHub.BLL.Services;
-public class JwtTokenManagementService : IJwtTokenManagementService
+public class TokenService : ITokenService
 {
     private readonly JwtSettings _settings;
 
-    public JwtTokenManagementService(IOptions<JwtSettings> settings)
+    public TokenService(IOptions<JwtSettings> settings)
     {
         _settings = settings.Value;
     }

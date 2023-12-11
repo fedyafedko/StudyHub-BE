@@ -3,5 +3,5 @@
 namespace StudyHub.BLL.Services.Interfaces;
 public interface IGoogleAuthService
 {
-    Task<AuthSuccessDTO> GoogleLogin(string oauthorizationCode);
+    Task<AuthSuccessDTO> GoogleLogin(string authorizationCode);
 }

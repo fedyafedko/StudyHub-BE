@@ -15,9 +15,9 @@ public class GoogleAuthController : Controller
     }
 
     [HttpPost("sign-in")]
-    public async Task<IActionResult> GoogleSignIn([FromHeader(Name = "Authorization-Code")] string oauthorizationCode)
+    public async Task<IActionResult> GoogleSignIn([FromHeader(Name = "Authorization-Code")] string authorizationCode)
     {
-        var result = await _googleAuthService.GoogleLogin(oauthorizationCode);
+        var result = await _googleAuthService.GoogleLogin(authorizationCode);
         return Ok(result);
     } 
 }

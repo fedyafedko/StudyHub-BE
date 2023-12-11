@@ -26,9 +26,9 @@ public class GoogleAuthService : IGoogleAuthService
         _tokenService = tokenService;
         _googleConfig = googleConfig.Value;
     }
-    public async Task<AuthSuccessDTO> GoogleLogin(string oauthorizationCode)
+    public async Task<AuthSuccessDTO> GoogleLogin(string authorizationCode)
     {
-        var paylod = await GetUserInfoAsync(oauthorizationCode);
+        var paylod = await GetUserInfoAsync(authorizationCode);
 
         var user = await _userManager.FindByEmailAsync(paylod.Email);
 
@@ -40,7 +40,7 @@ public class GoogleAuthService : IGoogleAuthService
             _tokenService.GenerateRefreshTokenAsync(user));
     }
 
-    private async Task<GoogleJsonWebSignature.Payload> GetUserInfoAsync(string oauthorizationCode)
+    private async Task<GoogleJsonWebSignature.Payload> GetUserInfoAsync(string authorizationCode)
     {
         var flow = new GoogleAuthorizationCodeFlow(new GoogleAuthorizationCodeFlow.Initializer
         {
@@ -53,7 +53,7 @@ public class GoogleAuthService : IGoogleAuthService
 
         var tokenResponse = await flow.ExchangeCodeForTokenAsync(
             string.Empty,
-            oauthorizationCode,
+            authorizationCode,
             _googleConfig.RedirectUri,
             CancellationToken.None);
 

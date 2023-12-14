@@ -1,35 +1,26 @@
-﻿using Microsoft.AspNet.Identity;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.IdentityModel.Tokens;
 using StudyHub.BLL.Services.Interfaces;
 using StudyHub.Common.DTO.AuthDTO;
 using StudyHub.Common.Exceptions;
-using StudyHub.Common.Models;
-using StudyHub.DAL.Repositories.Interfaces;
 using StudyHub.Entities;
-using System.CodeDom;
-using System.Data.Entity;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
+using Microsoft.AspNetCore.Identity;
 
 namespace StudyHub.BLL.Services;
 
 public class AuthService : IAuthService
 {
-    private readonly Microsoft.AspNetCore.Identity.UserManager<User> _userManager;
-    private readonly JwtSettings _settings;
+    private readonly UserManager<User> _userManager;
+    private readonly ITokenService _tokenService;
     private readonly TokenValidationParameters _tokenValidationParametrs;
     public AuthService(
-        Microsoft.AspNetCore.Identity.UserManager<User> userManager,
-        IOptions<JwtSettings> settings,
+        UserManager<User> userManager,
+        ITokenService tokenService,
         TokenValidationParameters tokenValidationParameters)
     {
         _userManager = userManager;
-        _settings = settings.Value;
+        _tokenService = tokenService;
         _tokenValidationParametrs = tokenValidationParameters;
     }
 
@@ -45,7 +36,9 @@ public class AuthService : IAuthService
         if (!isPasswordValid)
             throw new InvalidCredentialsException($"User input incorrect password. Password: {user.Password}");
 
-        return new AuthSuccessDTO(GenerateJwtToken(existingUser), GenerateRefreshTokenAsync(existingUser));
+        return new AuthSuccessDTO(
+            _tokenService.GenerateJwtToken(existingUser), 
+            _tokenService.GenerateRefreshTokenAsync(existingUser));
     }
 
     public async Task<AuthSuccessDTO> RegisterAsync(RegisterUserDTO user)
@@ -66,7 +59,9 @@ public class AuthService : IAuthService
         if (!result.Succeeded)
             throw new UserManagerException($"User manager operation failed:\n", result.Errors);
 
-        return new AuthSuccessDTO(GenerateJwtToken(newUser), GenerateRefreshTokenAsync(newUser));
+        return new AuthSuccessDTO(
+            _tokenService.GenerateJwtToken(newUser), 
+            _tokenService.GenerateRefreshTokenAsync(newUser));
     }
 
     public async Task<AuthSuccessDTO> RefreshTokenAsync(string accessToken, string refreshToken)
@@ -94,7 +89,9 @@ public class AuthService : IAuthService
         if (user.RefreshToken.Token != refreshToken)
             throw new IncorrectParametersException("Refresh token is invalid");
 
-        return new AuthSuccessDTO(GenerateJwtToken(user!), GenerateRefreshTokenAsync(user!));
+        return new AuthSuccessDTO(
+            _tokenService.GenerateJwtToken(user!), 
+            _tokenService.GenerateRefreshTokenAsync(user!));
     }
 
     private ClaimsPrincipal GetPrincipalFromToken(string token)
@@ -123,46 +120,5 @@ public class AuthService : IAuthService
             jwtSecurityToken.Header.Alg.Equals(
                 SecurityAlgorithms.HmacSha256,
                 StringComparison.InvariantCultureIgnoreCase);
-    }
-
-    private string GenerateJwtToken(User user)
-    {
-        var jwtTokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.UTF8.GetBytes(_settings.Secret);
-        var tokenDescriptor = new SecurityTokenDescriptor
-        {
-            Subject = new ClaimsIdentity(new[]
-            {
-                new Claim("id", user.Id.ToString()),
-                new Claim(JwtRegisteredClaimNames.Sub, user.Email!),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email!),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-            }),
-            Expires = DateTime.UtcNow.Add(_settings.AccessTokenLifeTime),
-            SigningCredentials =
-                new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
-            Issuer = _settings.Issuer,
-            Audience = _settings.Audience
-        };
-
-        var token = jwtTokenHandler.CreateToken(tokenDescriptor);
-        var jwtToken = jwtTokenHandler.WriteToken(token);
-        return jwtToken;
-    }
-    private string GenerateRefreshTokenAsync(User user)
-    {
-        var refreshToken = new RefreshToken
-        {
-            UserId = user.Id,
-            Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
-            CreationDate = DateTime.UtcNow,
-            ExpiryDate = DateTime.Now.Add(_settings.RefreshTokenLifeTime),
-            Used = true,
-            Invalidated = false,
-        };
-
-        user.RefreshToken = refreshToken;
-
-        return user.RefreshToken.Token;
     }
 }

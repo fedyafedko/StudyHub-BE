@@ -79,10 +79,7 @@ public class AuthService : IAuthService
             {
                 User = newUser,
                 UserId = newUser.Id,
-            };
-            var roleresult = await _userManager.AddToRoleAsync(newUser, "Teacher");
-            if (!roleresult.Succeeded)
-                throw new UserManagerException($"User manager operation failed:\n", result.Errors);
+            };  
         }
 
         if (invitedUser.Role == "Student")
@@ -92,8 +89,12 @@ public class AuthService : IAuthService
                 User = newUser,
                 UserId = newUser.Id,
             };
-            await _userManager.AddToRoleAsync(newUser, "Student");
         }
+
+        var roleresult = await _userManager.AddToRoleAsync(newUser, invitedUser.Role);
+
+        if (!roleresult.Succeeded)
+            throw new UserManagerException($"User manager operation failed:\n", result.Errors);
 
         return new AuthSuccessDTO(GenerateJwtToken(newUser , (await _userManager.GetRolesAsync(newUser)).ToArray()), GenerateRefreshTokenAsync(newUser));
     }

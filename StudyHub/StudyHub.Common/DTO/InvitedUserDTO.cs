@@ -1,4 +1,5 @@
 ﻿namespace StudyHub.Common.DTO;
+
 public class InvitedUserDTO
 {
     public string Email { get; set; } = string.Empty;

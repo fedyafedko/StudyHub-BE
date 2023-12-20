@@ -1,36 +1,33 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using StudyHub.BLL.Services.Interfaces;
 using StudyHub.Common.DTO.AuthDTO;
 using StudyHub.Common.Exceptions;
-using StudyHub.Common.Models;
 using StudyHub.DAL.Repositories.Interfaces;
 using StudyHub.Entities;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace StudyHub.BLL.Services;
 
 public class AuthService : IAuthService
 {
     private readonly UserManager<User> _userManager;
-    private readonly JwtSettings _settings;
-    private readonly TokenValidationParameters _tokenValidationParametrs;
-    private readonly IRepository<InvitedUsers> _invitedUserRepository;
+    private readonly ITokenService _tokenService;
+    private readonly IRepository<InvitedUser> _invitedUserRepository;
+    private readonly IRepository<Teacher> _teacherRepository;
+    private readonly IRepository<Student> _studentRepository;
 
     public AuthService(
         UserManager<User> userManager,
-        IOptions<JwtSettings> settings,
-        TokenValidationParameters tokenValidationParameters,
-        IRepository<InvitedUsers> invitedUserRepository)
+        ITokenService tokenService,
+        IRepository<InvitedUser> invitedUserRepository,
+        IRepository<Teacher> teacherRepository,
+        IRepository<Student> studentRepository)
     {
         _invitedUserRepository = invitedUserRepository;
         _userManager = userManager;
-        _settings = settings.Value;
-        _tokenValidationParametrs = tokenValidationParameters;
+        _tokenService = tokenService;
+        _teacherRepository = teacherRepository;
+        _studentRepository = studentRepository;
     }
 
     public async Task<AuthSuccessDTO> LoginAsync(LoginUserDTO user)
@@ -45,7 +42,8 @@ public class AuthService : IAuthService
         if (!isPasswordValid)
             throw new InvalidCredentialsException($"User input incorrect password. Password: {user.Password}");
 
-        return new AuthSuccessDTO(GenerateJwtToken(existingUser, (await _userManager.GetRolesAsync(existingUser)).ToArray()), GenerateRefreshTokenAsync(existingUser));
+        return new AuthSuccessDTO(_tokenService.GenerateJwtToken(existingUser, (await _userManager.GetRolesAsync(existingUser)).ToArray()),
+            _tokenService.GenerateRefreshTokenAsync(existingUser));
     }
 
     public async Task<AuthSuccessDTO> RegisterAsync(RegisterUserDTO user)
@@ -72,7 +70,6 @@ public class AuthService : IAuthService
 
         if (!result.Succeeded)
             throw new UserManagerException($"User manager operation failed:\n", result.Errors);
-
         if (invitedUser.Role == "Teacher")
         {
             var newTeacher = new Teacher()
@@ -80,6 +77,7 @@ public class AuthService : IAuthService
                 User = newUser,
                 UserId = newUser.Id,
             };  
+            await _teacherRepository.InsertAsync(newTeacher);
         }
 
         if (invitedUser.Role == "Student")
@@ -89,6 +87,7 @@ public class AuthService : IAuthService
                 User = newUser,
                 UserId = newUser.Id,
             };
+            await _studentRepository.InsertAsync(newStudent);
         }
 
         var roleresult = await _userManager.AddToRoleAsync(newUser, invitedUser.Role);
@@ -96,12 +95,13 @@ public class AuthService : IAuthService
         if (!roleresult.Succeeded)
             throw new UserManagerException($"User manager operation failed:\n", result.Errors);
 
-        return new AuthSuccessDTO(GenerateJwtToken(newUser , (await _userManager.GetRolesAsync(newUser)).ToArray()), GenerateRefreshTokenAsync(newUser));
+        return new AuthSuccessDTO(_tokenService.GenerateJwtToken(newUser , (await _userManager.GetRolesAsync(newUser)).ToArray()), 
+            _tokenService.GenerateRefreshTokenAsync(newUser));
     }
 
     public async Task<AuthSuccessDTO> RefreshTokenAsync(string accessToken, string refreshToken)
     {
-        var validatedToken = GetPrincipalFromToken(accessToken);
+        var validatedToken = _tokenService.GetPrincipalFromToken(accessToken);
 
         var expiryDateUnix = long.Parse(validatedToken!.Claims.Single(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
 
@@ -124,82 +124,7 @@ public class AuthService : IAuthService
         if (user.RefreshToken.Token != refreshToken)
             throw new IncorrectParametersException("Refresh token is invalid");
 
-        return new AuthSuccessDTO(GenerateJwtToken(user!, (await _userManager.GetRolesAsync(user)).ToArray()), GenerateRefreshTokenAsync(user!));
-    }
-
-    private ClaimsPrincipal GetPrincipalFromToken(string token)
-    {
-        var jwtTokenHandler = new JwtSecurityTokenHandler();
-        var validationParametrs = _tokenValidationParametrs.Clone();
-        validationParametrs.ValidateLifetime = false;
-        try
-        {
-            var principal = jwtTokenHandler.ValidateToken(token, validationParametrs, out var validatedToken);
-
-            if (!IsJwtWithValidSecurityAlgorithm(validatedToken))
-                throw new InvalidSecurityAlgorithmException("Current token does not have right security algorithm");
-
-            return principal;
-        }
-        catch
-        {
-            throw new TokenValidatorException("Something went wrong with token validator");
-        }
-    }
-
-    private bool IsJwtWithValidSecurityAlgorithm(SecurityToken validatedToken)
-    {
-        return validatedToken is JwtSecurityToken jwtSecurityToken &&
-            jwtSecurityToken.Header.Alg.Equals(
-                SecurityAlgorithms.HmacSha256,
-                StringComparison.InvariantCultureIgnoreCase);
-    }
-
-    private string GenerateJwtToken(User user, string[] roles)
-    {
-        var jwtTokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.UTF8.GetBytes(_settings.Secret);
-        var claims = new List<Claim>
-        {
-            new Claim("id", user.Id.ToString()),
-            new Claim(JwtRegisteredClaimNames.Sub, user.Email!),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email!),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        };
-
-        foreach (var role in roles)
-        {
-            claims.Add(new Claim(ClaimTypes.Role, role));
-        }
-
-        var tokenDescriptor = new SecurityTokenDescriptor
-        {
-            Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.Add(_settings.AccessTokenLifeTime),
-            SigningCredentials =
-                new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
-            Issuer = _settings.Issuer,
-            Audience = _settings.Audience
-        };
-
-        var token = jwtTokenHandler.CreateToken(tokenDescriptor);
-        var jwtToken = jwtTokenHandler.WriteToken(token);
-        return jwtToken;
-    }
-    private string GenerateRefreshTokenAsync(User user)
-    {
-        var refreshToken = new RefreshToken
-        {
-            UserId = user.Id,
-            Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
-            CreationDate = DateTime.UtcNow,
-            ExpiryDate = DateTime.Now.Add(_settings.RefreshTokenLifeTime),
-            Used = true,
-            Invalidated = false,
-        };
-
-        user.RefreshToken = refreshToken;
-
-        return user.RefreshToken.Token;
+        return new AuthSuccessDTO(_tokenService.GenerateJwtToken(user!, (await _userManager.GetRolesAsync(user)).ToArray()), 
+            _tokenService.GenerateRefreshTokenAsync(user!));
     }
 }

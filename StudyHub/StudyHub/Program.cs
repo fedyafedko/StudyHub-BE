@@ -17,10 +17,15 @@ using System.Text;
 using StudyHub.Validators.AssignmentTaskOptionValidators;
 using Microsoft.OpenApi.Models;
 using StudyHub.Extensions;
-using StudyHub.BLL.Seeding.Behaviours;
+using StudyHub.FluentEmail;
+using StudyHub.Common.DTO;
+using StudyHub.FluentEmail.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
+
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+builder.Services.Configure<GoogleAuthConfig>(builder.Configuration.GetSection("GoogleAuth"));
+builder.Services.Configure<MessageSettings>(builder.Configuration.GetSection("EmailSettings"));
 
 builder.Services.AddAutoMapper(typeof(AssignmentTaskProfile));
 
@@ -36,9 +41,13 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 // Service
 builder.Services.AddScoped<ISubjectService, SubjectService>();
 builder.Services.AddScoped<IAssignmentTaskService, AssignmentTaskService>();
+builder.Services.AddScoped<IAssignmentService, AssignmentService>();
 builder.Services.AddScoped<IOptionsService, OptionsService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserInvitedService, UserInvitedService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 // Fluent Email
 builder.Services.AddFluentEmail(builder.Configuration);
@@ -108,6 +117,13 @@ builder.Services.AddSwaggerGen(c =>
     );
 });
 
+// CORS
+builder.Services.AddCors(options => options
+    .AddDefaultPolicy(build => build
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader()));
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -120,6 +136,8 @@ if (app.Environment.IsDevelopment())
 await app.ApplySeedingAsync();
 
 app.UseHttpsRedirection();
+app.UseCors(
+    opt => opt.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 
 app.UseAuthentication();
 app.UseAuthorization();

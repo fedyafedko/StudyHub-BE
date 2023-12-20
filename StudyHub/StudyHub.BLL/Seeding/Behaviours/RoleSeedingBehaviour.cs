@@ -2,6 +2,7 @@
 using StudyHub.BLL.Seeding.Interfaces;
 
 namespace StudyHub.BLL.Seeding.Behaviours;
+
 public class RoleSeedingBehaviour : ISeedingBehaviour
 {
 

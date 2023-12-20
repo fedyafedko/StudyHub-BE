@@ -6,25 +6,26 @@ using StudyHub.Common.Exceptions;
 using StudyHub.Common.Models;
 using StudyHub.DAL.Repositories.Interfaces;
 using StudyHub.Entities;
+using StudyHub.FluentEmail.Interfaces;
 using System.Security.Cryptography;
 
 namespace StudyHub.BLL.Services;
 
 public class UserInvitedService : IUserInvitedService
 {
-    private readonly IRepository<InvitedUsers> _invitedUserRepository;
-    private readonly IFluentEmail _fluentEmail;
+    private readonly IRepository<InvitedUser> _invitedUserRepository;
     private readonly IMapper _mapper;
-    private static readonly IReadOnlyList<string> Roles = new List<string>
+    private readonly IEmailService _emailService;
+    private readonly IReadOnlyList<string> Roles = new List<string>
     {
         "Admin",
         "Student",
         "Teacher"
     }.AsReadOnly();
 
-    public UserInvitedService(IRepository<InvitedUsers> invitedUserRepository, IMapper mapper, IFluentEmail fluentEmail)
+    public UserInvitedService(IRepository<InvitedUser> invitedUserRepository, IMapper mapper, IEmailService emailService)
     {
-        _fluentEmail = fluentEmail;
+        _emailService = emailService;
         _invitedUserRepository = invitedUserRepository;
         _mapper = mapper;
     }
@@ -40,12 +41,13 @@ public class UserInvitedService : IUserInvitedService
             Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
             Role = role
         };
-        var sendMessage = await SendInvintationToEmailAsync(registration);
+
+        var sendMessage = await _emailService.Send(registration);
 
         if (!sendMessage)
             throw new Exception("Something went wrong, invintation was not sent");
 
-        var result = _mapper.Map<InvitedUsers>(registration);
+        var result = _mapper.Map<InvitedUser>(registration);
 
         await _invitedUserRepository.InsertAsync(result);
     }
@@ -61,31 +63,14 @@ public class UserInvitedService : IUserInvitedService
                 Role = "Student"
             };
 
-            var sendMessage = await SendInvintationToEmailAsync(registration);
+            var sendMessage = await _emailService.Send(registration);
 
             if (!sendMessage)
                 throw new Exception("Something went wrong, invintation was not sent");
 
-            var result = _mapper.Map<InvitedUsers>(registration);
+            var result = _mapper.Map<InvitedUser>(registration);
 
             await _invitedUserRepository.InsertAsync(result);
         }
-    }
-
-    public async Task<bool> SendInvintationToEmailAsync( InvitedUserDTO invitedUserDTO)
-    {
-        var messageBuilder = new EmailMessageBuilder();
-
-        string emailBody = messageBuilder.BuildInvitationEmail(invitedUserDTO);
-
-        var sendEmail = await _fluentEmail
-             .To(invitedUserDTO.Email)
-             .Subject("Invitation")
-             .Body(emailBody)
-             .SendAsync();
-
-        _fluentEmail.Data.ToAddresses.Clear();
-
-        return sendEmail.Successful;
     }
 }

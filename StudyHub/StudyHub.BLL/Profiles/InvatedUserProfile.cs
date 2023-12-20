@@ -8,6 +8,6 @@ public class InvatedUserProfile : Profile
 {
     public InvatedUserProfile() 
     {
-        CreateMap<InvitedUserDTO, InvitedUsers>();
+        CreateMap<InvitedUserDTO, InvitedUser>();
     }
 }

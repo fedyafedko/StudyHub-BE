@@ -248,7 +248,7 @@ namespace StudyHub.DAL.Migrations
                     b.UseTphMappingStrategy();
                 });
 
-            modelBuilder.Entity("StudyHub.Entities.InvitedUsers", b =>
+            modelBuilder.Entity("StudyHub.Entities.InvitedUser", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -524,7 +524,7 @@ namespace StudyHub.DAL.Migrations
             modelBuilder.Entity("StudyHub.Entities.Assignment", b =>
                 {
                     b.HasOne("StudyHub.Entities.Subject", "Subject")
-                        .WithMany()
+                        .WithMany("Assignments")
                         .HasForeignKey("SubjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -630,6 +630,11 @@ namespace StudyHub.DAL.Migrations
             modelBuilder.Entity("StudyHub.Entities.Student", b =>
                 {
                     b.Navigation("SelectedOptions");
+                });
+
+            modelBuilder.Entity("StudyHub.Entities.Subject", b =>
+                {
+                    b.Navigation("Assignments");
                 });
 
             modelBuilder.Entity("StudyHub.Entities.Teacher", b =>

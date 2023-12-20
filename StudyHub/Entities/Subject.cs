@@ -1,7 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace StudyHub.Entities;
+
 public class Subject : EntityBase
 {
     [ForeignKey(nameof(Teacher))]
@@ -9,4 +9,5 @@ public class Subject : EntityBase
     public string Title { get; set; } = string.Empty;
     public Teacher Teacher { get; set; } = null!;
     public List<Student> Students { get; set; } = null!;
+    public List<Assignment> Assignments { get; set; } = null!;
 }

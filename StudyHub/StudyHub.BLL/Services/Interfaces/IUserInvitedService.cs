@@ -5,5 +5,4 @@ public interface IUserInvitedService
 {
     Task InviteStudentsAsync(InviteStudentsRequest inviteStudentsRequest);
     Task InviteAsync(string email, string role);
-    Task<bool> SendInvintationToEmailAsync(InvitedUserDTO invitedUserDTO);
 }

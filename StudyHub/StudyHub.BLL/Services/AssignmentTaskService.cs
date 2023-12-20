@@ -7,6 +7,7 @@ using StudyHub.DAL.Repositories.Interfaces;
 using StudyHub.Entities;
 
 namespace StudyHub.BLL.Services;
+
 public class AssignmentTaskService : IAssignmentTaskService
 {
     private readonly IRepository<AssignmentTask> _assignmentTaskRepository;
@@ -46,7 +47,6 @@ public class AssignmentTaskService : IAssignmentTaskService
     public async Task<bool> DeleteAssignmentTaskAsync(Guid assignmentTaskId)
     {
         var entity = await _assignmentTaskRepository
-            .Include(assignmentTask => assignmentTask.Options)
             .FirstOrDefaultAsync(assignmentTask => assignmentTask.Id == assignmentTaskId);
 
         if (entity == null)

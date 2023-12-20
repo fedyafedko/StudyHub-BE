@@ -90,9 +90,9 @@ public class AuthService : IAuthService
             await _studentRepository.InsertAsync(newStudent);
         }
 
-        var roleresult = await _userManager.AddToRoleAsync(newUser, invitedUser.Role);
+        var addRoleResult = await _userManager.AddToRoleAsync(newUser, invitedUser.Role);
 
-        if (!roleresult.Succeeded)
+        if (!addRoleResult.Succeeded)
             throw new UserManagerException($"User manager operation failed:\n", result.Errors);
 
         return new AuthSuccessDTO(_tokenService.GenerateJwtToken(newUser , (await _userManager.GetRolesAsync(newUser)).ToArray()), 

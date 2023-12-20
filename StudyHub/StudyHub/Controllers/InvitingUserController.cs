@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using RealtorAPI.Extensions;
 using StudyHub.BLL.Services.Interfaces;
 using StudyHub.Common.DTO;
 
@@ -10,10 +9,10 @@ namespace StudyHub.Controllers;
 [Route("[controller]")]
 public class InvitingUserController : Controller
 {
-    private readonly IUserInvitedService _userInvitingService;
-    public InvitingUserController(IUserInvitedService adminService)
+    private readonly IUserInvitingService _userInvitingService;
+    public InvitingUserController(IUserInvitingService userInvitingService)
     {
-        _userInvitingService = adminService;
+        _userInvitingService = userInvitingService;
     }
 
     [HttpPost("Teacher")]

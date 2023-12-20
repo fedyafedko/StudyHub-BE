@@ -46,7 +46,7 @@ builder.Services.AddScoped<IOptionsService, OptionsService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
-builder.Services.AddScoped<IUserInvitedService, UserInvitedService>();
+builder.Services.AddScoped<IUserInvitingService, UserInvitedService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 
 // Fluent Email

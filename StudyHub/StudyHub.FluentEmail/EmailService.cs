@@ -24,7 +24,7 @@ public class EmailService : IEmailService
         var sendEmail = await _fluentEmail
               .To(invitedUserDTO.Email)
               .Subject("Invitation")
-              .UsingTemplateFromFile(_messageSettings.MessagePath, new{ invitedUserDTO.Email, invitedUserDTO.Role, Url = url })
+              .UsingTemplateFromFile($"{Directory.GetCurrentDirectory()}.FluentEmail//{_messageSettings.MessagePath}", new{ invitedUserDTO.Email, invitedUserDTO.Role, Url = url })
               .SendAsync();
 
         _fluentEmail.Data.ToAddresses.Clear();

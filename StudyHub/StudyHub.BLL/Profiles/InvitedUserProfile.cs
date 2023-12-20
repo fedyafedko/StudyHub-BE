@@ -4,9 +4,9 @@ using StudyHub.Entities;
 
 namespace StudyHub.BLL.Profiles;
 
-public class InvatedUserProfile : Profile
+public class InvitedUserProfile : Profile
 {
-    public InvatedUserProfile() 
+    public InvitedUserProfile() 
     {
         CreateMap<InvitedUserDTO, InvitedUser>();
     }

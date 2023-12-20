@@ -1,9 +1,7 @@
 ﻿using AutoMapper;
-using FluentEmail.Core;
 using StudyHub.BLL.Services.Interfaces;
 using StudyHub.Common.DTO;
 using StudyHub.Common.Exceptions;
-using StudyHub.Common.Models;
 using StudyHub.DAL.Repositories.Interfaces;
 using StudyHub.Entities;
 using StudyHub.FluentEmail.Interfaces;
@@ -11,7 +9,7 @@ using System.Security.Cryptography;
 
 namespace StudyHub.BLL.Services;
 
-public class UserInvitedService : IUserInvitedService
+public class UserInvitedService : IUserInvitingService
 {
     private readonly IRepository<InvitedUser> _invitedUserRepository;
     private readonly IMapper _mapper;

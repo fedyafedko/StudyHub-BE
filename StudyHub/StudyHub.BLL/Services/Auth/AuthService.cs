@@ -7,6 +7,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using StudyHub.BLL.Services.Interfaces.Auth;
 using AutoMapper;
+using StudyHub.DAL.Repositories.Interfaces;
 
 namespace StudyHub.BLL.Services.Auth;
 
@@ -15,15 +16,18 @@ public class AuthService : IAuthService
 {
     protected readonly UserManager<User> _userManager;
     protected readonly ITokenService _tokenService;
+    private readonly IRepository<InvitedUser> _invitedUserRepository;
     protected readonly IMapper _mapper;
 
     public AuthService(
         UserManager<User> userManager,
         ITokenService tokenService,
+        IRepository<InvitedUser> invitedUserRepository,
         IMapper mapper)
     {
         _userManager = userManager;
         _tokenService = tokenService;
+        _invitedUserRepository = invitedUserRepository;
         _mapper = mapper;
     }
 
@@ -42,6 +46,12 @@ public class AuthService : IAuthService
 
     public async Task<AuthSuccessDTO> RegisterAsync(RegisterUserDTO dto)
     {
+        var invitedUser = _invitedUserRepository.FirstOrDefault(e => e.Email == dto.Email)
+            ?? throw new NotFoundException($"User with this email wasn't invited: {dto.Email}");
+
+        if (invitedUser.Token != dto.Token)
+            throw new IncorrectParametersException("Passed token isn't valid.");
+
         var user = await _userManager.FindByEmailAsync(dto.Email);
 
         if (user != null)
@@ -52,6 +62,15 @@ public class AuthService : IAuthService
         var result = await _userManager.CreateAsync(user, dto.Password);
 
         if (!result.Succeeded)
+            throw new UserManagerException($"User manager operation failed:\n", result.Errors);
+
+        var role = invitedUser.Role;
+
+        var currentUser = await _userManager.FindByIdAsync(user.Id.ToString());
+
+        var roleResult = await _userManager.AddToRoleAsync(user, role);
+
+        if (!roleResult.Succeeded)
             throw new UserManagerException($"User manager operation failed:\n", result.Errors);
 
         return await GetAuthTokensAsync(user);

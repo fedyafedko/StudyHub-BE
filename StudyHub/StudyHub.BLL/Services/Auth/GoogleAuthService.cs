@@ -9,6 +9,7 @@ using StudyHub.Common.Models;
 using Microsoft.Extensions.Options;
 using StudyHub.BLL.Services.Interfaces.Auth;
 using AutoMapper;
+using StudyHub.DAL.Repositories.Interfaces;
 
 namespace StudyHub.BLL.Services.Auth;
 
@@ -20,8 +21,9 @@ public class GoogleAuthService : AuthService, IGoogleAuthService
         UserManager<User> userManager,
         ITokenService tokenService,
         IOptions<GoogleAuthConfig> googleConfig,
+        IRepository<InvitedUser> invitedUserRepository,
         IMapper mapper)
-            : base(userManager, tokenService, mapper)
+            : base(userManager, tokenService, invitedUserRepository, mapper)
     {
         _googleConfig = googleConfig.Value;
     }

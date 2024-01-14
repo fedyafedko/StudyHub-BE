@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using StudyHub.BLL.Services.Interfaces;
+using StudyHub.BLL.Services.Interfaces.Auth;
 
 namespace StudyHub.Controllers;
 
@@ -14,10 +14,17 @@ public class GoogleAuthController : Controller
         _googleAuthService = googleAuthService;
     }
 
+    [HttpPost("sign-up")]
+    public async Task<IActionResult> GoogleSignUp([FromHeader(Name = "Authorization-Code")] string authorizationCode)
+    {
+        var result = await _googleAuthService.GoogleRegisterAsync(authorizationCode);
+        return Ok(result);
+    }
+
     [HttpPost("sign-in")]
     public async Task<IActionResult> GoogleSignIn([FromHeader(Name = "Authorization-Code")] string authorizationCode)
     {
-        var result = await _googleAuthService.GoogleLogin(authorizationCode);
+        var result = await _googleAuthService.GoogleLoginAsync(authorizationCode);
         return Ok(result);
     } 
 }

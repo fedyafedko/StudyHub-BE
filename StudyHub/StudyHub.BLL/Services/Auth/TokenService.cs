@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using StudyHub.BLL.Extensions;
 using StudyHub.BLL.Services.Interfaces.Auth;
+using StudyHub.Common.Exceptions;
 using StudyHub.Common.Models;
 using StudyHub.Entities;
 using System.IdentityModel.Tokens.Jwt;
@@ -10,15 +12,18 @@ using System.Security.Cryptography;
 using System.Text;
 
 namespace StudyHub.BLL.Services.Auth;
+
 public class TokenService : ITokenService
 {
     private readonly JwtSettings _settings;
     private readonly UserManager<User> _userManager;
+    private readonly TokenValidationParameters _tokenValidationParametrs;
 
-    public TokenService(IOptions<JwtSettings> settings, UserManager<User> userManager)
+    public TokenService(IOptions<JwtSettings> settings, UserManager<User> userManager, TokenValidationParameters tokenValidationParametrs)
     {
         _settings = settings.Value;
         _userManager = userManager;
+        _tokenValidationParametrs = tokenValidationParametrs;
     }
     public async Task<string> GenerateJwtTokenAsync(User user)
     {
@@ -67,5 +72,25 @@ public class TokenService : ITokenService
         user.RefreshToken = refreshToken;
 
         return user.RefreshToken.Token;
+    }
+
+    public ClaimsPrincipal GetPrincipalFromToken(string token)
+    {
+        var jwtTokenHandler = new JwtSecurityTokenHandler();
+        var validationParametrs = _tokenValidationParametrs.Clone();
+        validationParametrs.ValidateLifetime = false;
+        try
+        {
+            var principal = jwtTokenHandler.ValidateToken(token, validationParametrs, out var validatedToken);
+            
+            if (!validatedToken.IsJwtWithValidSecurityAlgorithm())
+                throw new InvalidSecurityAlgorithmException("Current token does not have right security algorithm");
+
+            return principal;
+        }
+        catch
+        {
+            throw new TokenValidatorException("Something went wrong with token validator");
+        }
     }
 }

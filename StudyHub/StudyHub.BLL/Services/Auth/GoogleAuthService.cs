@@ -12,23 +12,18 @@ using AutoMapper;
 
 namespace StudyHub.BLL.Services.Auth;
 
-public class GoogleAuthService : IGoogleAuthService
+public class GoogleAuthService : AuthService, IGoogleAuthService
 {
-    private readonly UserManager<User> _userManager;
-    private readonly ITokenService _tokenService;
     private readonly GoogleAuthConfig _googleConfig;
-    private readonly IMapper _mapper;
 
     public GoogleAuthService(
         UserManager<User> userManager,
         ITokenService tokenService,
         IOptions<GoogleAuthConfig> googleConfig,
         IMapper mapper)
+            : base(userManager, tokenService, mapper)
     {
-        _userManager = userManager;
-        _tokenService = tokenService;
         _googleConfig = googleConfig.Value;
-        _mapper = mapper;
     }
 
     public async Task<AuthSuccessDTO> GoogleRegisterAsync(string authorizationCode)
@@ -37,7 +32,7 @@ public class GoogleAuthService : IGoogleAuthService
 
         var user = await _userManager.FindByEmailAsync(payload.Email);
 
-        if (user is not null)
+        if (user != null)
             throw new NotFoundException("User with this email already exists");
 
         user = _mapper.Map<User>(payload);
@@ -47,10 +42,9 @@ public class GoogleAuthService : IGoogleAuthService
         if (!createdUserResult.Succeeded)
             throw new UserManagerException("Unable to authenticate given user", createdUserResult.Errors);
 
-        return new AuthSuccessDTO(
-            await _tokenService.GenerateJwtTokenAsync(user),
-            _tokenService.GenerateRefreshTokenAsync(user));
+        return await GetAuthTokensAsync(user);
     }
+
     public async Task<AuthSuccessDTO> GoogleLoginAsync(string authorizationCode)
     {
         var paylod = await GetGooglePayloadAsync(authorizationCode);
@@ -60,9 +54,7 @@ public class GoogleAuthService : IGoogleAuthService
         if (user == null)
             throw new NotFoundException($"Unable to find user by specified email. Email: {user!.Email}");
 
-        return new AuthSuccessDTO(
-            await _tokenService.GenerateJwtTokenAsync(user),
-            _tokenService.GenerateRefreshTokenAsync(user));
+        return await GetAuthTokensAsync(user);
     }
 
     private async Task<GoogleJsonWebSignature.Payload> GetGooglePayloadAsync(string authorizationCode)
@@ -89,7 +81,6 @@ public class GoogleAuthService : IGoogleAuthService
             ExpirationTimeClockTolerance = _googleConfig.ExpirationTimeClockTolerance,
         };
 
-        var paylod = await GoogleJsonWebSignature.ValidateAsync(tokenResponse.IdToken, setting);
-        return paylod;
+        return await GoogleJsonWebSignature.ValidateAsync(tokenResponse.IdToken, setting);
     }
 }

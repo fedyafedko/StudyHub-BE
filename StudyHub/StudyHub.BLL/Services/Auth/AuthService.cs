@@ -13,20 +13,17 @@ namespace StudyHub.BLL.Services.Auth;
 // ToDo: Implement Refresh Token
 public class AuthService : IAuthService
 {
-    private readonly UserManager<User> _userManager;
-    private readonly ITokenService _tokenService;
-    private readonly TokenValidationParameters _tokenValidationParametrs;
-    private readonly IMapper _mapper;
+    protected readonly UserManager<User> _userManager;
+    protected readonly ITokenService _tokenService;
+    protected readonly IMapper _mapper;
 
     public AuthService(
         UserManager<User> userManager,
         ITokenService tokenService,
-        TokenValidationParameters tokenValidationParameters,
         IMapper mapper)
     {
         _userManager = userManager;
         _tokenService = tokenService;
-        _tokenValidationParametrs = tokenValidationParameters;
         _mapper = mapper;
     }
 
@@ -42,9 +39,7 @@ public class AuthService : IAuthService
         if (!isPasswordValid)
             throw new InvalidCredentialsException($"User input incorrect password. Password: {dto.Password}");
 
-        return new AuthSuccessDTO(
-            await _tokenService.GenerateJwtTokenAsync(user),
-            _tokenService.GenerateRefreshTokenAsync(user));
+        return await GetAuthTokensAsync(user);
     }
 
     public async Task<AuthSuccessDTO> RegisterAsync(RegisterUserDTO dto)
@@ -61,14 +56,12 @@ public class AuthService : IAuthService
         if (!result.Succeeded)
             throw new UserManagerException($"User manager operation failed:\n", result.Errors);
 
-        return new AuthSuccessDTO(
-            await _tokenService.GenerateJwtTokenAsync(user),
-            _tokenService.GenerateRefreshTokenAsync(user));
+        return await GetAuthTokensAsync(user);
     }
 
     public async Task<AuthSuccessDTO> RefreshTokenAsync(RefreshTokenRequest request)
     {
-        var validatedToken = GetPrincipalFromToken(request.AccessToken);
+        var validatedToken = _tokenService.GetPrincipalFromToken(request.AccessToken);
 
         var expiryDateUnix = long.Parse(validatedToken!.Claims.Single(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
 
@@ -91,36 +84,12 @@ public class AuthService : IAuthService
         if (user.RefreshToken.Token != request.RefreshToken)
             throw new IncorrectParametersException("Refresh token is invalid");
 
-        return new AuthSuccessDTO(
-            await _tokenService.GenerateJwtTokenAsync(user!),
+        return await GetAuthTokensAsync(user);
+    }
+
+    protected async Task<AuthSuccessDTO> GetAuthTokensAsync(User user)
+    {
+        return new AuthSuccessDTO(await _tokenService.GenerateJwtTokenAsync(user!),
             _tokenService.GenerateRefreshTokenAsync(user!));
-    }
-
-    private ClaimsPrincipal GetPrincipalFromToken(string token)
-    {
-        var jwtTokenHandler = new JwtSecurityTokenHandler();
-        var validationParametrs = _tokenValidationParametrs.Clone();
-        validationParametrs.ValidateLifetime = false;
-        try
-        {
-            var principal = jwtTokenHandler.ValidateToken(token, validationParametrs, out var validatedToken);
-
-            if (!IsJwtWithValidSecurityAlgorithm(validatedToken))
-                throw new InvalidSecurityAlgorithmException("Current token does not have right security algorithm");
-
-            return principal;
-        }
-        catch
-        {
-            throw new TokenValidatorException("Something went wrong with token validator");
-        }
-    }
-
-    private bool IsJwtWithValidSecurityAlgorithm(SecurityToken validatedToken)
-    {
-        return validatedToken is JwtSecurityToken jwtSecurityToken &&
-            jwtSecurityToken.Header.Alg.Equals(
-                SecurityAlgorithms.HmacSha256,
-                StringComparison.InvariantCultureIgnoreCase);
     }
 }

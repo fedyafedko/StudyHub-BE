@@ -12,7 +12,6 @@ public class UserProfile : Profile
     {
         CreateMap<InvitedUserDTO, InvitedUser>();
         CreateMap<RegisterUserDTO, User>()
-            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
             .ForMember(dest => dest.EmailConfirmed, opt => opt.MapFrom(_ => true))
             .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Email));
 

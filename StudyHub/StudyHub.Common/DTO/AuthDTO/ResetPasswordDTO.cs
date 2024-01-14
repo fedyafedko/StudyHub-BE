@@ -1,4 +1,5 @@
 ﻿namespace StudyHub.Common.DTO.AuthDTO;
+
 public class ResetPasswordDTO
 {
     public string ResetToken { get; set; } = string.Empty;

@@ -1,6 +1,5 @@
-﻿using StudyHub.Common.DTO.AssignmentTask;
+﻿namespace StudyHub.Common.DTO.Assignment;
 
-namespace StudyHub.Common.DTO.AssignmentDTO;
 public class AssignmentDTO
 {
     public Guid Id { get; set; }

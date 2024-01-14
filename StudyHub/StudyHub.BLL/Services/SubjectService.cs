@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using StudyHub.BLL.Extensions;
 using StudyHub.BLL.Services.Interfaces;
 using StudyHub.Common.DTO.Subject;
 using StudyHub.Common.Exceptions;
@@ -7,37 +9,35 @@ using StudyHub.DAL.Repositories.Interfaces;
 using StudyHub.Entities;
 
 namespace StudyHub.BLL.Services;
+
 public class SubjectService : ISubjectService
 {
     private readonly IRepository<Subject> _subjectRepository;
-    private readonly IRepository<Teacher> _teacherRepository;
-    private readonly IRepository<Student> _studentRepository;
+    private readonly UserManager<User> _userManager;
     private readonly IMapper _mapper;
 
     public SubjectService(
         IRepository<Subject> subjectRepository,
-        IRepository<Teacher> teacherRepository,
-        IRepository<Student> studentRepository,
+        UserManager<User> userManager,
         IMapper mapper)
     {
         _subjectRepository = subjectRepository;
-        _teacherRepository = teacherRepository;
-        _studentRepository = studentRepository;
+        _userManager = userManager;
         _mapper = mapper;
     }
 
     public async Task<SubjectDTO> AddSubjectAsync(CreateSubjectDTO dto)
     {
         var entity = _mapper.Map<Subject>(dto);
-        var teacher = await _teacherRepository.FirstOrDefaultAsync(teacher => teacher.UserId == dto.TeacherId);
+
+        var teacher = _userManager.FindByIdAsync(dto.TeacherId);
 
         if (teacher == null)
             throw new NotFoundException($"Teacher not found in the database with this ID: {dto.TeacherId}");
 
         await _subjectRepository.InsertAsync(entity);
 
-        var result = _mapper.Map<SubjectDTO>(entity);
-        return result;
+        return _mapper.Map<SubjectDTO>(entity);
     }
 
     public async Task<bool> DeleteSubjectAsync(Guid userId, Guid subjectId)
@@ -65,11 +65,9 @@ public class SubjectService : ISubjectService
         return _mapper.Map<SubjectDTO>(entity);
     }
 
-    public List<SubjectDTO> GetSubjectsForStudent(Guid studentId)
+    public async Task<List<SubjectDTO>> GetSubjectsForStudentAsync(Guid studentId)
     {
-        var student =  _studentRepository
-                .Include(subject => subject.Subjects)
-                .FirstOrDefault(s => s.UserId == studentId);
+        var student = await _userManager.FindByIdAsync(studentId);
 
         if (student == null)
             throw new NotFoundException($"Unable to find entity with such key: {studentId}");
@@ -80,13 +78,11 @@ public class SubjectService : ISubjectService
         return subjects.ToList();
     }
 
-    public List<SubjectDTO> GetSubjectsForTeacher(Guid teacherId)
+    public  async Task<List<SubjectDTO>> GetSubjectsForTeacherAsync(Guid teacherId)
     {
-        var subjects =_mapper
-            .Map<List<SubjectDTO>>(_subjectRepository
-                .Where(x => x.TeacherId == teacherId));
+        var subjects = await _subjectRepository.Where(x => x.TeacherId == teacherId).ToListAsync();
 
-        return subjects.ToList();
+        return _mapper.Map<List<SubjectDTO>>(subjects);
     }
 
     public async Task<SubjectDTO> UpdateSubjectAsync(Guid userId, Guid subjectId, UpdateSubjectDTO dto)

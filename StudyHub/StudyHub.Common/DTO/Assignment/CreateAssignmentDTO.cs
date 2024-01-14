@@ -1,6 +1,8 @@
-﻿namespace StudyHub.Common.DTO.AssignmentDTO;
-public class UpdateAssignmentDTO
+﻿namespace StudyHub.Common.DTO.Assignment;
+
+public class CreateAssignmentDTO
 {
+    public Guid SubjectId { get; set; }
     public string Title { get; set; } = string.Empty;
     public int MaxMark { get; set; }
     public DateTime StartDate { get; set; }

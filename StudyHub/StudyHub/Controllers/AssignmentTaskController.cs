@@ -6,7 +6,7 @@ using StudyHub.Validators.AssignmentTaskValidators;
 
 namespace StudyHub.Controllers;
 
-[Route("[controller]")]
+[Route("api/[controller]")]
 [ApiController]
 public class AssignmentTaskController : Controller
 {

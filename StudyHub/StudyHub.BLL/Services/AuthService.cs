@@ -1,72 +1,77 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using StudyHub.BLL.Services.Interfaces;
 using StudyHub.Common.DTO.AuthDTO;
 using StudyHub.Common.Exceptions;
+using StudyHub.DAL.Repositories.Interfaces;
 using StudyHub.Entities;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Identity;
 
 namespace StudyHub.BLL.Services;
 
+// ToDo: Implement Refresh Token
 public class AuthService : IAuthService
 {
     private readonly UserManager<User> _userManager;
     private readonly ITokenService _tokenService;
-    private readonly TokenValidationParameters _tokenValidationParametrs;
+    private readonly IRepository<InvitedUser> _invitedUserRepository;
+    private readonly IMapper _mapper;
+
     public AuthService(
         UserManager<User> userManager,
         ITokenService tokenService,
-        TokenValidationParameters tokenValidationParameters)
+        IRepository<InvitedUser> invitedUserRepository,
+        IMapper mapper)
     {
+        _mapper = mapper;
+        _invitedUserRepository = invitedUserRepository;
         _userManager = userManager;
         _tokenService = tokenService;
-        _tokenValidationParametrs = tokenValidationParameters;
     }
 
     public async Task<AuthSuccessDTO> LoginAsync(LoginUserDTO user)
     {
-        var existingUser = await _userManager.FindByEmailAsync(user.Email);
-
-        if (existingUser == null)
-            throw new NotFoundException($"Unable to find user by specified email. Email: {user.Email}");
+        var existingUser = await _userManager.FindByEmailAsync(user.Email)
+            ?? throw new NotFoundException($"Unable to find user by specified email. Email: {user.Email}");
 
         var isPasswordValid = await _userManager.CheckPasswordAsync(existingUser, user.Password);
 
         if (!isPasswordValid)
             throw new InvalidCredentialsException($"User input incorrect password. Password: {user.Password}");
 
-        return new AuthSuccessDTO(
-            _tokenService.GenerateJwtToken(existingUser), 
-            _tokenService.GenerateRefreshTokenAsync(existingUser));
+        return await GetAuthTokens(existingUser);
     }
 
-    public async Task<AuthSuccessDTO> RegisterAsync(RegisterUserDTO user)
+    public async Task<AuthSuccessDTO> RegisterAsync(RegisterUserDTO dto)
     {
-        var existingUser = await _userManager.FindByEmailAsync(user.Email);
+        var invitedUser = _invitedUserRepository.FirstOrDefault(e => e.Email == dto.Email)
+            ?? throw new NotFoundException($"User with this email wasn't invited: {dto.Email}");
 
-        if (existingUser != null)
-            throw new NotFoundException($"User with specified email already exists. Email: {user.Email}");
+        if (invitedUser.Token != dto.Token)
+            throw new IncorrectParametersException("Passed token isn't valid.");
 
-        var newUser = new User()
-        {
-            Email = user.Email,
-            UserName = user.Email,
-        };
+        var user = _mapper.Map<User>(dto);
 
-        var result = await _userManager.CreateAsync(newUser, user.Password);
+        var result = await _userManager.CreateAsync(user, dto.Password);
 
         if (!result.Succeeded)
             throw new UserManagerException($"User manager operation failed:\n", result.Errors);
 
-        return new AuthSuccessDTO(
-            _tokenService.GenerateJwtToken(newUser), 
-            _tokenService.GenerateRefreshTokenAsync(newUser));
+        var role = invitedUser.Role;
+
+        var currentUser = await _userManager.FindByIdAsync(user.Id.ToString());
+
+        var roleResult = await _userManager.AddToRoleAsync(user, role);
+
+        if (!roleResult.Succeeded)
+            throw new UserManagerException($"User manager operation failed:\n", result.Errors);
+
+        return await GetAuthTokens(user);
     }
 
     public async Task<AuthSuccessDTO> RefreshTokenAsync(string accessToken, string refreshToken)
     {
-        var validatedToken = GetPrincipalFromToken(accessToken);
+        var validatedToken = _tokenService.GetPrincipalFromToken(accessToken);
 
         var expiryDateUnix = long.Parse(validatedToken!.Claims.Single(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
 
@@ -89,36 +94,13 @@ public class AuthService : IAuthService
         if (user.RefreshToken.Token != refreshToken)
             throw new IncorrectParametersException("Refresh token is invalid");
 
-        return new AuthSuccessDTO(
-            _tokenService.GenerateJwtToken(user!), 
+        return await GetAuthTokens(user);
+    }
+
+    private async Task<AuthSuccessDTO> GetAuthTokens(User user)
+    {
+        var roles = (await _userManager.GetRolesAsync(user)).ToArray();
+        return new AuthSuccessDTO(_tokenService.GenerateJwtToken(user!, roles),
             _tokenService.GenerateRefreshTokenAsync(user!));
-    }
-
-    private ClaimsPrincipal GetPrincipalFromToken(string token)
-    {
-        var jwtTokenHandler = new JwtSecurityTokenHandler();
-        var validationParametrs = _tokenValidationParametrs.Clone();
-        validationParametrs.ValidateLifetime = false;
-        try
-        {
-            var principal = jwtTokenHandler.ValidateToken(token, validationParametrs, out var validatedToken);
-
-            if (!IsJwtWithValidSecurityAlgorithm(validatedToken))
-                throw new InvalidSecurityAlgorithmException("Current token does not have right security algorithm");
-
-            return principal;
-        }
-        catch
-        {
-            throw new TokenValidatorException("Something went wrong with token validator");
-        }
-    }
-
-    private bool IsJwtWithValidSecurityAlgorithm(SecurityToken validatedToken)
-    {
-        return validatedToken is JwtSecurityToken jwtSecurityToken &&
-            jwtSecurityToken.Header.Alg.Equals(
-                SecurityAlgorithms.HmacSha256,
-                StringComparison.InvariantCultureIgnoreCase);
     }
 }

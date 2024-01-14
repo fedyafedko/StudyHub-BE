@@ -7,7 +7,7 @@ using StudyHub.Common.DTO.Subject;
 
 namespace StudyHub.Controllers;
 
-[Route("[controller]")]
+[Route("api/[controller]")]
 [ApiController]
 public class SubjectController : Controller
 {
@@ -58,7 +58,7 @@ public class SubjectController : Controller
     public IActionResult GetSubjectForTeacher()
     {
         var teacherId = HttpContext.GetUserId();
-        var result = _subjectService.GetSubjectsForTeacher(teacherId);
+        var result = _subjectService.GetSubjectsForTeacherAsync(teacherId);
         return Ok(result);
     }
 
@@ -67,7 +67,7 @@ public class SubjectController : Controller
     public IActionResult GetSubjectForStudent()
     {
         var studentId = HttpContext.GetUserId();
-        var result = _subjectService.GetSubjectsForStudent(studentId);
+        var result = _subjectService.GetSubjectsForStudentAsync(studentId);
         return Ok(result);
     }
 

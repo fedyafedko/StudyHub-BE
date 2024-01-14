@@ -1,12 +1,13 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using StudyHub.BLL.Services.Interfaces;
-using StudyHub.Common.DTO.AssignmentDTO;
+using StudyHub.Common.DTO.Assignment;
 using StudyHub.Common.Exceptions;
 using StudyHub.DAL.Repositories.Interfaces;
 using StudyHub.Entities;
 
 namespace StudyHub.BLL.Services;
+
 public class AssignmentService : IAssignmentService
 {
     private readonly IRepository<Assignment> _assignmentRepository;

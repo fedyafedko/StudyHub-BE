@@ -16,7 +16,6 @@ public class UserProfile : Profile
             .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Email));
 
         CreateMap<GoogleJsonWebSignature.Payload, User>()
-            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
             .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Email));
     }
 }

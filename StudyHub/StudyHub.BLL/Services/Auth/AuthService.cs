@@ -29,10 +29,8 @@ public class AuthService : IAuthService
 
     public async Task<AuthSuccessDTO> LoginAsync(LoginUserDTO dto)
     {
-        var user = await _userManager.FindByEmailAsync(dto.Email);
-
-        if (user == null)
-            throw new NotFoundException($"Unable to find user by specified email. Email: {dto.Email}");
+        var user = await _userManager.FindByEmailAsync(dto.Email)
+            ?? throw new NotFoundException($"Unable to find user by specified email. Email: {dto.Email}");
 
         var isPasswordValid = await _userManager.CheckPasswordAsync(user, dto.Password);
 
@@ -47,7 +45,7 @@ public class AuthService : IAuthService
         var user = await _userManager.FindByEmailAsync(dto.Email);
 
         if (user != null)
-            throw new NotFoundException($"User with specified email already exists. Email: {dto.Email}");
+            throw new AlreadyExistsException($"User with specified email already exists. Email: {dto.Email}");
 
         user = _mapper.Map<User>(dto);
 

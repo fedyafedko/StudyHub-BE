@@ -1,11 +1,10 @@
-﻿using StudyHub.BLL.Seeding.Behaviours;
-using StudyHub.BLL.Seeding.Interfaces;
-using System.Net.Mail;
-using System.Net;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using StudyHub.Seeding.Behaviours;
+using StudyHub.Seeding.Interfaces;
 
-namespace StudyHub.Extensions;
-
-public static class SeedingExtensions
+namespace StudyHub.Seeding.Extentions;
+public static class SeedingExtentions
 {
     public static IServiceCollection AddSeeding(this IServiceCollection services)
     {

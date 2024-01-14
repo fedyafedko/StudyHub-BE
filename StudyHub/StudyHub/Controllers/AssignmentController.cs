@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using StudyHub.BLL.Services.Interfaces;
-using StudyHub.Common.DTO.AssignmentDTO;
+using StudyHub.Common.DTO.Assignment;
 
 namespace StudyHub.Controllers;
 
-[Route("[controller]")]
+[Route("api/[controller]")]
 [ApiController]
 public class AssignmentController : Controller
 {

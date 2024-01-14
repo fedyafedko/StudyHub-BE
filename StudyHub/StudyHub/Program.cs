@@ -18,14 +18,14 @@ using StudyHub.Validators.AssignmentTaskOptionValidators;
 using Microsoft.OpenApi.Models;
 using StudyHub.Extensions;
 using StudyHub.FluentEmail;
-using StudyHub.Common.DTO;
 using StudyHub.FluentEmail.Interfaces;
+using StudyHub.Seeding.Extentions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 builder.Services.Configure<GoogleAuthConfig>(builder.Configuration.GetSection("GoogleAuth"));
-builder.Services.Configure<MessageSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 
 builder.Services.AddAutoMapper(typeof(AssignmentTaskProfile));
 
@@ -46,7 +46,7 @@ builder.Services.AddScoped<IOptionsService, OptionsService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
-builder.Services.AddScoped<IUserInvitingService, UserInvitedService>();
+builder.Services.AddScoped<IUserInvitationService, UserInvitationService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 
 // Fluent Email

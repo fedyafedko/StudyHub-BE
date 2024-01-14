@@ -4,5 +4,5 @@ namespace StudyHub.FluentEmail.Interfaces;
 
 public interface IEmailService
 {
-    Task<bool> Send(InvitedUserDTO invitedUserDTO);
+    Task<bool> SendAsync(InvitedUserDTO invitedUserDTO);
 }

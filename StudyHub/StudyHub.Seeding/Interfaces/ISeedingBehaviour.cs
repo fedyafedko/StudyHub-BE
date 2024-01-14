@@ -1,4 +1,4 @@
-﻿namespace StudyHub.BLL.Seeding.Interfaces;
+﻿namespace StudyHub.Seeding.Interfaces;
 
 public interface ISeedingBehaviour
 {

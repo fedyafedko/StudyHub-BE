@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using StudyHub.BLL.Seeding.Interfaces;
+using StudyHub.Seeding.Interfaces;
 
-namespace StudyHub.BLL.Seeding.Behaviours;
+namespace StudyHub.Seeding.Behaviours;
 
 public class RoleSeedingBehaviour : ISeedingBehaviour
 {

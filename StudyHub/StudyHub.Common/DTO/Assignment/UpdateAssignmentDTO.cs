@@ -1,4 +1,4 @@
-﻿namespace StudyHub.Common.DTO.AssignmentDTO;
+﻿namespace StudyHub.Common.DTO.Assignment;
 
 public class UpdateAssignmentDTO
 {

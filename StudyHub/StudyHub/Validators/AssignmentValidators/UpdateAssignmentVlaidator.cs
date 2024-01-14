@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using StudyHub.Common.DTO.AssignmentDTO;
+using StudyHub.Common.DTO.Assignment;
 
 namespace StudyHub.Validators.AssignmentValidators;
 

@@ -2,5 +2,5 @@
 
 public class InviteStudentsRequest
 {
-    public List<string> Email { get; set; } = null!;
+    public List<string> Emails { get; set; } = null!;
 }

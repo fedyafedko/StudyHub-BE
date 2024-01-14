@@ -1,4 +1,4 @@
-﻿using StudyHub.Common.DTO.AssignmentDTO;
+﻿using StudyHub.Common.DTO.Assignment;
 
 namespace StudyHub.BLL.Services.Interfaces;
 public interface IAssignmentService

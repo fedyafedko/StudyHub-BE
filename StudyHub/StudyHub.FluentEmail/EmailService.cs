@@ -9,22 +9,22 @@ namespace StudyHub.FluentEmail;
 public class EmailService : IEmailService
 {
     private readonly IFluentEmail _fluentEmail;
-    private readonly MessageSettings _messageSettings;
+    private readonly EmailSettings _messageSettings;
 
-    public EmailService(IFluentEmail fluentEmail, IOptions<MessageSettings> messageSettings)
+    public EmailService(IFluentEmail fluentEmail, IOptions<EmailSettings> messageSettings)
     {
         _fluentEmail = fluentEmail;
         _messageSettings = messageSettings.Value;
     }
 
-    public async Task<bool> Send(InvitedUserDTO invitedUserDTO)
+    public async Task<bool> SendAsync(InvitedUserDTO invitedUserDTO)
     {
-        string url = $"https://localhost:1234/accept-invitation?role={invitedUserDTO.Role}&token={invitedUserDTO.Token}";
+        var url = string.Format(_messageSettings.AcceptInvitationUrl, invitedUserDTO.Role, invitedUserDTO.Token);
 
         var sendEmail = await _fluentEmail
               .To(invitedUserDTO.Email)
               .Subject("Invitation")
-              .UsingTemplateFromFile($"{Directory.GetCurrentDirectory()}.FluentEmail//{_messageSettings.MessagePath}", new{ invitedUserDTO.Email, invitedUserDTO.Role, Url = url })
+              .UsingTemplateFromFile($"{Directory.GetCurrentDirectory()}.FluentEmail//{_messageSettings.MessagePath}", new { invitedUserDTO.Email, invitedUserDTO.Role, Url = url })
               .SendAsync();
 
         _fluentEmail.Data.ToAddresses.Clear();

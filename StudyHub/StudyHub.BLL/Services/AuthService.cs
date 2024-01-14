@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using StudyHub.BLL.Services.Interfaces;
 using StudyHub.Common.DTO.AuthDTO;
 using StudyHub.Common.Exceptions;
@@ -8,95 +9,64 @@ using System.IdentityModel.Tokens.Jwt;
 
 namespace StudyHub.BLL.Services;
 
+// ToDo: Implement Refresh Token
 public class AuthService : IAuthService
 {
     private readonly UserManager<User> _userManager;
     private readonly ITokenService _tokenService;
     private readonly IRepository<InvitedUser> _invitedUserRepository;
-    private readonly IRepository<Teacher> _teacherRepository;
-    private readonly IRepository<Student> _studentRepository;
+    private readonly IMapper _mapper;
 
     public AuthService(
         UserManager<User> userManager,
         ITokenService tokenService,
         IRepository<InvitedUser> invitedUserRepository,
-        IRepository<Teacher> teacherRepository,
-        IRepository<Student> studentRepository)
+        IMapper mapper)
     {
+        _mapper = mapper;
         _invitedUserRepository = invitedUserRepository;
         _userManager = userManager;
         _tokenService = tokenService;
-        _teacherRepository = teacherRepository;
-        _studentRepository = studentRepository;
     }
 
     public async Task<AuthSuccessDTO> LoginAsync(LoginUserDTO user)
     {
-        var existingUser = await _userManager.FindByEmailAsync(user.Email);
-
-        if (existingUser == null)
-            throw new NotFoundException($"Unable to find user by specified email. Email: {user.Email}");
+        var existingUser = await _userManager.FindByEmailAsync(user.Email)
+            ?? throw new NotFoundException($"Unable to find user by specified email. Email: {user.Email}");
 
         var isPasswordValid = await _userManager.CheckPasswordAsync(existingUser, user.Password);
 
         if (!isPasswordValid)
             throw new InvalidCredentialsException($"User input incorrect password. Password: {user.Password}");
 
-        return new AuthSuccessDTO(_tokenService.GenerateJwtToken(existingUser, (await _userManager.GetRolesAsync(existingUser)).ToArray()),
-            _tokenService.GenerateRefreshTokenAsync(existingUser));
+        return await GetAuthTokens(existingUser);
     }
 
-    public async Task<AuthSuccessDTO> RegisterAsync(RegisterUserDTO user)
+    public async Task<AuthSuccessDTO> RegisterAsync(RegisterUserDTO dto)
     {
-        var invitedUser = _invitedUserRepository.FirstOrDefault(e => e.Email == user.Email);
-        if (invitedUser == null)
-            throw new NotFoundException($"You doesn't invited by this email:{user.Email}");
+        var invitedUser = _invitedUserRepository.FirstOrDefault(e => e.Email == dto.Email)
+            ?? throw new NotFoundException($"User with this email wasn't invited: {dto.Email}");
 
-        if(invitedUser.Token != user.Token)
-            throw new IncorrectParametersException("Token does not exist");
+        if (invitedUser.Token != dto.Token)
+            throw new IncorrectParametersException("Passed token isn't valid.");
 
-        var existingUser = await _userManager.FindByEmailAsync(user.Email);
+        var user = _mapper.Map<User>(dto);
 
-        if (existingUser != null)
-            throw new NotFoundException($"User with specified email already exists. Email: {user.Email}");
-
-        var newUser = new User()
-        {
-            Email = user.Email,
-            UserName = user.Email,
-        };
-
-        var result = await _userManager.CreateAsync(newUser, user.Password);
+        var result = await _userManager.CreateAsync(user, dto.Password);
 
         if (!result.Succeeded)
             throw new UserManagerException($"User manager operation failed:\n", result.Errors);
-        if (invitedUser.Role == "Teacher")
-        {
-            var newTeacher = new Teacher()
-            {
-                User = newUser,
-                UserId = newUser.Id,
-            };  
-            await _teacherRepository.InsertAsync(newTeacher);
-        }
 
-        if (invitedUser.Role == "Student")
-        {
-            var newStudent = new Student()
-            {
-                User = newUser,
-                UserId = newUser.Id,
-            };
-            await _studentRepository.InsertAsync(newStudent);
-        }
+        var role = invitedUser.Role;
 
-        var addRoleResult = await _userManager.AddToRoleAsync(newUser, invitedUser.Role);
+        var currentUser = await _userManager.FindByIdAsync(user.Id.ToString());
 
-        if (!addRoleResult.Succeeded)
+        var roleResult = await _userManager.AddToRoleAsync(user, role);
+
+        if (!roleResult.Succeeded)
             throw new UserManagerException($"User manager operation failed:\n", result.Errors);
 
-        return new AuthSuccessDTO(_tokenService.GenerateJwtToken(newUser , (await _userManager.GetRolesAsync(newUser)).ToArray()), 
-            _tokenService.GenerateRefreshTokenAsync(newUser));
+        return await GetAuthTokens(user);
     }
 
     public async Task<AuthSuccessDTO> RefreshTokenAsync(string accessToken, string refreshToken)
@@ -124,7 +94,13 @@ public class AuthService : IAuthService
         if (user.RefreshToken.Token != refreshToken)
             throw new IncorrectParametersException("Refresh token is invalid");
 
-        return new AuthSuccessDTO(_tokenService.GenerateJwtToken(user!, (await _userManager.GetRolesAsync(user)).ToArray()), 
+        return await GetAuthTokens(user);
+    }
+
+    private async Task<AuthSuccessDTO> GetAuthTokens(User user)
+    {
+        var roles = (await _userManager.GetRolesAsync(user)).ToArray();
+        return new AuthSuccessDTO(_tokenService.GenerateJwtToken(user!, roles),
             _tokenService.GenerateRefreshTokenAsync(user!));
     }
 }

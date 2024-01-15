@@ -1,21 +1,23 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Identity;
-using StudyHub.BLL.Services.Interfaces;
+﻿using Microsoft.IdentityModel.Tokens;
 using StudyHub.Common.DTO.AuthDTO;
 using StudyHub.Common.Exceptions;
-using StudyHub.DAL.Repositories.Interfaces;
 using StudyHub.Entities;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
+using StudyHub.BLL.Services.Interfaces.Auth;
+using AutoMapper;
+using StudyHub.DAL.Repositories.Interfaces;
 
-namespace StudyHub.BLL.Services;
+namespace StudyHub.BLL.Services.Auth;
 
 // ToDo: Implement Refresh Token
 public class AuthService : IAuthService
 {
-    private readonly UserManager<User> _userManager;
-    private readonly ITokenService _tokenService;
+    protected readonly UserManager<User> _userManager;
+    protected readonly ITokenService _tokenService;
     private readonly IRepository<InvitedUser> _invitedUserRepository;
-    private readonly IMapper _mapper;
+    protected readonly IMapper _mapper;
 
     public AuthService(
         UserManager<User> userManager,
@@ -23,23 +25,23 @@ public class AuthService : IAuthService
         IRepository<InvitedUser> invitedUserRepository,
         IMapper mapper)
     {
-        _mapper = mapper;
-        _invitedUserRepository = invitedUserRepository;
         _userManager = userManager;
         _tokenService = tokenService;
+        _invitedUserRepository = invitedUserRepository;
+        _mapper = mapper;
     }
 
-    public async Task<AuthSuccessDTO> LoginAsync(LoginUserDTO user)
+    public async Task<AuthSuccessDTO> LoginAsync(LoginUserDTO dto)
     {
-        var existingUser = await _userManager.FindByEmailAsync(user.Email)
-            ?? throw new NotFoundException($"Unable to find user by specified email. Email: {user.Email}");
+        var user = await _userManager.FindByEmailAsync(dto.Email)
+            ?? throw new NotFoundException($"Unable to find user by specified email. Email: {dto.Email}");
 
-        var isPasswordValid = await _userManager.CheckPasswordAsync(existingUser, user.Password);
+        var isPasswordValid = await _userManager.CheckPasswordAsync(user, dto.Password);
 
         if (!isPasswordValid)
-            throw new InvalidCredentialsException($"User input incorrect password. Password: {user.Password}");
+            throw new InvalidCredentialsException($"User input incorrect password. Password: {dto.Password}");
 
-        return await GetAuthTokens(existingUser);
+        return await GetAuthTokensAsync(user);
     }
 
     public async Task<AuthSuccessDTO> RegisterAsync(RegisterUserDTO dto)
@@ -50,7 +52,12 @@ public class AuthService : IAuthService
         if (invitedUser.Token != dto.Token)
             throw new IncorrectParametersException("Passed token isn't valid.");
 
-        var user = _mapper.Map<User>(dto);
+        var user = await _userManager.FindByEmailAsync(dto.Email);
+
+        if (user != null)
+            throw new AlreadyExistsException($"User with specified email already exists. Email: {dto.Email}");
+
+        user = _mapper.Map<User>(dto);
 
         var result = await _userManager.CreateAsync(user, dto.Password);
 
@@ -66,12 +73,12 @@ public class AuthService : IAuthService
         if (!roleResult.Succeeded)
             throw new UserManagerException($"User manager operation failed:\n", result.Errors);
 
-        return await GetAuthTokens(user);
+        return await GetAuthTokensAsync(user);
     }
 
-    public async Task<AuthSuccessDTO> RefreshTokenAsync(string accessToken, string refreshToken)
+    public async Task<AuthSuccessDTO> RefreshTokenAsync(RefreshTokenRequest request)
     {
-        var validatedToken = _tokenService.GetPrincipalFromToken(accessToken);
+        var validatedToken = _tokenService.GetPrincipalFromToken(request.AccessToken);
 
         var expiryDateUnix = long.Parse(validatedToken!.Claims.Single(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
 
@@ -91,16 +98,15 @@ public class AuthService : IAuthService
         if (DateTimeOffset.UtcNow > user.RefreshToken.ExpiryDate)
             throw new ExpiredException("Refresh token is expired");
 
-        if (user.RefreshToken.Token != refreshToken)
+        if (user.RefreshToken.Token != request.RefreshToken)
             throw new IncorrectParametersException("Refresh token is invalid");
 
-        return await GetAuthTokens(user);
+        return await GetAuthTokensAsync(user);
     }
 
-    private async Task<AuthSuccessDTO> GetAuthTokens(User user)
+    protected async Task<AuthSuccessDTO> GetAuthTokensAsync(User user)
     {
-        var roles = (await _userManager.GetRolesAsync(user)).ToArray();
-        return new AuthSuccessDTO(_tokenService.GenerateJwtToken(user!, roles),
+        return new AuthSuccessDTO(await _tokenService.GenerateJwtTokenAsync(user!),
             _tokenService.GenerateRefreshTokenAsync(user!));
     }
 }

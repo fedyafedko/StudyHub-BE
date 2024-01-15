@@ -30,7 +30,7 @@ public class SubjectService : ISubjectService
     {
         var entity = _mapper.Map<Subject>(dto);
 
-        var teacher = _userManager.FindByIdAsync(dto.TeacherId);
+        var teacher = await _userManager.FindByIdAsync(dto.TeacherId);
 
         if (teacher == null)
             throw new NotFoundException($"Teacher not found in the database with this ID: {dto.TeacherId}");

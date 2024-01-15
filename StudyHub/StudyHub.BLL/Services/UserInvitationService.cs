@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Identity;
 using StudyHub.BLL.Extensions;
 using StudyHub.BLL.Services.Interfaces;
 using StudyHub.Common;
+using StudyHub.Common.DTO;
 using StudyHub.Common.DTO.UserInvitation;
 using StudyHub.Common.Exceptions;
-using StudyHub.Common.Requests;
 using StudyHub.DAL.Repositories.Interfaces;
 using StudyHub.Entities;
 using StudyHub.FluentEmail.Interfaces;
@@ -35,7 +35,7 @@ public class UserInvitationService : IUserInvitationService
         _roleManager = roleManager;
     }
 
-    public async Task<bool> InviteManyAsync(Guid userId, InviteUsersRequest dto)
+    public async Task<bool> InviteManyAsync(Guid userId, InviteUsersDTO dto)
     {
         var user = await _userManager.FindByIdAsync(userId);
 

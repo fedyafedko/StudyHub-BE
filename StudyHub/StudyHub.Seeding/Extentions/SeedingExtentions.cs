@@ -9,7 +9,6 @@ public static class SeedingExtentions
     public static IServiceCollection AddSeeding(this IServiceCollection services)
     {
         services.AddScoped<ISeedingBehaviour, RoleSeedingBehaviour>();
-        services.AddScoped<ISeedingBehaviour, UsersSeedingBehaviour>();
 
         return services;
     }

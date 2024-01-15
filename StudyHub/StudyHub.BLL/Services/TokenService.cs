@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using StudyHub.BLL.Services.Interfaces;
 using StudyHub.Common.Exceptions;
 using StudyHub.Common.Models;
-using StudyHub.DAL.Repositories.Interfaces;
 using StudyHub.Entities;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -17,17 +15,12 @@ public class TokenService : ITokenService
 {
     private readonly JwtSettings _settings;
     private readonly TokenValidationParameters _tokenValidationParametrs;
-    private readonly IRepository<RefreshToken> _refreshTokenRepository;
-    private readonly UserManager<User> _userManager;
 
-    public TokenService(IOptions<JwtSettings> settings, TokenValidationParameters tokenValidationParametrs, IRepository<RefreshToken> refreshTokenRepository, UserManager<User> userManager)
+    public TokenService(IOptions<JwtSettings> settings, TokenValidationParameters tokenValidationParametrs)
     {
-        _userManager = userManager;
-        _refreshTokenRepository = refreshTokenRepository;
         _settings = settings.Value;
         _tokenValidationParametrs = tokenValidationParametrs;
     }
-
     public ClaimsPrincipal GetPrincipalFromToken(string token)
     {
         var jwtTokenHandler = new JwtSecurityTokenHandler();
@@ -84,8 +77,7 @@ public class TokenService : ITokenService
         var jwtToken = jwtTokenHandler.WriteToken(token);
         return jwtToken;
     }
-
-    public async Task<string> GenerateRefreshTokenAsync(User user)
+    public string GenerateRefreshTokenAsync(User user)
     {
         var refreshToken = new RefreshToken
         {
@@ -97,12 +89,8 @@ public class TokenService : ITokenService
             Invalidated = false,
         };
 
-        await _refreshTokenRepository.InsertAsync(refreshToken);
+        user.RefreshToken = refreshToken;
 
-        user.RefreshTokenId = refreshToken.Id;
-
-        await _userManager.UpdateAsync(user);
-
-        return refreshToken.Token;
+        return user.RefreshToken.Token;
     }
 }

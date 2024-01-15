@@ -258,9 +258,8 @@ namespace StudyHub.DAL.Migrations
 
             modelBuilder.Entity("StudyHub.Entities.RefreshToken", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("Token")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
@@ -271,17 +270,16 @@ namespace StudyHub.DAL.Migrations
                     b.Property<bool>("Invalidated")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("Used")
                         .HasColumnType("bit");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("Id");
+                    b.HasKey("Token");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("RefreshTokens");
                 });
@@ -379,9 +377,6 @@ namespace StudyHub.DAL.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
-
-                    b.Property<Guid>("RefreshTokenId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
@@ -525,6 +520,17 @@ namespace StudyHub.DAL.Migrations
                     b.Navigation("Task");
                 });
 
+            modelBuilder.Entity("StudyHub.Entities.RefreshToken", b =>
+                {
+                    b.HasOne("StudyHub.Entities.User", "User")
+                        .WithOne("RefreshToken")
+                        .HasForeignKey("StudyHub.Entities.RefreshToken", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("StudyHub.Entities.StudentSelectedOption", b =>
                 {
                     b.HasOne("StudyHub.Entities.AssignmentTaskOptionBase", "Option")
@@ -587,6 +593,9 @@ namespace StudyHub.DAL.Migrations
 
             modelBuilder.Entity("StudyHub.Entities.User", b =>
                 {
+                    b.Navigation("RefreshToken")
+                        .IsRequired();
+
                     b.Navigation("SelectedOptions");
 
                     b.Navigation("TeacherSubjects");

@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using RealtorAPI.Extensions;
 using StudyHub.BLL.Services.Interfaces;
-using StudyHub.Common.Requests;
+using StudyHub.Common.DTO.UserInvitation;
 
 namespace StudyHub.Controllers;
 
@@ -18,7 +18,7 @@ public class UsersController : Controller
 
     [HttpPost("invite")]
     [Authorize(Roles = "Admin,Teacher")]
-    public async Task<IActionResult> InviteUsers(InviteUsersRequest dto)
+    public async Task<IActionResult> InviteUsers(InviteUsersDTO dto)
     {
         var userId = HttpContext.GetUserId();
 

@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
+using StudyHub.Common.DTO;
 using StudyHub.Common.DTO.AuthDTO;
-using StudyHub.Common.DTO.UserInvitation;
 using StudyHub.Entities;
 
 namespace StudyHub.BLL.Profiles;

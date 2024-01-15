@@ -15,14 +15,14 @@ public class GoogleAuthController : Controller
     }
 
     [HttpPost("[action]")]
-    public async Task<IActionResult> GoogleSignUp([FromHeader(Name = "Authorization-Code")] string authorizationCode)
+    public async Task<IActionResult> GoogleRegister([FromHeader(Name = "Authorization-Code")] string authorizationCode)
     {
         var result = await _googleAuthService.GoogleRegisterAsync(authorizationCode);
         return Ok(result);
     }
 
     [HttpPost("[action]")]
-    public async Task<IActionResult> GoogleSignIn([FromHeader(Name = "Authorization-Code")] string authorizationCode)
+    public async Task<IActionResult> GoogleLogin([FromHeader(Name = "Authorization-Code")] string authorizationCode)
     {
         var result = await _googleAuthService.GoogleLoginAsync(authorizationCode);
         return Ok(result);

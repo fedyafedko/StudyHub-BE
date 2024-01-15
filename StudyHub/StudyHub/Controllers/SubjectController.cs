@@ -54,7 +54,7 @@ public class SubjectController : Controller
     }
 
     [HttpGet("teacher")]
-    [Authorize(Roles ="Teacher")]
+    [Authorize(Roles = "Teacher")]
     public async Task<IActionResult> GetSubjectForTeacher()
     {
         var teacherId = HttpContext.GetUserId();
@@ -64,10 +64,10 @@ public class SubjectController : Controller
 
     [HttpGet("student")]
     [Authorize]
-    public IActionResult GetSubjectForStudent()
+    public async Task<IActionResult> GetSubjectForStudent()
     {
         var studentId = HttpContext.GetUserId();
-        var result = _subjectService.GetSubjectsForStudentAsync(studentId);
+        var result = await _subjectService.GetSubjectsForStudentAsync(studentId);
         return Ok(result);
     }
 

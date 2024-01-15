@@ -1,9 +1,9 @@
-﻿using StudyHub.Common.DTO.AuthDTO;
+﻿using StudyHub.Common.Requests;
 
 namespace StudyHub.BLL.Services.Interfaces.Auth;
 
 public interface IPasswordService
 {
-    Task<string> ForgotPassword(ForgotPasswordDTO dto);
-    Task<bool> IsResetPassword(ResetPasswordDTO dto);
+    Task<string> ForgotPasswordAsync(ForgotPasswordRequest dto);
+    Task<bool> ResetPasswordAsync(ResetPasswordRequest dto);
 }

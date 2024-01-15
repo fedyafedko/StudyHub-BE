@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using StudyHub.BLL.Services.Interfaces.Auth;
 using StudyHub.Common.DTO.AuthDTO;
+using StudyHub.Common.Requests;
 
 namespace StudyHub.Controllers;
 
@@ -17,14 +18,14 @@ public class AuthController : ControllerBase
         _passwordService = passwordService;
     }
 
-    [HttpPost("sign-up")]
+    [HttpPost("[action]")]
     public async Task<IActionResult> Register(RegisterUserDTO dto)
     {
         var result = await _authService.RegisterAsync(dto);
         return Ok(result);
     }
 
-    [HttpPost("sign-in")]
+    [HttpPost("[action]")]
     public async Task<IActionResult> Login(LoginUserDTO dto)
     {
         var result = await _authService.LoginAsync(dto);
@@ -39,17 +40,17 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("forgot-password")]
-    public async Task<IActionResult> ForgotPassword(ForgotPasswordDTO dto) 
+    public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest dto) 
     {
-        var result = await _passwordService.ForgotPassword(dto);
+        var result = await _passwordService.ForgotPasswordAsync(dto);
 
         return Ok(result);
     }
 
     [HttpPost("reset-password")]
-    public async Task<IActionResult> ResetPassword(ResetPasswordDTO dto)
+    public async Task<IActionResult> ResetPassword(ResetPasswordRequest dto)
     {
-        var result = await _passwordService.IsResetPassword(dto);
+        var result = await _passwordService.ResetPasswordAsync(dto);
 
         return Ok(result);
     }

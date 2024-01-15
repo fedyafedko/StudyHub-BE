@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using StudyHub.BLL.Services.Interfaces.Auth;
-using StudyHub.Common.DTO.AuthDTO;
 using StudyHub.Common.Exceptions;
+using StudyHub.Common.Requests;
 using StudyHub.Entities;
 
 namespace StudyHub.BLL.Services.Auth;
@@ -15,7 +15,7 @@ public class PasswordService : IPasswordService
         _userManager = userManager;
     }
 
-    public async Task<string> ForgotPassword(ForgotPasswordDTO dto)
+    public async Task<string> ForgotPasswordAsync(ForgotPasswordRequest dto)
     {
         var user = await _userManager.FindByEmailAsync(dto.Email)
             ?? throw new NotFoundException($"User with this email does not exist. Email: {dto.Email}");
@@ -25,7 +25,7 @@ public class PasswordService : IPasswordService
         return token;
     }
 
-    public async Task<bool> IsResetPassword(ResetPasswordDTO dto)
+    public async Task<bool> ResetPasswordAsync(ResetPasswordRequest dto)
     {
         var user = await _userManager.FindByEmailAsync(dto.Email)
             ?? throw new NotFoundException($"Unable to find user by specified email. Email: {dto.Email}");

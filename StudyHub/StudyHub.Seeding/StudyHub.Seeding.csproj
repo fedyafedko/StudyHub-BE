@@ -11,4 +11,9 @@
     <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="7.0.13" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Entities\StudyHub.Entities.csproj" />
+    <ProjectReference Include="..\StudyHub.Common\StudyHub.Common.csproj" />
+  </ItemGroup>
+
 </Project>

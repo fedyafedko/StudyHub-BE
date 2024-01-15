@@ -36,7 +36,7 @@ public class GoogleAuthService : IGoogleAuthService
             throw new NotFoundException($"Unable to find user by specified email. Email: {user!.Email}");
 
         return new AuthSuccessDTO(_tokenService.GenerateJwtToken(user, (await _userManager.GetRolesAsync(user)).ToArray()),
-            _tokenService.GenerateRefreshTokenAsync(user));
+            await _tokenService.GenerateRefreshTokenAsync(user));
     }
 
     private async Task<GoogleJsonWebSignature.Payload> GetUserInfoAsync(string authorizationCode)

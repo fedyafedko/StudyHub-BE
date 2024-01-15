@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using StudyHub.Common.DTO.AuthDTO;
+using StudyHub.Common.Requests;
 
 namespace StudyHub.Validators.RefreshTokenValidators;
 
@@ -10,7 +10,7 @@ public class RefreshTokenValidator : AbstractValidator<RefreshTokenRequest>
         RuleFor(x => x.RefreshToken)
             .NotEmpty();
 
-        RuleFor(x => x.Token)
+        RuleFor(x => x.AccessToken)
            .NotEmpty();
     }
 }

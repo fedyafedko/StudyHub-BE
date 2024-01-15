@@ -5,6 +5,7 @@ using StudyHub.Common.DTO.AuthDTO;
 using StudyHub.Common.Exceptions;
 using StudyHub.DAL.Repositories.Interfaces;
 using StudyHub.Entities;
+using System.Data.Entity.Infrastructure;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace StudyHub.BLL.Services;
@@ -16,17 +17,20 @@ public class AuthService : IAuthService
     private readonly ITokenService _tokenService;
     private readonly IRepository<InvitedUser> _invitedUserRepository;
     private readonly IMapper _mapper;
+    private readonly IRepository<RefreshToken> _refreshTokenRepository;
 
     public AuthService(
         UserManager<User> userManager,
         ITokenService tokenService,
         IRepository<InvitedUser> invitedUserRepository,
-        IMapper mapper)
+        IMapper mapper,
+        IRepository<RefreshToken> refreshTokenRepository)
     {
         _mapper = mapper;
         _invitedUserRepository = invitedUserRepository;
         _userManager = userManager;
         _tokenService = tokenService;
+        _refreshTokenRepository = refreshTokenRepository;
     }
 
     public async Task<AuthSuccessDTO> LoginAsync(LoginUserDTO user)
@@ -83,16 +87,19 @@ public class AuthService : IAuthService
 
         var jti = validatedToken!.Claims.Single(x => x.Type == JwtRegisteredClaimNames.Exp).Value;
 
-        var user = await _userManager.FindByIdAsync(validatedToken.Claims.Single(x => x.Type == "id").Value);
+        var existingToken = _refreshTokenRepository.FirstOrDefault(rf => rf.Token == refreshToken) 
+            ?? throw new NotFoundException($"This token doesn't found: {refreshToken}");
 
-        if (user is null)
-            throw new NotFoundException("User with this id does not exist");
-
-        if (DateTimeOffset.UtcNow > user.RefreshToken.ExpiryDate)
+        if (DateTimeOffset.UtcNow > existingToken.ExpiryDate)
             throw new ExpiredException("Refresh token is expired");
 
-        if (user.RefreshToken.Token != refreshToken)
-            throw new IncorrectParametersException("Refresh token is invalid");
+        if (existingToken.Invalidated)
+            throw new TokenValidatorException($"This token is invaludated: {refreshToken}");
+        
+        await _refreshTokenRepository.DeleteAsync(existingToken);
+
+        var user = await _userManager.FindByIdAsync(validatedToken.Claims.Single(x => x.Type == "id").Value)
+            ?? throw new NotFoundException("User with this id does not exist");
 
         return await GetAuthTokens(user);
     }
@@ -101,6 +108,6 @@ public class AuthService : IAuthService
     {
         var roles = (await _userManager.GetRolesAsync(user)).ToArray();
         return new AuthSuccessDTO(_tokenService.GenerateJwtToken(user!, roles),
-            _tokenService.GenerateRefreshTokenAsync(user!));
+            await _tokenService.GenerateRefreshTokenAsync(user!));
     }
 }

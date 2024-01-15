@@ -6,7 +6,7 @@ namespace StudyHub.BLL.Services.Interfaces;
 public interface ITokenService
 {
     string GenerateJwtToken(User user, string[] roles);
-    string GenerateRefreshTokenAsync(User user);
+    Task<string> GenerateRefreshTokenAsync(User user);
     bool IsJwtWithValidSecurityAlgorithm(SecurityToken validatedToken);
     ClaimsPrincipal GetPrincipalFromToken(string token);
 }

@@ -1,4 +1,4 @@
-﻿using StudyHub.Common.DTO;
+﻿using StudyHub.Common.DTO.UserInvitation;
 
 namespace StudyHub.FluentEmail.Interfaces;
 

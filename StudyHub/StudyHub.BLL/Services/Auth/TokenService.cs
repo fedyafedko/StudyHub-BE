@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using StudyHub.BLL.Services.Interfaces;
+using StudyHub.BLL.Extensions;
+using StudyHub.BLL.Services.Interfaces.Auth;
 using StudyHub.Common.Exceptions;
 using StudyHub.Common.Models;
 using StudyHub.DAL.Repositories.Interfaces;
@@ -11,55 +12,30 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace StudyHub.BLL.Services;
+namespace StudyHub.BLL.Services.Auth;
 
 public class TokenService : ITokenService
 {
     private readonly JwtSettings _settings;
+    private readonly UserManager<User> _userManager;
     private readonly TokenValidationParameters _tokenValidationParametrs;
     private readonly IRepository<RefreshToken> _refreshTokenRepository;
-    private readonly UserManager<User> _userManager;
 
-    public TokenService(IOptions<JwtSettings> settings, TokenValidationParameters tokenValidationParametrs, IRepository<RefreshToken> refreshTokenRepository, UserManager<User> userManager)
+    public TokenService(IOptions<JwtSettings> settings, 
+        TokenValidationParameters tokenValidationParametrs,
+        IRepository<RefreshToken> refreshTokenRepository, 
+        UserManager<User> userManager)
     {
-        _userManager = userManager;
         _refreshTokenRepository = refreshTokenRepository;
         _settings = settings.Value;
+        _userManager = userManager;
         _tokenValidationParametrs = tokenValidationParametrs;
     }
-
-    public ClaimsPrincipal GetPrincipalFromToken(string token)
-    {
-        var jwtTokenHandler = new JwtSecurityTokenHandler();
-        var validationParametrs = _tokenValidationParametrs.Clone();
-        validationParametrs.ValidateLifetime = false;
-        try
-        {
-            var principal = jwtTokenHandler.ValidateToken(token, validationParametrs, out var validatedToken);
-
-            if (!IsJwtWithValidSecurityAlgorithm(validatedToken))
-                throw new InvalidSecurityAlgorithmException("Current token does not have right security algorithm");
-
-            return principal;
-        }
-        catch
-        {
-            throw new TokenValidatorException("Something went wrong with token validator");
-        }
-    }
-
-    public bool IsJwtWithValidSecurityAlgorithm(SecurityToken validatedToken)
-    {
-        return validatedToken is JwtSecurityToken jwtSecurityToken &&
-            jwtSecurityToken.Header.Alg.Equals(
-                SecurityAlgorithms.HmacSha256,
-                StringComparison.InvariantCultureIgnoreCase);
-    }
-
-    public string GenerateJwtToken(User user, string[] roles)
+    public async Task<string> GenerateJwtTokenAsync(User user)
     {
         var jwtTokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.UTF8.GetBytes(_settings.Secret);
+
         var claims = new List<Claim>
         {
             new Claim("id", user.Id.ToString()),
@@ -67,6 +43,8 @@ public class TokenService : ITokenService
             new Claim(JwtRegisteredClaimNames.Email, user.Email!),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
+
+        var roles = await _userManager.GetRolesAsync(user);
 
         claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
@@ -104,5 +82,25 @@ public class TokenService : ITokenService
         await _userManager.UpdateAsync(user);
 
         return refreshToken.Token;
+    }
+
+    public ClaimsPrincipal GetPrincipalFromToken(string token)
+    {
+        var jwtTokenHandler = new JwtSecurityTokenHandler();
+        var validationParametrs = _tokenValidationParametrs.Clone();
+        validationParametrs.ValidateLifetime = false;
+        try
+        {
+            var principal = jwtTokenHandler.ValidateToken(token, validationParametrs, out var validatedToken);
+            
+            if (!validatedToken.IsJwtWithValidSecurityAlgorithm())
+                throw new InvalidSecurityAlgorithmException("Current token does not have right security algorithm");
+
+            return principal;
+        }
+        catch
+        {
+            throw new TokenValidatorException("Something went wrong with token validator");
+        }
     }
 }

@@ -8,38 +8,60 @@ using StudyHub.Entities;
 using Microsoft.AspNetCore.Identity;
 using StudyHub.Common.Models;
 using Microsoft.Extensions.Options;
+using StudyHub.BLL.Services.Interfaces.Auth;
+using AutoMapper;
+using StudyHub.DAL.Repositories.Interfaces;
 
-namespace StudyHub.BLL.Services;
+namespace StudyHub.BLL.Services.Auth;
 
-public class GoogleAuthService : IGoogleAuthService
+public class GoogleAuthService : AuthService, IGoogleAuthService
 {
-    private readonly UserManager<User> _userManager;
-    private readonly ITokenService _tokenService;
     private readonly GoogleAuthConfig _googleConfig;
 
     public GoogleAuthService(
         UserManager<User> userManager,
         ITokenService tokenService,
-        IOptions<GoogleAuthConfig> googleConfig)
+        IOptions<GoogleAuthConfig> googleConfig,
+        IRepository<InvitedUser> invitedUserRepository,
+        IRepository<RefreshToken> refreshTokenRepository,
+        IMapper mapper)
+            : base(userManager, tokenService, invitedUserRepository, mapper, refreshTokenRepository)
     {
-        _userManager = userManager;
-        _tokenService = tokenService;
         _googleConfig = googleConfig.Value;
     }
-    public async Task<AuthSuccessDTO> GoogleLogin(string authorizationCode)
+
+    public async Task<AuthSuccessDTO> GoogleRegisterAsync(string authorizationCode)
     {
-        var paylod = await GetUserInfoAsync(authorizationCode);
+        var payload = await GetGooglePayloadAsync(authorizationCode);
+
+        var user = await _userManager.FindByEmailAsync(payload.Email);
+
+        if (user != null)
+            throw new NotFoundException("User with this email already exists");
+
+        user = _mapper.Map<User>(payload);
+
+        var createdUserResult = await _userManager.CreateAsync(user);
+
+        if (!createdUserResult.Succeeded)
+            throw new UserManagerException("Unable to authenticate given user", createdUserResult.Errors);
+
+        return await GetAuthTokensAsync(user);
+    }
+
+    public async Task<AuthSuccessDTO> GoogleLoginAsync(string authorizationCode)
+    {
+        var paylod = await GetGooglePayloadAsync(authorizationCode);
 
         var user = await _userManager.FindByEmailAsync(paylod.Email);
 
         if (user == null)
             throw new NotFoundException($"Unable to find user by specified email. Email: {user!.Email}");
 
-        return new AuthSuccessDTO(_tokenService.GenerateJwtToken(user, (await _userManager.GetRolesAsync(user)).ToArray()),
-            await _tokenService.GenerateRefreshTokenAsync(user));
+        return await GetAuthTokensAsync(user);
     }
 
-    private async Task<GoogleJsonWebSignature.Payload> GetUserInfoAsync(string authorizationCode)
+    private async Task<GoogleJsonWebSignature.Payload> GetGooglePayloadAsync(string authorizationCode)
     {
         var flow = new GoogleAuthorizationCodeFlow(new GoogleAuthorizationCodeFlow.Initializer
         {
@@ -63,7 +85,6 @@ public class GoogleAuthService : IGoogleAuthService
             ExpirationTimeClockTolerance = _googleConfig.ExpirationTimeClockTolerance,
         };
 
-        var paylod = await GoogleJsonWebSignature.ValidateAsync(tokenResponse.IdToken, setting);
-        return paylod;
+        return await GoogleJsonWebSignature.ValidateAsync(tokenResponse.IdToken, setting);
     }
 }

@@ -3,7 +3,6 @@ using StudyHub.DAL.EF;
 using StudyHub.DAL.Repositories.Interfaces;
 using StudyHub.DAL.Repositories;
 using StudyHub.Common.Models;
-using StudyHub.BLL.Services;
 using StudyHub.BLL.Profiles;
 using StudyHub.BLL.Services.Interfaces;
 using StudyHub.Entities;
@@ -20,6 +19,9 @@ using StudyHub.Extensions;
 using StudyHub.FluentEmail;
 using StudyHub.FluentEmail.Interfaces;
 using StudyHub.Seeding.Extentions;
+using StudyHub.BLL.Services.Auth;
+using StudyHub.BLL.Services.Interfaces.Auth;
+using StudyHub.BLL.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,6 +50,7 @@ builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserInvitationService, UserInvitationService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IPasswordService, PasswordService>();
 
 // Fluent Email
 builder.Services.AddFluentEmail(builder.Configuration);

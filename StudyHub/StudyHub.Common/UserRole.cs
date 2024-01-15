@@ -42,6 +42,17 @@ public class UserRole : IEquatable<UserRole>
     public static bool operator !=(string? left, UserRole? right)
     {
         return !(left == right?.Value);
-    } 
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return ((UserRole)obj!).Value.Equals(Value, StringComparison.Ordinal);
+    }
+
+    public override int GetHashCode()
+    {
+        return Value.GetHashCode();
+    }
+
     #endregion
 }

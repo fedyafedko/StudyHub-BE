@@ -2,11 +2,11 @@
 using StudyHub.Entities;
 using System.Security.Claims;
 
-namespace StudyHub.BLL.Services.Interfaces;
+namespace StudyHub.BLL.Services.Interfaces.Auth;
+
 public interface ITokenService
 {
-    string GenerateJwtToken(User user, string[] roles);
+    Task<string> GenerateJwtTokenAsync(User user);
     Task<string> GenerateRefreshTokenAsync(User user);
-    bool IsJwtWithValidSecurityAlgorithm(SecurityToken validatedToken);
     ClaimsPrincipal GetPrincipalFromToken(string token);
 }

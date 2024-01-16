@@ -1,6 +1,5 @@
 ﻿using FluentEmail.Core;
 using Microsoft.Extensions.Options;
-using StudyHub.Common.DTO;
 using StudyHub.Common.Models;
 using StudyHub.FluentEmail.MessageBase;
 using StudyHub.FluentEmail.Services.Interfaces;
@@ -21,8 +20,6 @@ public class EmailService : IEmailService
     public async Task<bool> SendAsync<T>(string to, T message)
         where T : EmailMessageBase
     {
-        //var url = string.Format(_messageSettings.AcceptInvitationUrl, invitedUserDTO.Role, invitedUserDTO.Token);
-
         var path = $@"{Directory.GetCurrentDirectory()}{_messageSettings.MessagePath}\{message.TemplateName}.cshtml";
 
         var sendEmail = await _fluentEmail

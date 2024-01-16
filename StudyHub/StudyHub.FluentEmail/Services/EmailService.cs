@@ -33,18 +33,23 @@ public class EmailService : IEmailService
         return sendEmail.Successful;
     }
 
-    public async Task SendManyAsync<T>(List<T> message)
+    public async Task<bool> SendManyAsync<T>(List<T> message)
         where T : EmailMessageBase
     {
         foreach (var item in message)
         {
             var path = $@"{Directory.GetCurrentDirectory()}{_messageSettings.MessagePath}\{item.TemplateName}.cshtml";
-            await _fluentEmailFactory
-                .Create()
-                .To(item.Email)
-                .Subject(item.Subject)
-                .UsingTemplateFromFile(path, item)
-                .SendAsync();
+            var sendEmail = await _fluentEmailFactory
+                 .Create()
+                 .To(item.Recipient)
+                 .Subject(item.Subject)
+                 .UsingTemplateFromFile(path, item)
+                 .SendAsync();
+
+            if (!sendEmail.Successful)
+                return false;
         }
+
+        return true;
     }
 }

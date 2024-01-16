@@ -36,7 +36,7 @@ public class PasswordService : IPasswordService
         var uri = string.Format(_messageSettings.AcceptInvitationUrl, user.Email, token);
 
         var emailSent = await _emailService.SendAsync(user.Email!,
-            new ResetPasswordMessage { Email = user.Email!, ResetPasswordUri = uri });
+            new ResetPasswordMessage { Recipient = user.Email!, ResetPasswordUri = uri });
 
         return emailSent;
     }

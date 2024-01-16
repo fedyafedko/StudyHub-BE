@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FluentEmail.Core;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using StudyHub.BLL.Extensions;
@@ -12,6 +13,7 @@ using StudyHub.DAL.Repositories.Interfaces;
 using StudyHub.Entities;
 using StudyHub.FluentEmail.MessageBase;
 using StudyHub.FluentEmail.Services.Interfaces;
+using System.Management;
 using System.Security.Cryptography;
 
 namespace StudyHub.BLL.Services;
@@ -41,56 +43,59 @@ public class UserInvitationService : IUserInvitationService
         _messageSettings = messageSettings.Value;
     }
 
-    public async Task<bool> InviteManyAsync(Guid userId, InviteUsersRequest dto)
+    public async Task<bool> InviteManyAsync(Guid userId, InviteUsersRequest request)
     {
         var user = await _userManager.FindByIdAsync(userId);
 
         var roles = await _userManager.GetRolesAsync(user!);
 
-        if (!IsValidRoleToAdd(roles.First(), dto.Role))
+        if (!IsValidRoleToAdd(roles.First(), request.Role))
         {
-            throw new IncorrectParametersException($"Specified user unable to invite users with role: {dto.Role}.");
+            throw new IncorrectParametersException($"Specified user unable to invite users with role: {request.Role}.");
         }
 
         var invitedUsers = new List<InvitedUser>();
         var usersMessage = new List<InviteUserMessage>();
 
-        foreach (var email in dto.Emails)
+        foreach (var email in request.Emails)
         {
             var allRoles = _roleManager.Roles.ToList().Select(r => r.Name);
 
-            if (!allRoles.Contains(dto.Role))
-                throw new NotFoundException($"Role {dto.Role} doesn't exist");
+            if (!allRoles.Contains(request.Role))
+                throw new NotFoundException($"Role {request.Role} doesn't exist");
 
             if (await _userManager.FindByEmailAsync(email) != null)
                 throw new IncorrectParametersException($"User with email {email} already exists.");
 
-            var registration = new InvitedUserDTO
-            {
-                Email = email,
-                // ToDo: Move this to Random extensions or something like this
-                Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
-                Role = dto.Role
-            };
+            string tokenRaw = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
 
-            var url = string.Format(_messageSettings.AcceptInvitationUrl, registration.Role, registration.Token);
+            // ToDo: place html friendly token as param here
+            var url = string.Format(_messageSettings.AcceptInvitationUrl, request.Role, tokenRaw);
 
             var userMessage = new InviteUserMessage
             {
-                Email = registration.Email,
-                Token = registration.Token,
-                Role = registration.Role,
+                Recipient = email,
                 InviteUserUrl = url
             };
 
             usersMessage.Add(userMessage);
 
+            var registration = new InvitedUserDTO
+            {
+                Email = email,
+                // ToDo: Move this to Random extensions or something like this + encode via HtmlUtility
+                Token = tokenRaw,
+                Role = request.Role
+            };
             var invitedUser = _mapper.Map<InvitedUser>(registration);
 
             invitedUsers.Add(invitedUser);
         }
 
-        await _emailService.SendManyAsync(usersMessage);
+        var IsEmailSend = await _emailService.SendManyAsync(usersMessage);
+
+        if(!IsEmailSend)
+            throw new Exception($"Unable to send email.");
 
         return await _invitedUserRepository.InsertManyAsync(invitedUsers);
     }

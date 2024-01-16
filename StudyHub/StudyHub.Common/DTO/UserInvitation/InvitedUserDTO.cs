@@ -1,4 +1,4 @@
-﻿namespace StudyHub.Common.DTO;
+﻿namespace StudyHub.Common.DTO.UserInvitation;
 
 public class InvitedUserDTO
 {

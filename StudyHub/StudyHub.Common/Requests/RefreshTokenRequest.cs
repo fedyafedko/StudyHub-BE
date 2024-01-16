@@ -1,4 +1,4 @@
-﻿namespace StudyHub.Common.DTO.AuthDTO;
+﻿namespace StudyHub.Common.Requests;
 
 public class RefreshTokenRequest
 {

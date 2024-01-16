@@ -1,4 +1,5 @@
 ﻿namespace StudyHub.Common.DTO.Subject;
+
 public class SubjectDTO
 {
     public Guid Id { get; set; }

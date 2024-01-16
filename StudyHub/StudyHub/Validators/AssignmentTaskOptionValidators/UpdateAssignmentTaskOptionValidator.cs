@@ -10,7 +10,7 @@ public class UpdateAssignmentTaskOptionValidator : AbstractValidator<List<Update
         RuleFor(options => options)
             .Must(HaveConsistentCorrectness)
             .WithMessage("Options must all have IsCorrect set or unset, but not a mix.");
-            
+
         RuleFor(options => options)
             .Must(options => options.Count > 0)
             .WithMessage("Options must not be empty");

@@ -26,5 +26,5 @@ public class GoogleAuthController : Controller
     {
         var result = await _googleAuthService.GoogleLoginAsync(authorizationCode);
         return Ok(result);
-    } 
+    }
 }

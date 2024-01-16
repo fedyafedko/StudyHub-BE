@@ -4,19 +4,17 @@
 
 namespace StudyHub.DAL.Migrations
 {
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public partial class RenameTableInvitedUser : Migration
     {
-        /// <inheritdoc />
+        /// <inheritdoc/>
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-
         }
     }
 }

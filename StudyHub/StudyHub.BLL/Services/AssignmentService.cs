@@ -15,14 +15,15 @@ public class AssignmentService : IAssignmentService
     private readonly IMapper _mapper;
 
     public AssignmentService(
-        IRepository<Assignment> assignmentRepository, 
-        IRepository<Subject> subjectRepository, 
+        IRepository<Assignment> assignmentRepository,
+        IRepository<Subject> subjectRepository,
         IMapper mapper)
     {
         _assignmentRepository = assignmentRepository;
         _subjectRepository = subjectRepository;
         _mapper = mapper;
     }
+
     public async Task<AssignmentDTO> CreateAssignmentAsync(CreateAssignmentDTO dto)
     {
         var entity = _mapper.Map<Assignment>(dto);

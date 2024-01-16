@@ -10,6 +10,7 @@ using StudyHub.Common.Requests;
 using AutoMapper;
 using StudyHub.DAL.Repositories.Interfaces;
 using StudyHub.BLL.Extensions;
+using System.Web;
 
 namespace StudyHub.BLL.Services.Auth;
 
@@ -53,7 +54,7 @@ public class AuthService : IAuthService
         var invitedUser = _invitedUserRepository.FirstOrDefault(e => e.Email == dto.Email)
             ?? throw new NotFoundException($"User with this email wasn't invited: {dto.Email}");
 
-        if (!dto.Token.Descrypt(invitedUser.Token))
+        if (!HttpUtility.UrlDecode(dto.Token).Descrypt(invitedUser.Token))
             throw new InvalidSecurityAlgorithmException($"User with this token doesn't exist: {dto.Token}");
 
         var user = await _userManager.FindByEmailAsync(dto.Email);

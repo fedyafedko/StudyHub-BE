@@ -74,11 +74,11 @@ public class SubjectService : ISubjectService
 
         var subjects = _mapper
             .Map<List<SubjectDTO>>(student.Subjects);
-                
+
         return subjects.ToList();
     }
 
-    public  async Task<List<SubjectDTO>> GetSubjectsForTeacherAsync(Guid teacherId)
+    public async Task<List<SubjectDTO>> GetSubjectsForTeacherAsync(Guid teacherId)
     {
         var subjects = await _subjectRepository.Where(x => x.TeacherId == teacherId).ToListAsync();
 

@@ -40,18 +40,14 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("forgot-password")]
-    public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest dto) 
+    public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest dto)
     {
-        var result = await _passwordService.ForgotPasswordAsync(dto);
-
-        return Ok(result);
+        return await _passwordService.ForgotPasswordAsync(dto) ? NoContent() : BadRequest();
     }
 
     [HttpPost("reset-password")]
     public async Task<IActionResult> ResetPassword(ResetPasswordRequest dto)
     {
-        var result = await _passwordService.ResetPasswordAsync(dto);
-
-        return Ok(result);
+        return await _passwordService.ResetPasswordAsync(dto) ? NoContent() : BadRequest();
     }
 }

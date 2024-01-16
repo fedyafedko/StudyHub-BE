@@ -24,6 +24,7 @@ public class UserRole : IEquatable<UserRole>
     }
 
     #region Operators overload
+
     public static bool operator ==(UserRole? left, UserRole? right)
     {
         return left?.Value == right?.Value;
@@ -54,5 +55,5 @@ public class UserRole : IEquatable<UserRole>
         return Value.GetHashCode();
     }
 
-    #endregion
+    #endregion Operators overload
 }

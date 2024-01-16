@@ -2,6 +2,6 @@
 
 public class IncorrectParametersException : Exception
 {
-    public IncorrectParametersException(string? message) 
+    public IncorrectParametersException(string? message)
         : base(message) { }
 }

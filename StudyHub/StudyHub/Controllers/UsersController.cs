@@ -11,6 +11,7 @@ namespace StudyHub.Controllers;
 public class UsersController : Controller
 {
     private readonly IUserInvitationService _userInvitingService;
+
     public UsersController(IUserInvitationService userInvitingService)
     {
         _userInvitingService = userInvitingService;

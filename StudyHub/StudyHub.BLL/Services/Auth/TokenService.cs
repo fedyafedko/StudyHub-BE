@@ -31,6 +31,7 @@ public class TokenService : ITokenService
         _userManager = userManager;
         _tokenValidationParametrs = tokenValidationParametrs;
     }
+
     public async Task<string> GenerateJwtTokenAsync(User user)
     {
         var jwtTokenHandler = new JwtSecurityTokenHandler();
@@ -92,7 +93,7 @@ public class TokenService : ITokenService
         try
         {
             var principal = jwtTokenHandler.ValidateToken(token, validationParametrs, out var validatedToken);
-            
+
             if (!validatedToken.IsJwtWithValidSecurityAlgorithm())
                 throw new InvalidSecurityAlgorithmException("Current token does not have right security algorithm");
 

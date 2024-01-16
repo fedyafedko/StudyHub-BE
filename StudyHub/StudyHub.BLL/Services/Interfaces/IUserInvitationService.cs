@@ -1,5 +1,4 @@
-﻿using StudyHub.Common.DTO;
-using StudyHub.Common.Requests;
+﻿using StudyHub.Common.Requests;
 
 namespace StudyHub.BLL.Services.Interfaces;
 

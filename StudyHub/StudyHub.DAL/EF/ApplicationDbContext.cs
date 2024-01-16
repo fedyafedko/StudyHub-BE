@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using StudyHub.Entities;
-using System.Reflection.Metadata;
 
 namespace StudyHub.DAL.EF;
 

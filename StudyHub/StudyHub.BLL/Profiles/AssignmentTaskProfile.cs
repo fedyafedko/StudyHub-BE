@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using StudyHub.Entities;
 using StudyHub.Common.DTO.AssignmentTask;
+using StudyHub.Entities;
 
 namespace StudyHub.BLL.Profiles;
 

@@ -1,5 +1,4 @@
-﻿using Microsoft.IdentityModel.Tokens;
-using StudyHub.Entities;
+﻿using StudyHub.Entities;
 using System.Security.Claims;
 
 namespace StudyHub.BLL.Services.Interfaces.Auth;

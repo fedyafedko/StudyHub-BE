@@ -16,7 +16,7 @@ public class AssignmentTaskService : IAssignmentTaskService
     private readonly IMapper _mapper;
 
     public AssignmentTaskService(
-        IRepository<AssignmentTask> repositoryAssignmentTask, 
+        IRepository<AssignmentTask> repositoryAssignmentTask,
         IRepository<Assignment> repositoryAssignment,
         IOptionsService optionsService,
         IMapper mapper)
@@ -34,7 +34,7 @@ public class AssignmentTaskService : IAssignmentTaskService
 
         if (assignment == null)
             throw new NotFoundException($"Assignment not found in the database with this ID: {dto.AssignmentId}");
-        
+
         await _assignmentTaskRepository.InsertAsync(entity);
         var options = await _optionsService.AddAssignmentTaskOptionsAsync(entity.Id, dto.Options);
 

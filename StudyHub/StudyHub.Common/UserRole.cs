@@ -9,9 +9,12 @@ public class UserRole : IEquatable<UserRole>
 
     public string Value { get; private set; }
 
-    public static UserRole Admin { get { return new UserRole("Admin"); } }
-    public static UserRole Teacher { get { return new UserRole("Teacher"); } }
-    public static UserRole Student { get { return new UserRole("Student"); } }
+    public static UserRole Admin
+    { get { return new UserRole("Admin"); } }
+    public static UserRole Teacher
+    { get { return new UserRole("Teacher"); } }
+    public static UserRole Student
+    { get { return new UserRole("Student"); } }
 
     public override string ToString()
     {
@@ -24,6 +27,7 @@ public class UserRole : IEquatable<UserRole>
     }
 
     #region Operators overload
+
     public static bool operator ==(UserRole? left, UserRole? right)
     {
         return left?.Value == right?.Value;
@@ -54,5 +58,5 @@ public class UserRole : IEquatable<UserRole>
         return Value.GetHashCode();
     }
 
-    #endregion
+    #endregion Operators overload
 }

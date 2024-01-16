@@ -58,11 +58,12 @@ public class UserInvitationService : IUserInvitationService
             if (await _userManager.FindByEmailAsync(email) != null)
                 throw new IncorrectParametersException($"User with email {email} already exists.");
 
+            var userToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+
             var registration = new InvitedUserDTO
             {
                 Email = email,
-                // ToDo: Move this to Random extensions or something like this
-                Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
+                Token = userToken,
                 Role = dto.Role
             };
 
@@ -70,6 +71,8 @@ public class UserInvitationService : IUserInvitationService
 
             if (!isMessageSent)
                 throw new Exception($"Unable to send email. Email: {email}");
+
+            registration.Token = userToken.Encrypt();
 
             var invitedUser = _mapper.Map<InvitedUser>(registration);
 
@@ -81,11 +84,11 @@ public class UserInvitationService : IUserInvitationService
 
     private bool IsValidRoleToAdd(string requestingUserRole, string userToAddRole)
     {
-        if (requestingUserRole == UserRole.Admin)
+        if (requestingUserRole.ToUpper() == UserRole.Admin.Value)
             return true;
-        
-        if (requestingUserRole == UserRole.Teacher)
-            return userToAddRole == UserRole.Teacher || userToAddRole == UserRole.Student;
+
+        if (requestingUserRole.ToUpper() == UserRole.Teacher.Value)
+            return userToAddRole.ToUpper() == UserRole.Teacher.Value || userToAddRole.ToUpper() == UserRole.Student.Value;
 
         return false;
     }

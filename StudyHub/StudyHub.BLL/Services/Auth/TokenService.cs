@@ -5,6 +5,7 @@ using StudyHub.BLL.Extensions;
 using StudyHub.BLL.Services.Interfaces.Auth;
 using StudyHub.Common.Exceptions;
 using StudyHub.Common.Models;
+using StudyHub.DAL.Repositories.Interfaces;
 using StudyHub.Entities;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -18,9 +19,14 @@ public class TokenService : ITokenService
     private readonly JwtSettings _settings;
     private readonly UserManager<User> _userManager;
     private readonly TokenValidationParameters _tokenValidationParametrs;
+    private readonly IRepository<RefreshToken> _refreshTokenRepository;
 
-    public TokenService(IOptions<JwtSettings> settings, UserManager<User> userManager, TokenValidationParameters tokenValidationParametrs)
+    public TokenService(IOptions<JwtSettings> settings, 
+        TokenValidationParameters tokenValidationParametrs,
+        IRepository<RefreshToken> refreshTokenRepository, 
+        UserManager<User> userManager)
     {
+        _refreshTokenRepository = refreshTokenRepository;
         _settings = settings.Value;
         _userManager = userManager;
         _tokenValidationParametrs = tokenValidationParametrs;
@@ -45,7 +51,6 @@ public class TokenService : ITokenService
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),
-
             Expires = DateTime.UtcNow.Add(_settings.AccessTokenLifeTime),
             SigningCredentials =
                 new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
@@ -57,7 +62,8 @@ public class TokenService : ITokenService
         var jwtToken = jwtTokenHandler.WriteToken(token);
         return jwtToken;
     }
-    public string GenerateRefreshTokenAsync(User user)
+
+    public async Task<string> GenerateRefreshTokenAsync(User user)
     {
         var refreshToken = new RefreshToken
         {
@@ -69,9 +75,13 @@ public class TokenService : ITokenService
             Invalidated = false,
         };
 
-        user.RefreshToken = refreshToken;
+        await _refreshTokenRepository.InsertAsync(refreshToken);
 
-        return user.RefreshToken.Token;
+        user.RefreshTokenId = refreshToken.Id;
+
+        await _userManager.UpdateAsync(user);
+
+        return refreshToken.Token;
     }
 
     public ClaimsPrincipal GetPrincipalFromToken(string token)

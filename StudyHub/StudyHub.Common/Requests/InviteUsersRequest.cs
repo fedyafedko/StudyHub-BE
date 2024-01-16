@@ -1,6 +1,6 @@
-﻿namespace StudyHub.Common.DTO.UserInvitation;
+﻿namespace StudyHub.Common.Requests;
 
-public class InviteUsersDTO
+public class InviteUsersRequest
 {
     public List<string> Emails { get; set; } = null!;
     public string Role { get; set; } = string.Empty;

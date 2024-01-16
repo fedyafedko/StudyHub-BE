@@ -1,6 +1,6 @@
 ﻿using FluentEmail.Core;
 using Microsoft.Extensions.Options;
-using StudyHub.Common.DTO;
+using StudyHub.Common.DTO.UserInvitation;
 using StudyHub.Common.Models;
 using StudyHub.FluentEmail.Interfaces;
 

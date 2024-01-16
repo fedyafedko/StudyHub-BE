@@ -1,6 +1,7 @@
 ﻿using Google.Apis.Auth.OAuth2.Flows;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Auth;
+using StudyHub.BLL.Services.Interfaces;
 using StudyHub.Common.DTO.AuthDTO;
 using StudyHub.Common.Exceptions;
 using StudyHub.Entities;
@@ -22,8 +23,9 @@ public class GoogleAuthService : AuthService, IGoogleAuthService
         ITokenService tokenService,
         IOptions<GoogleAuthConfig> googleConfig,
         IRepository<InvitedUser> invitedUserRepository,
+        IRepository<RefreshToken> refreshTokenRepository,
         IMapper mapper)
-            : base(userManager, tokenService, invitedUserRepository, mapper)
+            : base(userManager, tokenService, invitedUserRepository, mapper, refreshTokenRepository)
     {
         _googleConfig = googleConfig.Value;
     }

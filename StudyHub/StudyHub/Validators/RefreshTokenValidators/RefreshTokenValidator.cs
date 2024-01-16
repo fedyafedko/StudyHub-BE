@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using StudyHub.Common.DTO.AuthDTO;
+using StudyHub.Common.Requests;
 
 namespace StudyHub.Validators.RefreshTokenValidators;
 

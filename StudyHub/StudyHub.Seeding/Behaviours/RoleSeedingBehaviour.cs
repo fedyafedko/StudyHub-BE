@@ -10,7 +10,7 @@ public class RoleSeedingBehaviour : ISeedingBehaviour
     public RoleSeedingBehaviour(RoleManager<IdentityRole<Guid>> roleManager)
     {
         _roleManager = roleManager;
-    } 
+    }
 
     public async Task SeedAsync()
     {

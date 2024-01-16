@@ -4,6 +4,7 @@ using StudyHub.Seeding.Behaviours;
 using StudyHub.Seeding.Interfaces;
 
 namespace StudyHub.Seeding.Extentions;
+
 public static class SeedingExtentions
 {
     public static IServiceCollection AddSeeding(this IServiceCollection services)

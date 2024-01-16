@@ -4,10 +4,10 @@
 
 namespace StudyHub.DAL.Migrations
 {
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public partial class FixedTypeOf : Migration
     {
-        /// <inheritdoc />
+        /// <inheritdoc/>
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.RenameColumn(
@@ -16,7 +16,7 @@ namespace StudyHub.DAL.Migrations
                 newName: "Label");
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.RenameColumn(

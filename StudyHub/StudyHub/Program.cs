@@ -1,27 +1,27 @@
-using Microsoft.EntityFrameworkCore;
-using StudyHub.DAL.EF;
-using StudyHub.DAL.Repositories.Interfaces;
-using StudyHub.DAL.Repositories;
-using StudyHub.Common.Models;
-using StudyHub.BLL.Profiles;
-using StudyHub.BLL.Services.Interfaces;
-using StudyHub.Entities;
-using Microsoft.AspNetCore.Identity;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using StudyHub.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using StudyHub.Validators.AssignmentTaskOptionValidators;
 using Microsoft.OpenApi.Models;
-using StudyHub.Extensions;
-using StudyHub.FluentEmail;
-using StudyHub.FluentEmail.Interfaces;
-using StudyHub.Seeding.Extentions;
-using StudyHub.BLL.Services.Auth;
-using StudyHub.BLL.Services.Interfaces.Auth;
+using StudyHub.BLL.Profiles;
 using StudyHub.BLL.Services;
+using StudyHub.BLL.Services.Auth;
+using StudyHub.BLL.Services.Interfaces;
+using StudyHub.BLL.Services.Interfaces.Auth;
+using StudyHub.Common.Models;
+using StudyHub.DAL.EF;
+using StudyHub.DAL.Repositories;
+using StudyHub.DAL.Repositories.Interfaces;
+using StudyHub.Entities;
+using StudyHub.Extensions;
+using StudyHub.FluentEmail.Services;
+using StudyHub.FluentEmail.Services.Interfaces;
+using StudyHub.Middlewares;
+using StudyHub.Seeding.Extentions;
+using StudyHub.Validators.AssignmentTaskOptionValidators;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,9 +55,9 @@ builder.Services.AddScoped<IPasswordService, PasswordService>();
 // Fluent Email
 builder.Services.AddFluentEmail(builder.Configuration);
 
-// Seeding 
+// Seeding
 builder.Services.AddSeeding();
- 
+
 // Identity
 builder.Services.AddIdentity<User, IdentityRole<Guid>>()
     .AddRoles<IdentityRole<Guid>>()

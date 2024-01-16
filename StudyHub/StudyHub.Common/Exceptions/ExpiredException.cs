@@ -2,6 +2,6 @@
 
 public class ExpiredException : Exception
 {
-    public ExpiredException(string? message) 
+    public ExpiredException(string? message)
         : base(message) { }
 }

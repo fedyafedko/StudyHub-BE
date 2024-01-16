@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RealtorAPI.Extensions;
-using StudyHub.BLL.Services;
 using StudyHub.BLL.Services.Interfaces;
 using StudyHub.Common.DTO.Subject;
 
@@ -15,7 +14,7 @@ public class SubjectController : Controller
     private readonly IAssignmentService _assignmentService;
 
     public SubjectController(
-        ISubjectService subjectService, 
+        ISubjectService subjectService,
         IAssignmentService assignmentService)
     {
         _subjectService = subjectService;
@@ -28,7 +27,7 @@ public class SubjectController : Controller
         var result = await _subjectService.AddSubjectAsync(dto);
         return Ok(result);
     }
-    
+
     [HttpPut("{subjectId}")]
     [Authorize]
     public async Task<IActionResult> UpdateSubject(Guid subjectId, UpdateSubjectDTO dto)

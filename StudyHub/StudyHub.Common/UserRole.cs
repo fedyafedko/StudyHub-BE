@@ -9,12 +9,9 @@ public class UserRole : IEquatable<UserRole>
 
     public string Value { get; private set; }
 
-    public static UserRole Admin
-    { get { return new UserRole("Admin"); } }
-    public static UserRole Teacher
-    { get { return new UserRole("Teacher"); } }
-    public static UserRole Student
-    { get { return new UserRole("Student"); } }
+    public static UserRole Admin { get { return new UserRole("Admin"); } }
+    public static UserRole Teacher { get { return new UserRole("Teacher"); } }
+    public static UserRole Student { get { return new UserRole("Student"); } }
 
     public override string ToString()
     {

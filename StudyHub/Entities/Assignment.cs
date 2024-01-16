@@ -6,7 +6,6 @@ public class Assignment : EntityBase
 {
     [ForeignKey(nameof(Subject))]
     public Guid SubjectId { get; set; }
-
     public string Title { get; set; } = string.Empty;
     public int MaxMark { get; set; }
     public DateTime StartDate { get; set; }

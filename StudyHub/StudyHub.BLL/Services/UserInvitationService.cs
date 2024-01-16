@@ -53,6 +53,7 @@ public class UserInvitationService : IUserInvitationService
         }
 
         var invitedUsers = new List<InvitedUser>();
+        var usersMessage = new List<InviteUserMessage>();
 
         foreach (var email in dto.Emails)
         {
@@ -74,21 +75,22 @@ public class UserInvitationService : IUserInvitationService
 
             var url = string.Format(_messageSettings.AcceptInvitationUrl, registration.Role, registration.Token);
 
-            var isMessageSent = await _emailService.SendAsync(email, new InviteUserMessage
+            var userMessage = new InviteUserMessage
             {
                 Email = registration.Email,
                 Token = registration.Token,
                 Role = registration.Role,
                 InviteUserUrl = url
-            });
+            };
 
-            if (!isMessageSent)
-                throw new Exception($"Unable to send email. Email: {email}");
+            usersMessage.Add(userMessage);
 
             var invitedUser = _mapper.Map<InvitedUser>(registration);
 
             invitedUsers.Add(invitedUser);
         }
+
+        await _emailService.SendManyAsync(usersMessage);
 
         return await _invitedUserRepository.InsertManyAsync(invitedUsers);
     }

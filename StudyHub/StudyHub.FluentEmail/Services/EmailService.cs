@@ -9,12 +9,14 @@ namespace StudyHub.FluentEmail.Services;
 public class EmailService : IEmailService
 {
     private readonly IFluentEmail _fluentEmail;
+    private readonly IFluentEmailFactory _fluentEmailFactory;
     private readonly EmailSettings _messageSettings;
 
-    public EmailService(IFluentEmail fluentEmail, IOptions<EmailSettings> messageSettings)
+    public EmailService(IFluentEmail fluentEmail, IOptions<EmailSettings> messageSettings, IFluentEmailFactory fluentEmailFactory)
     {
         _fluentEmail = fluentEmail;
         _messageSettings = messageSettings.Value;
+        _fluentEmailFactory = fluentEmailFactory;
     }
 
     public async Task<bool> SendAsync<T>(string to, T message)
@@ -28,8 +30,21 @@ public class EmailService : IEmailService
                   .UsingTemplateFromFile(path, message)
                   .SendAsync();
 
-        _fluentEmail.Data.ToAddresses.Clear();
-
         return sendEmail.Successful;
+    }
+
+    public async Task SendManyAsync<T>(List<T> message)
+        where T : EmailMessageBase
+    {
+        foreach (var item in message)
+        {
+            var path = $@"{Directory.GetCurrentDirectory()}{_messageSettings.MessagePath}\{item.TemplateName}.cshtml";
+            await _fluentEmailFactory
+                .Create()
+                .To(item.Email)
+                .Subject(item.Subject)
+                .UsingTemplateFromFile(path, item)
+                .SendAsync();
+        }
     }
 }

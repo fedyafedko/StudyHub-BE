@@ -46,6 +46,7 @@ public class EmailService : IEmailService
                  .UsingTemplateFromFile(path, item)
                  .SendAsync();
 
+            // ToDo: play around CancelationToken here, something can be done here
             if (!sendEmail.Successful)
                 return false;
         }

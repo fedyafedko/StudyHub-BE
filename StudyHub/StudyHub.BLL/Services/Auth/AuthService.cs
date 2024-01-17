@@ -55,7 +55,7 @@ public class AuthService : IAuthService
             ?? throw new NotFoundException($"User with this email wasn't invited: {dto.Email}");
 
         if (!_encryptService.Verify(HttpUtility.UrlDecode(dto.Token), invitedUser.Token))
-            throw new InvalidSecurityAlgorithmException($"User with this token doesn't exist: {dto.Token}");
+            throw new InvalidTokenException($"This token isn't correct: {dto.Token}");
 
         var user = await _userManager.FindByEmailAsync(dto.Email);
 

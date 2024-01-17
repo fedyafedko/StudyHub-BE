@@ -7,6 +7,7 @@ using StudyHub.Entities;
 using System.IdentityModel.Tokens.Jwt;
 using StudyHub.BLL.Services.Interfaces.Auth;
 using StudyHub.Common.Requests;
+using System.Web;
 
 namespace StudyHub.BLL.Services.Auth;
 
@@ -14,6 +15,7 @@ public class AuthService : IAuthService
 {
     protected readonly UserManager<User> _userManager;
     protected readonly ITokenService _tokenService;
+    private readonly IEncryptService _encryptService;
     private readonly IRepository<InvitedUser> _invitedUserRepository;
     private readonly IRepository<RefreshToken> _refreshTokenRepository;
     protected readonly IMapper _mapper;
@@ -21,15 +23,17 @@ public class AuthService : IAuthService
     public AuthService(
         UserManager<User> userManager,
         ITokenService tokenService,
+        IEncryptService encryptService,
         IRepository<InvitedUser> invitedUserRepository,
-        IMapper mapper,
-        IRepository<RefreshToken> refreshTokenRepository)
+        IRepository<RefreshToken> refreshTokenRepository,
+        IMapper mapper)
     {
         _userManager = userManager;
         _tokenService = tokenService;
+        _encryptService = encryptService;
         _invitedUserRepository = invitedUserRepository;
-        _mapper = mapper;
         _refreshTokenRepository = refreshTokenRepository;
+        _mapper = mapper;
     }
 
     public async Task<AuthSuccessDTO> LoginAsync(LoginUserDTO dto)
@@ -50,8 +54,8 @@ public class AuthService : IAuthService
         var invitedUser = _invitedUserRepository.FirstOrDefault(e => e.Email == dto.Email)
             ?? throw new NotFoundException($"User with this email wasn't invited: {dto.Email}");
 
-        if (invitedUser.Token != dto.Token)
-            throw new IncorrectParametersException("Passed token isn't valid.");
+        if (!_encryptService.Verify(HttpUtility.UrlDecode(dto.Token), invitedUser.Token))
+            throw new InvalidTokenException($"This token isn't correct: {dto.Token}");
 
         var user = await _userManager.FindByEmailAsync(dto.Email);
 

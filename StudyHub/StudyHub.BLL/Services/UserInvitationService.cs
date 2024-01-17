@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
-using FluentEmail.Core;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using StudyHub.BLL.Extensions;
 using StudyHub.BLL.Services.Interfaces;
+using StudyHub.BLL.Services.Interfaces.Auth;
 using StudyHub.Common;
 using StudyHub.Common.DTO.UserInvitation;
 using StudyHub.Common.Exceptions;
@@ -13,14 +13,14 @@ using StudyHub.DAL.Repositories.Interfaces;
 using StudyHub.Entities;
 using StudyHub.FluentEmail.MessageBase;
 using StudyHub.FluentEmail.Services.Interfaces;
-using System.Management;
-using System.Security.Cryptography;
+using System.Web;
 
 namespace StudyHub.BLL.Services;
 
 public class UserInvitationService : IUserInvitationService
 {
     private readonly IRepository<InvitedUser> _invitedUserRepository;
+    private readonly IEncryptService _encryptService;
     private readonly IMapper _mapper;
     private readonly IEmailService _emailService;
     private readonly UserManager<User> _userManager;
@@ -33,7 +33,8 @@ public class UserInvitationService : IUserInvitationService
         IEmailService emailService,
         UserManager<User> userManager,
         RoleManager<IdentityRole<Guid>> roleManager,
-        IOptions<EmailSettings> messageSettings)
+        IOptions<EmailSettings> messageSettings,
+        IEncryptService encryptService)
     {
         _emailService = emailService;
         _userManager = userManager;
@@ -41,6 +42,7 @@ public class UserInvitationService : IUserInvitationService
         _mapper = mapper;
         _roleManager = roleManager;
         _messageSettings = messageSettings.Value;
+        _encryptService = encryptService;
     }
 
     public async Task<bool> InviteManyAsync(Guid userId, InviteUsersRequest request)
@@ -55,6 +57,7 @@ public class UserInvitationService : IUserInvitationService
         }
 
         var invitedUsers = new List<InvitedUser>();
+
         var usersMessage = new List<InviteUserMessage>();
 
         foreach (var email in request.Emails)
@@ -67,10 +70,11 @@ public class UserInvitationService : IUserInvitationService
             if (await _userManager.FindByEmailAsync(email) != null)
                 throw new IncorrectParametersException($"User with email {email} already exists.");
 
-            string tokenRaw = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+            string tokenRaw = GenerateTokenExtension.GenerateToken();
 
-            // ToDo: place html friendly token as param here
-            var url = string.Format(_messageSettings.AcceptInvitationUrl, request.Role, tokenRaw);
+            var encodedToken = HttpUtility.UrlEncode(tokenRaw);
+
+            var url = string.Format(_messageSettings.AcceptInvitationUrl, request.Role, encodedToken);
 
             var userMessage = new InviteUserMessage
             {
@@ -83,10 +87,10 @@ public class UserInvitationService : IUserInvitationService
             var registration = new InvitedUserDTO
             {
                 Email = email,
-                // ToDo: Move this to Random extensions or something like this + encode via HtmlUtility
-                Token = tokenRaw,
+                Token = _encryptService.Encrypt(tokenRaw),
                 Role = request.Role
             };
+
             var invitedUser = _mapper.Map<InvitedUser>(registration);
 
             invitedUsers.Add(invitedUser);

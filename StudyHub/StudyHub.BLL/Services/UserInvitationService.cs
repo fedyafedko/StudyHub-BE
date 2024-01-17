@@ -47,9 +47,10 @@ public class UserInvitationService : IUserInvitationService
 
     public async Task<bool> InviteManyAsync(Guid userId, InviteUsersRequest request)
     {
-        var user = await _userManager.FindByIdAsync(userId);
+        var user = await _userManager.FindByIdAsync(userId)
+            ?? throw new NotFoundException($"Unable to find user entity with this key: {userId}");
 
-        var roles = await _userManager.GetRolesAsync(user!);
+        var roles = await _userManager.GetRolesAsync(user);
 
         if (!IsValidRoleToAdd(roles.First(), request.Role))
         {

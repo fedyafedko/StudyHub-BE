@@ -25,23 +25,11 @@ public class OptionsService : IOptionsService
         _mapper = mapper;
     }
 
-    public async Task<List<AssignmentTaskOptionDTO>> AddAssignmentTaskOptionsAsync(Guid assignmentTaskId, List<CreateAssignmentTaskOptionDTO> taskOptions)
-    {
-        // ToDo: remove unnecessary call
-        return await AddSeparationOptions(assignmentTaskId, taskOptions);
-    }
-
-    public async Task<List<AssignmentTaskOptionDTO>> UpdateAssignmentTaskOptionsAsync(Guid taskId, List<UpdateAssignmentTaskOptionDTO> dto)
-    {
-        // ToDo: remove unnecessary call
-        return await UpdateSeparationOptions(taskId, dto);
-    }
-
-    private async Task<List<AssignmentTaskOptionDTO>> UpdateSeparationOptions(
+    public async Task<List<AssignmentTaskOptionDTO>> UpdateAssignmentTaskOptionsAsync(
         Guid assignmentTaskId,
-        List<UpdateAssignmentTaskOptionDTO> taskOptions)
+        List<UpdateAssignmentTaskOptionDTO> dto)
     {
-        bool isOpenEnded = taskOptions.All(option => option.IsCorrect == null);
+        bool isOpenEnded = dto.All(option => option.IsCorrect == null);
 
         if (isOpenEnded)
         {
@@ -51,7 +39,7 @@ public class OptionsService : IOptionsService
 
             for (var i = 0; i < entity.Count; i++)
             {
-                _mapper.Map(taskOptions[i], entity[i]);
+                _mapper.Map(dto[i], entity[i]);
             }
 
             await _optionRepository.UpdateManyAsync(entity);
@@ -66,7 +54,7 @@ public class OptionsService : IOptionsService
 
             for (var i = 0; i < entity.Count; i++)
             {
-                _mapper.Map(taskOptions[i], entity[i]);
+                _mapper.Map(dto[i], entity[i]);
             }
 
             await _choiceOptionRepository.UpdateManyAsync(entity);
@@ -75,15 +63,15 @@ public class OptionsService : IOptionsService
         }
     }
 
-    private async Task<List<AssignmentTaskOptionDTO>> AddSeparationOptions(
+    public async Task<List<AssignmentTaskOptionDTO>> AddAssignmentTaskOptionsAsync(
         Guid assignmentTaskId,
-        List<CreateAssignmentTaskOptionDTO> taskOptions)
+        List<CreateAssignmentTaskOptionDTO> dto)
     {
-        bool isOpenEnded = taskOptions.All(option => option.IsCorrect == null);
+        bool isOpenEnded = dto.All(option => option.IsCorrect == null);
 
         var options = isOpenEnded
-            ? _mapper.Map<List<OpenEndedOption>>(taskOptions).Cast<AssignmentTaskOptionBase>().ToList()
-            : _mapper.Map<List<ChoiceOption>>(taskOptions).Cast<AssignmentTaskOptionBase>().ToList();
+            ? _mapper.Map<List<OpenEndedOption>>(dto).Cast<AssignmentTaskOptionBase>().ToList()
+            : _mapper.Map<List<ChoiceOption>>(dto).Cast<AssignmentTaskOptionBase>().ToList();
 
         options.ForEach(opt => opt.AssignmentTaskId = assignmentTaskId);
 

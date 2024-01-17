@@ -53,10 +53,8 @@ public class GoogleAuthService : AuthService, IGoogleAuthService
     {
         var paylod = await GetGooglePayloadAsync(authorizationCode);
 
-        var user = await _userManager.FindByEmailAsync(paylod.Email);
-
-        if (user == null)
-            throw new NotFoundException($"Unable to find user by specified email. Email: {user!.Email}");
+        var user = await _userManager.FindByEmailAsync(paylod.Email)
+            ?? throw new NotFoundException($"Unable to find user by specified email. Email: {paylod.Email}");
 
         return await GetAuthTokensAsync(user);
     }

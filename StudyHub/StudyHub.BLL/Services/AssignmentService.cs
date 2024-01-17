@@ -27,10 +27,9 @@ public class AssignmentService : IAssignmentService
     public async Task<AssignmentDTO> CreateAssignmentAsync(CreateAssignmentDTO dto)
     {
         var entity = _mapper.Map<Assignment>(dto);
-        var subject = await _subjectRepository.FirstOrDefaultAsync(x => x.Id == dto.SubjectId);
 
-        if (subject == null)
-            throw new NotFoundException($"Subject not found in the database with this Id: {dto.SubjectId}");
+        var subject = await _subjectRepository.FirstOrDefaultAsync(x => x.Id == dto.SubjectId)
+            ?? throw new NotFoundException($"Subject not found in the database with this Id: {dto.SubjectId}");
 
         await _assignmentRepository.InsertAsync(entity);
 
@@ -41,10 +40,8 @@ public class AssignmentService : IAssignmentService
     public async Task<bool> DeleteAssignmentAsync(Guid assignmentId)
     {
         var entity = await _assignmentRepository
-            .FirstOrDefaultAsync(x => x.Id == assignmentId);
-
-        if (entity == null)
-            throw new NotFoundException($"Unable to find entity with such key: {assignmentId}");
+            .FirstOrDefaultAsync(x => x.Id == assignmentId)
+            ?? throw new NotFoundException($"Unable to find entity with such key: {assignmentId}");
 
         return await _assignmentRepository.DeleteAsync(entity);
     }
@@ -52,10 +49,8 @@ public class AssignmentService : IAssignmentService
     public async Task<AssignmentDTO> GetAssignmentByIdAsync(Guid assignmentId)
     {
         var entity = await _assignmentRepository
-            .FirstOrDefaultAsync(x => x.Id == assignmentId);
-
-        if (entity == null)
-            throw new NotFoundException($"Unable to find entity with such key: {assignmentId}");
+            .FirstOrDefaultAsync(x => x.Id == assignmentId)
+            ?? throw new NotFoundException($"Unable to find entity with such key: {assignmentId}");
 
         return _mapper.Map<AssignmentDTO>(entity);
     }
@@ -64,20 +59,16 @@ public class AssignmentService : IAssignmentService
     {
         var entity = await _subjectRepository
             .Include(x => x.Assignments)
-            .FirstOrDefaultAsync(x => x.Id == subjectId);
-
-        if (entity == null)
-            throw new NotFoundException($"Unable to find entity with such key: {subjectId}");
+            .FirstOrDefaultAsync(x => x.Id == subjectId)
+            ?? throw new NotFoundException($"Unable to find entity with such key: {subjectId}");
 
         return _mapper.Map<List<AssignmentDTO>>(entity.Assignments);
     }
 
     public async Task<AssignmentDTO> UpdateAssignmentAsync(Guid assignmentId, UpdateAssignmentDTO dto)
     {
-        var entity = await _assignmentRepository.FirstOrDefaultAsync(x => x.Id == assignmentId);
-
-        if (entity == null)
-            throw new NotFoundException($"Unable to find entity with such key: {assignmentId}");
+        var entity = await _assignmentRepository.FirstOrDefaultAsync(x => x.Id == assignmentId)
+            ?? throw new NotFoundException($"Unable to find entity with such key: {assignmentId}");          
 
         _mapper.Map(dto, entity);
 

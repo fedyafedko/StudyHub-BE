@@ -85,7 +85,7 @@ public class AuthService : IAuthService
     {
         var validatedToken = _tokenService.GetPrincipalFromToken(request.AccessToken);
 
-        var expiryDateUnix = long.Parse(validatedToken!.Claims.Single(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
+        var expiryDateUnix = long.Parse(validatedToken.Claims.Single(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
 
         var expiryDateTimeUtc = new DateTime(year: 1970, month: 1, day: 1, hour: 0, minute: 0, second: 0, DateTimeKind.Utc)
             .AddSeconds(expiryDateUnix);
@@ -93,7 +93,7 @@ public class AuthService : IAuthService
         if (expiryDateTimeUtc > DateTime.UtcNow)
             throw new IncorrectParametersException("Access token is not expired yet");
 
-        var jti = validatedToken!.Claims.Single(x => x.Type == JwtRegisteredClaimNames.Exp).Value;
+        var jti = validatedToken.Claims.Single(x => x.Type == JwtRegisteredClaimNames.Exp).Value;
 
         var existingToken = _refreshTokenRepository.FirstOrDefault(rf => rf.Token == request.RefreshToken) 
             ?? throw new NotFoundException($"This token doesn't found: {request.RefreshToken}");
@@ -114,7 +114,7 @@ public class AuthService : IAuthService
 
     protected async Task<AuthSuccessDTO> GetAuthTokensAsync(User user)
     {
-        return new AuthSuccessDTO(await _tokenService.GenerateJwtTokenAsync(user!),
-           await _tokenService.GenerateRefreshTokenAsync(user!));
+        return new AuthSuccessDTO(await _tokenService.GenerateJwtTokenAsync(user),
+           await _tokenService.GenerateRefreshTokenAsync(user));
     }
 }

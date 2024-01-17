@@ -2,6 +2,6 @@
 
 public interface IEncryptService
 {
-    public bool Verify(string token, string hash);
     public string Encrypt(string token);
+    public bool Verify(string token, string hash);
 }

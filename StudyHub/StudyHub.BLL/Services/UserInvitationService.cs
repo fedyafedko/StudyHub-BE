@@ -13,7 +13,6 @@ using StudyHub.DAL.Repositories.Interfaces;
 using StudyHub.Entities;
 using StudyHub.FluentEmail.MessageBase;
 using StudyHub.FluentEmail.Services.Interfaces;
-using System.Data.Entity;
 using System.Web;
 
 namespace StudyHub.BLL.Services;
@@ -46,7 +45,7 @@ public class UserInvitationService : IUserInvitationService
         _mapper = mapper;
     }
 
-    public async Task ClearExpiredInvitations()
+    public async Task ClearExpiredInvitationsAsync()
     {
         var expired = _invitedUserRepository
             .Where(user => user.CreatedAt.AddDays(7) <= DateTime.Today);

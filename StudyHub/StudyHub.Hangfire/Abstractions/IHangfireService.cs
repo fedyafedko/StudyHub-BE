@@ -1,4 +1,5 @@
 ﻿namespace StudyHub.Hangfire.Abstractions;
+
 public interface IHangfireService
 {
     bool Delete(string jobId);

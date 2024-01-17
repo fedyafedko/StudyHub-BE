@@ -5,6 +5,7 @@ using StudyHub.Hangfire.Abstractions;
 using StudyHub.Hangfire.Jobs;
 
 namespace StudyHub.Hangfire.Extensions;
+
 public static class HangfireExtensions
 {
     public static void SetupHangfire(this IHost host)

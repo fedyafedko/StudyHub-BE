@@ -5,6 +5,6 @@ namespace StudyHub.BLL.Services.Interfaces;
 
 public interface IUserInvitationService
 {
-    Task ClearExpiredInvitations();
+    Task ClearExpiredInvitationsAsync();
     Task<bool> InviteManyAsync(Guid userId, InviteUsersRequest dto);
 }

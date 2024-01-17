@@ -15,6 +15,6 @@ public class ClearingInvitedUsersJob : IJob
     public static string Id => nameof(ClearingInvitedUsersJob);
 
     public async Task Run(CancellationToken cancellationToken = default) =>
-        await _userInvitationService.ClearExpiredInvitations();
+        await _userInvitationService.ClearExpiredInvitationsAsync();
 
 }

@@ -4,5 +4,5 @@ namespace StudyHub.BLL.Services.Interfaces;
 
 public interface IHangfireService
 {
-    bool DeleteUsers(List<InvitedUser> invitedUsers);
+    Task<bool> DeleteUsersAsync(List<InvitedUser> invitedUsers);
 }

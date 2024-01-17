@@ -104,7 +104,7 @@ public class UserInvitationService : IUserInvitationService
         
         var result = await _invitedUserRepository.InsertManyAsync(invitedUsers);
 
-        _backgroundJobClient.Schedule(() => _hangfireService.DeleteUsers(invitedUsers), TimeSpan.FromDays(7));
+        _backgroundJobClient.Schedule(() => _hangfireService.DeleteUsersAsync(invitedUsers), TimeSpan.FromDays(7));
 
         return result;
     }

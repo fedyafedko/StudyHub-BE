@@ -13,7 +13,7 @@ public class HangfireService : IHangfireService
         _invitedUserRepository = invitedUserRepository;
     }
 
-    public bool DeleteUsers(List<InvitedUser> invitedUsers)
+    public async Task<bool> DeleteUsersAsync(List<InvitedUser> invitedUsers)
     {
         var invitedUserIds = invitedUsers.Select(invitedUser => invitedUser.Id).ToList();
 
@@ -21,6 +21,6 @@ public class HangfireService : IHangfireService
             .Where(u => invitedUserIds.Contains(u.Id))
             .ToList();
 
-        return _invitedUserRepository.DeleteMany(remainingUsers);
+        return await _invitedUserRepository.DeleteManyAsync(remainingUsers);
     }
 }

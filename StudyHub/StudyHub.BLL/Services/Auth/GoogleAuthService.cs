@@ -18,13 +18,13 @@ public class GoogleAuthService : AuthService, IGoogleAuthService
     private readonly GoogleAuthConfig _googleConfig;
 
     public GoogleAuthService(
-        UserManager<User> userManager,
-        ITokenService tokenService,
-        IOptions<GoogleAuthConfig> googleConfig,
         IRepository<InvitedUser> invitedUserRepository,
         IRepository<RefreshToken> refreshTokenRepository,
+        ITokenService tokenService,
+        UserManager<User> userManager,
+        IOptions<GoogleAuthConfig> googleConfig,
         IMapper mapper)
-            : base(userManager, tokenService, invitedUserRepository, mapper, refreshTokenRepository)
+            : base(refreshTokenRepository, invitedUserRepository, tokenService, userManager, mapper)
     {
         _googleConfig = googleConfig.Value;
     }

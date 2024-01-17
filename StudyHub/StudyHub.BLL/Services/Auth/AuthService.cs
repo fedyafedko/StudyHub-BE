@@ -12,24 +12,24 @@ namespace StudyHub.BLL.Services.Auth;
 
 public class AuthService : IAuthService
 {
-    protected readonly UserManager<User> _userManager;
-    protected readonly ITokenService _tokenService;
     private readonly IRepository<InvitedUser> _invitedUserRepository;
     private readonly IRepository<RefreshToken> _refreshTokenRepository;
+    protected readonly ITokenService _tokenService;
+    protected readonly UserManager<User> _userManager;
     protected readonly IMapper _mapper;
 
     public AuthService(
-        UserManager<User> userManager,
-        ITokenService tokenService,
+        IRepository<RefreshToken> refreshTokenRepository,
         IRepository<InvitedUser> invitedUserRepository,
-        IMapper mapper,
-        IRepository<RefreshToken> refreshTokenRepository)
+        ITokenService tokenService,
+        UserManager<User> userManager,
+        IMapper mapper)
     {
-        _userManager = userManager;
-        _tokenService = tokenService;
-        _invitedUserRepository = invitedUserRepository;
-        _mapper = mapper;
         _refreshTokenRepository = refreshTokenRepository;
+        _invitedUserRepository = invitedUserRepository;
+        _tokenService = tokenService;
+        _userManager = userManager;
+        _mapper = mapper;
     }
 
     public async Task<AuthSuccessDTO> LoginAsync(LoginUserDTO dto)
@@ -73,6 +73,8 @@ public class AuthService : IAuthService
 
         if (!roleResult.Succeeded)
             throw new UserManagerException($"User manager operation failed:\n", result.Errors);
+
+        await _invitedUserRepository.DeleteAsync(invitedUser);
 
         return await GetAuthTokensAsync(user);
     }

@@ -23,12 +23,18 @@ using StudyHub.Seeding.Extentions;
 using StudyHub.Validators.AssignmentTaskOptionValidators;
 using System.Text;
 using Hangfire;
+using StudyHub.Hangfire.Services;
+using StudyHub.Hangfire.Abstractions;
+using StudyHub.Hangfire;
+using StudyHub.Hangfire.Extensions;
+using Hangfire.SqlServer;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 builder.Services.Configure<GoogleAuthConfig>(builder.Configuration.GetSection("GoogleAuth"));
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.Configure<HangfireConfig>(builder.Configuration.GetSection("HangfireConfig"));
 
 builder.Services.AddAutoMapper(typeof(AssignmentTaskProfile));
 
@@ -38,8 +44,9 @@ builder.Services.AddControllers(cfg => cfg.Filters.Add(typeof(ExceptionFilter)))
 builder.Services.AddDbContext<ApplicationDbContext>(opt =>
     opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddHangfire(x => x.UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddHangfireServer();
+// Hangfire
+builder.Services.AddHangfire(builder.Configuration);
+builder.Services.AddScoped<IHangfireService, HangfireService>();
 
 // Repository
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
@@ -55,7 +62,6 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserInvitationService, UserInvitationService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
-builder.Services.AddScoped<IHangfireService, HangfireService>();
 builder.Services.AddScoped<IEncryptService, EncryptService>();
 
 // Fluent Email
@@ -143,6 +149,7 @@ if (app.Environment.IsDevelopment())
 }
 
 await app.ApplySeedingAsync();
+app.SetupHangfire();
 
 app.UseHttpsRedirection();
 app.UseCors(
@@ -152,6 +159,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.UseHangfireDashboard("/mydashboard");
+app.UseHangfireDashboard("/hangfire");
 
 app.Run();

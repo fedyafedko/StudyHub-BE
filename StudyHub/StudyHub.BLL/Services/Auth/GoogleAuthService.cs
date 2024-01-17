@@ -20,6 +20,7 @@ public class GoogleAuthService : AuthService, IGoogleAuthService
     public GoogleAuthService(
         IRepository<InvitedUser> invitedUserRepository,
         IRepository<RefreshToken> refreshTokenRepository,
+        UserManager<User> userManager,
         ITokenService tokenService,
         IEncryptService encryptService,
         IOptions<GoogleAuthConfig> googleConfig,

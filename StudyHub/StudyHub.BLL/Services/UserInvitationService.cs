@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Hangfire;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using StudyHub.BLL.Extensions;
@@ -14,8 +13,8 @@ using StudyHub.DAL.Repositories.Interfaces;
 using StudyHub.Entities;
 using StudyHub.FluentEmail.MessageBase;
 using StudyHub.FluentEmail.Services.Interfaces;
+using System.Data.Entity;
 using System.Web;
-using System.Security.Cryptography;
 
 namespace StudyHub.BLL.Services;
 
@@ -23,36 +22,36 @@ public class UserInvitationService : IUserInvitationService
 {
     private readonly IRepository<InvitedUser> _invitedUserRepository;
     private readonly IEncryptService _encryptService;
-    private readonly IMapper _mapper;
-    private readonly IHangfireService _hangfireService;
     private readonly IEmailService _emailService;
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<IdentityRole<Guid>> _roleManager;
     private readonly EmailSettings _messageSettings;
-    private readonly IBackgroundJobClient _backgroundJobClient;
     private readonly IMapper _mapper;
 
     public UserInvitationService(
         IRepository<InvitedUser> invitedUserRepository,
-        IHangfireService hangfireService,
         IEmailService emailService,
         UserManager<User> userManager,
         RoleManager<IdentityRole<Guid>> roleManager,
+        IEncryptService encryptService,
         IOptions<EmailSettings> messageSettings,
-        IEncryptService encryptService)
-        IOptions<EmailSettings> messageSettings,
-        IBackgroundJobClient backgroundJobClient,
         IMapper mapper)
     {
         _invitedUserRepository = invitedUserRepository;
-        _hangfireService = hangfireService;
         _emailService = emailService;
         _userManager = userManager;
         _roleManager = roleManager;
         _messageSettings = messageSettings.Value;
         _encryptService = encryptService;
-        _backgroundJobClient = backgroundJobClient;
         _mapper = mapper;
+    }
+
+    public async Task ClearExpiredInvitations()
+    {
+        var expired = _invitedUserRepository
+            .Where(user => user.CreatedAt.AddDays(7) <= DateTime.Today);
+
+        await _invitedUserRepository.DeleteManyAsync(expired);
     }
 
     public async Task<bool> InviteManyAsync(Guid userId, InviteUsersRequest request)
@@ -98,7 +97,8 @@ public class UserInvitationService : IUserInvitationService
             {
                 Email = email,
                 Token = _encryptService.Encrypt(tokenRaw),
-                Role = request.Role
+                Role = request.Role,
+                CreatedAt = DateTime.Today,
             };
 
             var invitedUser = _mapper.Map<InvitedUser>(registration);
@@ -110,10 +110,8 @@ public class UserInvitationService : IUserInvitationService
 
         if(!IsEmailSend)
             throw new Exception($"Unable to send email.");
-        
-        var result = await _invitedUserRepository.InsertManyAsync(invitedUsers);
 
-        _backgroundJobClient.Schedule(() => _hangfireService.DeleteUsersAsync(invitedUsers), TimeSpan.FromDays(7));
+        var result = await _invitedUserRepository.InsertManyAsync(invitedUsers);
 
         return result;
     }

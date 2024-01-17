@@ -15,12 +15,10 @@ public class AuthService : IAuthService
 {
     protected readonly UserManager<User> _userManager;
     protected readonly ITokenService _tokenService;
+    protected readonly IMapper _mapper;
     private readonly IEncryptService _encryptService;
     private readonly IRepository<InvitedUser> _invitedUserRepository;
     private readonly IRepository<RefreshToken> _refreshTokenRepository;
-    protected readonly ITokenService _tokenService;
-    protected readonly UserManager<User> _userManager;
-    protected readonly IMapper _mapper;
 
     public AuthService(
         UserManager<User> userManager,
@@ -36,8 +34,6 @@ public class AuthService : IAuthService
         _userManager = userManager;
         _tokenService = tokenService;
         _encryptService = encryptService;
-        _invitedUserRepository = invitedUserRepository;
-        _refreshTokenRepository = refreshTokenRepository;
         _mapper = mapper;
     }
 

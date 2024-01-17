@@ -21,10 +21,10 @@ public class GoogleAuthService : AuthService, IGoogleAuthService
         IRepository<InvitedUser> invitedUserRepository,
         IRepository<RefreshToken> refreshTokenRepository,
         ITokenService tokenService,
-        UserManager<User> userManager,
+        IEncryptService encryptService,
         IOptions<GoogleAuthConfig> googleConfig,
         IMapper mapper)
-            : base(refreshTokenRepository, invitedUserRepository, tokenService, userManager, mapper)
+            : base(userManager, tokenService, encryptService, invitedUserRepository, refreshTokenRepository, mapper)
     {
         _googleConfig = googleConfig.Value;
     }

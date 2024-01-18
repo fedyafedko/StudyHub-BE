@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StudyHub.BLL.Services.Interfaces;
 using StudyHub.Common.DTO.AssignmentTask;
@@ -8,6 +9,7 @@ namespace StudyHub.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class AssignmentTaskController : Controller
 {
     private readonly IAssignmentTaskService _assignmentTaskService;
@@ -25,6 +27,7 @@ public class AssignmentTaskController : Controller
     }
 
     [HttpPost]
+    [Authorize(Roles = "Teacher")]
     public async Task<IActionResult> InsertAssigmentTask(CreateAssignmentTaskDTO dto)
     {
         _createAssignmentTaskValidator.ValidateAndThrow(dto);
@@ -41,6 +44,7 @@ public class AssignmentTaskController : Controller
     }
 
     [HttpPut("{assignmentTaskId}")]
+    [Authorize(Roles = "Teacher")]
     public async Task<IActionResult> UpdateAssigmentTask(Guid assignmentTaskId, [FromBody] UpdateAssignmentTaskDTO dto)
     {
         _updateAssignmentTaskValidator.ValidateAndThrow(dto);
@@ -50,6 +54,7 @@ public class AssignmentTaskController : Controller
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Teacher")]
     public async Task<IActionResult> DeleteAssignmentTask(Guid id)
     {
         return await _assignmentTaskService.DeleteAssignmentTaskAsync(id) ? NoContent() : NotFound();

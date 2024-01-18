@@ -22,12 +22,21 @@ using StudyHub.Middlewares;
 using StudyHub.Seeding.Extentions;
 using StudyHub.Validators.AssignmentTaskOptionValidators;
 using System.Text;
+using Hangfire;
+using StudyHub.Hangfire.Services;
+using StudyHub.Hangfire.Abstractions;
+using StudyHub.Hangfire;
+using StudyHub.Hangfire.Extensions;
+using Hangfire.SqlServer;
+using StudyHub.BLL.Configs;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 builder.Services.Configure<GoogleAuthConfig>(builder.Configuration.GetSection("GoogleAuth"));
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.Configure<HangfireConfig>(builder.Configuration.GetSection("HangfireConfig"));
+builder.Services.Configure<UserInvitationConfig>(builder.Configuration.GetSection("UserInvitationConfig"));
 
 builder.Services.AddAutoMapper(typeof(AssignmentTaskProfile));
 
@@ -36,6 +45,9 @@ builder.Services.AddControllers(cfg => cfg.Filters.Add(typeof(ExceptionFilter)))
 // DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(opt =>
     opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Hangfire
+builder.Services.AddHangfire(builder.Configuration);
 
 // Repository
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
@@ -138,6 +150,7 @@ if (app.Environment.IsDevelopment())
 }
 
 await app.ApplySeedingAsync();
+app.SetupHangfire();
 
 app.UseHttpsRedirection();
 app.UseCors(
@@ -147,5 +160,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.UseHangfireDashboard("/hangfire");
 
 app.Run();

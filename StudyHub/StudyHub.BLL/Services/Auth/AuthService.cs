@@ -15,10 +15,10 @@ public class AuthService : IAuthService
 {
     protected readonly UserManager<User> _userManager;
     protected readonly ITokenService _tokenService;
+    protected readonly IMapper _mapper;
     private readonly IEncryptService _encryptService;
     private readonly IRepository<InvitedUser> _invitedUserRepository;
     private readonly IRepository<RefreshToken> _refreshTokenRepository;
-    protected readonly IMapper _mapper;
 
     public AuthService(
         UserManager<User> userManager,
@@ -28,11 +28,12 @@ public class AuthService : IAuthService
         IRepository<RefreshToken> refreshTokenRepository,
         IMapper mapper)
     {
+        _refreshTokenRepository = refreshTokenRepository;
+        _invitedUserRepository = invitedUserRepository;
+        _tokenService = tokenService;
         _userManager = userManager;
         _tokenService = tokenService;
         _encryptService = encryptService;
-        _invitedUserRepository = invitedUserRepository;
-        _refreshTokenRepository = refreshTokenRepository;
         _mapper = mapper;
     }
 
@@ -77,6 +78,8 @@ public class AuthService : IAuthService
 
         if (!roleResult.Succeeded)
             throw new UserManagerException($"User manager operation failed:\n", result.Errors);
+
+        await _invitedUserRepository.DeleteAsync(invitedUser);
 
         return await GetAuthTokensAsync(user);
     }

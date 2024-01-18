@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
+using StudyHub.BLL.Configs;
 using StudyHub.BLL.Extensions;
 using StudyHub.BLL.Services.Interfaces;
 using StudyHub.BLL.Services.Interfaces.Auth;
@@ -25,6 +26,7 @@ public class UserInvitationService : IUserInvitationService
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<IdentityRole<Guid>> _roleManager;
     private readonly EmailSettings _messageSettings;
+    private readonly LifeTimeConfig _lifeTimeConfig;
     private readonly IMapper _mapper;
 
     public UserInvitationService(
@@ -34,6 +36,7 @@ public class UserInvitationService : IUserInvitationService
         RoleManager<IdentityRole<Guid>> roleManager,
         IEncryptService encryptService,
         IOptions<EmailSettings> messageSettings,
+        IOptions<LifeTimeConfig> lifeTimeConfig,
         IMapper mapper)
     {
         _invitedUserRepository = invitedUserRepository;
@@ -42,13 +45,14 @@ public class UserInvitationService : IUserInvitationService
         _roleManager = roleManager;
         _messageSettings = messageSettings.Value;
         _encryptService = encryptService;
+        _lifeTimeConfig = lifeTimeConfig.Value;
         _mapper = mapper;
     }
 
     public async Task ClearExpiredInvitationsAsync()
     {
         var expired = _invitedUserRepository
-            .Where(user => user.CreatedAt.AddDays(7) <= DateTime.Today);
+            .Where(user => user.CreatedAt.AddDays(_lifeTimeConfig.LifeTime) <= DateTime.Today);
 
         await _invitedUserRepository.DeleteManyAsync(expired);
     }

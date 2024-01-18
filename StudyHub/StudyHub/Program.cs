@@ -28,6 +28,7 @@ using StudyHub.Hangfire.Abstractions;
 using StudyHub.Hangfire;
 using StudyHub.Hangfire.Extensions;
 using Hangfire.SqlServer;
+using StudyHub.BLL.Configs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +36,7 @@ builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSet
 builder.Services.Configure<GoogleAuthConfig>(builder.Configuration.GetSection("GoogleAuth"));
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.Configure<HangfireConfig>(builder.Configuration.GetSection("HangfireConfig"));
+builder.Services.Configure<LifeTimeConfig>(builder.Configuration.GetSection("LifeTimeConfig"));
 
 builder.Services.AddAutoMapper(typeof(AssignmentTaskProfile));
 
@@ -46,7 +48,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(opt =>
 
 // Hangfire
 builder.Services.AddHangfire(builder.Configuration);
-builder.Services.AddScoped<IHangfireService, HangfireService>();
 
 // Repository
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));

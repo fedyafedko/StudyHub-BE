@@ -15,5 +15,6 @@ public static class HangfireExtension
         JobStorage.Current = new SqlServerStorage(configuration.GetConnectionString("DefaultConnection"));
 
         services.AddHangfireServer();
+        services.AddScoped<IHangfireService, HangfireService>();
     }
 }

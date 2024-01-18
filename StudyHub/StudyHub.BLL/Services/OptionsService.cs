@@ -27,9 +27,9 @@ public class OptionsService : IOptionsService
 
     public async Task<List<AssignmentTaskOptionDTO>> UpdateAssignmentTaskOptionsAsync(
         Guid assignmentTaskId,
-        List<UpdateAssignmentTaskOptionDTO> dto)
+        List<UpdateAssignmentTaskOptionDTO> taskOptions)
     {
-        bool isOpenEnded = dto.All(option => option.IsCorrect == null);
+        bool isOpenEnded = taskOptions.All(option => option.IsCorrect == null);
 
         if (isOpenEnded)
         {
@@ -39,7 +39,7 @@ public class OptionsService : IOptionsService
 
             for (var i = 0; i < entity.Count; i++)
             {
-                _mapper.Map(dto[i], entity[i]);
+                _mapper.Map(taskOptions[i], entity[i]);
             }
 
             await _optionRepository.UpdateManyAsync(entity);
@@ -54,7 +54,7 @@ public class OptionsService : IOptionsService
 
             for (var i = 0; i < entity.Count; i++)
             {
-                _mapper.Map(dto[i], entity[i]);
+                _mapper.Map(taskOptions[i], entity[i]);
             }
 
             await _choiceOptionRepository.UpdateManyAsync(entity);
@@ -65,13 +65,13 @@ public class OptionsService : IOptionsService
 
     public async Task<List<AssignmentTaskOptionDTO>> AddAssignmentTaskOptionsAsync(
         Guid assignmentTaskId,
-        List<CreateAssignmentTaskOptionDTO> dto)
+        List<CreateAssignmentTaskOptionDTO> taskOptions)
     {
-        bool isOpenEnded = dto.All(option => option.IsCorrect == null);
+        bool isOpenEnded = taskOptions.All(option => option.IsCorrect == null);
 
         var options = isOpenEnded
-            ? _mapper.Map<List<OpenEndedOption>>(dto).Cast<AssignmentTaskOptionBase>().ToList()
-            : _mapper.Map<List<ChoiceOption>>(dto).Cast<AssignmentTaskOptionBase>().ToList();
+            ? _mapper.Map<List<OpenEndedOption>>(taskOptions).Cast<AssignmentTaskOptionBase>().ToList()
+            : _mapper.Map<List<ChoiceOption>>(taskOptions).Cast<AssignmentTaskOptionBase>().ToList();
 
         options.ForEach(opt => opt.AssignmentTaskId = assignmentTaskId);
 

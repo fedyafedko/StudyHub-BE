@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
+using StudyHub.BLL.Configs;
 using StudyHub.BLL.Extensions;
 using StudyHub.BLL.Services.Interfaces;
 using StudyHub.BLL.Services.Interfaces.Auth;
@@ -21,28 +22,39 @@ public class UserInvitationService : IUserInvitationService
 {
     private readonly IRepository<InvitedUser> _invitedUserRepository;
     private readonly IEncryptService _encryptService;
-    private readonly IMapper _mapper;
     private readonly IEmailService _emailService;
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<IdentityRole<Guid>> _roleManager;
     private readonly EmailSettings _messageSettings;
+    private readonly UserInvitationConfig _userInvitationConfig;
+    private readonly IMapper _mapper;
 
     public UserInvitationService(
         IRepository<InvitedUser> invitedUserRepository,
-        IMapper mapper,
         IEmailService emailService,
         UserManager<User> userManager,
         RoleManager<IdentityRole<Guid>> roleManager,
+        IEncryptService encryptService,
         IOptions<EmailSettings> messageSettings,
-        IEncryptService encryptService)
+        IOptions<UserInvitationConfig> userInvitationConfig,
+        IMapper mapper)
     {
+        _invitedUserRepository = invitedUserRepository;
         _emailService = emailService;
         _userManager = userManager;
-        _invitedUserRepository = invitedUserRepository;
-        _mapper = mapper;
         _roleManager = roleManager;
         _messageSettings = messageSettings.Value;
         _encryptService = encryptService;
+        _userInvitationConfig = userInvitationConfig.Value;
+        _mapper = mapper;
+    }
+
+    public async Task ClearExpiredInvitationsAsync()
+    {
+        var expired = _invitedUserRepository
+            .Where(user => user.CreatedAt.AddDays(_userInvitationConfig.InvitationLifeTime) <= DateTime.Today);
+
+        await _invitedUserRepository.DeleteManyAsync(expired);
     }
 
     public async Task<bool> InviteManyAsync(Guid userId, InviteUsersRequest request)
@@ -88,7 +100,8 @@ public class UserInvitationService : IUserInvitationService
             {
                 Email = email,
                 Token = _encryptService.Encrypt(tokenRaw),
-                Role = request.Role
+                Role = request.Role,
+                CreatedAt = DateTime.Today,
             };
 
             var invitedUser = _mapper.Map<InvitedUser>(registration);
@@ -101,7 +114,9 @@ public class UserInvitationService : IUserInvitationService
         if(!IsEmailSend)
             throw new Exception($"Unable to send email.");
 
-        return await _invitedUserRepository.InsertManyAsync(invitedUsers);
+        var result = await _invitedUserRepository.InsertManyAsync(invitedUsers);
+
+        return result;
     }
 
     private bool IsValidRoleToAdd(string requestingUserRole, string userToAddRole)

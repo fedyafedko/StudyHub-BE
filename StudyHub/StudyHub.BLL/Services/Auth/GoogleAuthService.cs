@@ -18,12 +18,12 @@ public class GoogleAuthService : AuthService, IGoogleAuthService
     private readonly GoogleAuthConfig _googleConfig;
 
     public GoogleAuthService(
+        IRepository<InvitedUser> invitedUserRepository,
+        IRepository<RefreshToken> refreshTokenRepository,
         UserManager<User> userManager,
         ITokenService tokenService,
         IEncryptService encryptService,
         IOptions<GoogleAuthConfig> googleConfig,
-        IRepository<InvitedUser> invitedUserRepository,
-        IRepository<RefreshToken> refreshTokenRepository,
         IMapper mapper)
             : base(userManager, tokenService, encryptService, invitedUserRepository, refreshTokenRepository, mapper)
     {

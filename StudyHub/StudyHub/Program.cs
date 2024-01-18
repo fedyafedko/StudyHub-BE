@@ -36,7 +36,7 @@ builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSet
 builder.Services.Configure<GoogleAuthConfig>(builder.Configuration.GetSection("GoogleAuth"));
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.Configure<HangfireConfig>(builder.Configuration.GetSection("HangfireConfig"));
-builder.Services.Configure<LifeTimeConfig>(builder.Configuration.GetSection("LifeTimeConfig"));
+builder.Services.Configure<UserInvitationConfig>(builder.Configuration.GetSection("UserInvitationConfig"));
 
 builder.Services.AddAutoMapper(typeof(AssignmentTaskProfile));
 

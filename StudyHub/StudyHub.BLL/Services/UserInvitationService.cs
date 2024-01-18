@@ -26,7 +26,7 @@ public class UserInvitationService : IUserInvitationService
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<IdentityRole<Guid>> _roleManager;
     private readonly EmailSettings _messageSettings;
-    private readonly LifeTimeConfig _lifeTimeConfig;
+    private readonly UserInvitationConfig _lifeTimeConfig;
     private readonly IMapper _mapper;
 
     public UserInvitationService(
@@ -36,7 +36,7 @@ public class UserInvitationService : IUserInvitationService
         RoleManager<IdentityRole<Guid>> roleManager,
         IEncryptService encryptService,
         IOptions<EmailSettings> messageSettings,
-        IOptions<LifeTimeConfig> lifeTimeConfig,
+        IOptions<UserInvitationConfig> lifeTimeConfig,
         IMapper mapper)
     {
         _invitedUserRepository = invitedUserRepository;
@@ -52,7 +52,7 @@ public class UserInvitationService : IUserInvitationService
     public async Task ClearExpiredInvitationsAsync()
     {
         var expired = _invitedUserRepository
-            .Where(user => user.CreatedAt.AddDays(_lifeTimeConfig.LifeTime) <= DateTime.Today);
+            .Where(user => user.CreatedAt.AddDays(_lifeTimeConfig.LifeTimeCount) <= DateTime.Today);
 
         await _invitedUserRepository.DeleteManyAsync(expired);
     }

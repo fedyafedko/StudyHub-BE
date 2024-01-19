@@ -67,9 +67,9 @@ public class SubjectService : ISubjectService
             .FirstOrDefaultAsync(u => u.Id == userId)
             ?? throw new NotFoundException($"Unable to find entity with such key: {userId}");
 
-        var role = _userManager.GetRolesAsync(user).Result.First();
+        var roles = await _userManager.GetRolesAsync(user);
 
-        var subjects = role == "Student" 
+        var subjects = roles.First() == "Student" 
             ? user.Subjects
             : user.TeacherSubjects;
 

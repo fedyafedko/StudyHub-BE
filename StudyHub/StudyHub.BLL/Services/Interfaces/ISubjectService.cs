@@ -12,5 +12,5 @@ public interface ISubjectService
 
     Task<bool> DeleteSubjectAsync(Guid userId, Guid subjectId);
 
-    Task<List<SubjectDTO>> GetSubjectsForUserAsync(Guid userId, string userRole);
+    Task<List<SubjectDTO>> GetSubjectsForUserAsync(Guid userId);
 }

@@ -59,8 +59,7 @@ public class SubjectController : Controller
     public async Task<IActionResult> GetSubjectForUser()
     {
         var studentId = HttpContext.GetUserId();
-        var userRole = HttpContext.GetUserRole();
-        var result = await _subjectService.GetSubjectsForUserAsync(studentId, userRole);
+        var result = await _subjectService.GetSubjectsForUserAsync(studentId);
         return Ok(result);
     }
 

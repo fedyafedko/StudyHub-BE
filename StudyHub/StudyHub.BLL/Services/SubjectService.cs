@@ -59,7 +59,7 @@ public class SubjectService : ISubjectService
         return _mapper.Map<SubjectDTO>(entity);
     }
 
-    public async Task<List<SubjectDTO>> GetSubjectsForUserAsync(Guid userId, string userRole)
+    public async Task<List<SubjectDTO>> GetSubjectsForUserAsync(Guid userId)
     {
         var user = await _userManager.Users
             .Include(u => u.TeacherSubjects)
@@ -67,11 +67,13 @@ public class SubjectService : ISubjectService
             .FirstOrDefaultAsync(u => u.Id == userId)
             ?? throw new NotFoundException($"Unable to find entity with such key: {userId}");
 
-        var subjects = userRole == "Student" 
-            ? _mapper.Map<List<SubjectDTO>>(user.Subjects) 
-            : _mapper.Map<List<SubjectDTO>>(user.TeacherSubjects);
+        var role = _userManager.GetRolesAsync(user).Result;
 
-        return subjects.ToList();
+        var subjects = role.First() == "Student" 
+            ? user.Subjects
+            : user.TeacherSubjects;
+
+        return _mapper.Map<List<SubjectDTO>>(subjects);
     }
 
     public async Task<SubjectDTO> UpdateSubjectAsync(Guid userId, Guid subjectId, UpdateSubjectDTO dto)

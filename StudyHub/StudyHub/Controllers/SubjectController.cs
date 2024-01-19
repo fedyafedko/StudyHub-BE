@@ -56,7 +56,6 @@ public class SubjectController : Controller
     }
 
     [HttpGet("[action]")]
-    [Authorize]
     public async Task<IActionResult> GetSubjectForUser()
     {
         var studentId = HttpContext.GetUserId();

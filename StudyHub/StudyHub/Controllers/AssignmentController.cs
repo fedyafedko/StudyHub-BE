@@ -35,9 +35,9 @@ public class AssignmentController : Controller
 
     [HttpDelete("{id}")]
     [Authorize(Roles = "Teacher")]
-    public async Task<IActionResult> DeleteAssignment(Guid id)
+    public async Task<IActionResult> DeleteAssignment(Guid assignmentId)
     {
-        return await _assignmentService.DeleteAssignmentAsync(id) ? NoContent() : NotFound();
+        return await _assignmentService.DeleteAssignmentAsync(assignmentId) ? NoContent() : NotFound();
     }
 
     [HttpGet("{assignmentId}")]

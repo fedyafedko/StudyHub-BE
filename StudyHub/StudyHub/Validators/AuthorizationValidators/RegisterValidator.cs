@@ -1,9 +1,10 @@
 ﻿using FluentValidation;
 using StudyHub.Common.DTO.AuthDTO;
+using StudyHub.Common.Utility;
 
 namespace StudyHub.Validators.AuthorizationValidators;
 
-public class RegisterValidator :AbstractValidator<RegisterUserDTO>
+public class RegisterValidator : AbstractValidator<RegisterUserDTO>
 {
     public RegisterValidator()
     {
@@ -14,7 +15,7 @@ public class RegisterValidator :AbstractValidator<RegisterUserDTO>
 
         RuleFor(dto => dto.FullName)
             .NotEmpty()
-            .Matches(@"^[A-Za-z\s]*$")
+            .Matches(ValidationRegexes.FullNameRegexes)
             .WithMessage("'{PropertyName}' should only contain letters.");
 
         RuleFor(dto => dto.Password)

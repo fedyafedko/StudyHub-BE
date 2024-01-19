@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using StudyHub.BLL.Services.Interfaces;
 using StudyHub.Common.DTO.Assignment;
 
@@ -6,6 +7,7 @@ namespace StudyHub.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class AssignmentController : Controller
 {
     private readonly IAssignmentService _assignmentService;
@@ -16,6 +18,7 @@ public class AssignmentController : Controller
     }
 
     [HttpPost]
+    [Authorize(Roles = "Teacher")]
     public async Task<IActionResult> InsertAssignment(CreateAssignmentDTO dto)
     {
         var result = await _assignmentService.CreateAssignmentAsync(dto);
@@ -23,6 +26,7 @@ public class AssignmentController : Controller
     }
 
     [HttpPut("{assignmentId}")]
+    [Authorize(Roles = "Teacher")]
     public async Task<IActionResult> UpdateAssignment(Guid assignmentId, UpdateAssignmentDTO dto)
     {
         var result = await _assignmentService.UpdateAssignmentAsync(assignmentId, dto);
@@ -30,9 +34,10 @@ public class AssignmentController : Controller
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteAssignment(Guid id)
+    [Authorize(Roles = "Teacher")]
+    public async Task<IActionResult> DeleteAssignment(Guid assignmentId)
     {
-        return await _assignmentService.DeleteAssignmentAsync(id) ? NoContent() : NotFound();
+        return await _assignmentService.DeleteAssignmentAsync(assignmentId) ? NoContent() : NotFound();
     }
 
     [HttpGet("{assignmentId}")]

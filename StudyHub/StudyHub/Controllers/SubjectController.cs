@@ -8,6 +8,7 @@ namespace StudyHub.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class SubjectController : Controller
 {
     private readonly ISubjectService _subjectService;
@@ -22,6 +23,7 @@ public class SubjectController : Controller
     }
 
     [HttpPost]
+    [Authorize(Roles = "Teacher")]
     public async Task<IActionResult> InsertSubject(CreateSubjectDTO dto)
     {
         var result = await _subjectService.AddSubjectAsync(dto);
@@ -30,6 +32,7 @@ public class SubjectController : Controller
 
     [HttpPut("{subjectId}")]
     [Authorize]
+    [Authorize(Roles = "Teacher")]
     public async Task<IActionResult> UpdateSubject(Guid subjectId, UpdateSubjectDTO dto)
     {
         var userId = HttpContext.GetUserId();
@@ -38,7 +41,7 @@ public class SubjectController : Controller
     }
 
     [HttpDelete("{subjectId}")]
-    [Authorize]
+    [Authorize(Roles = "Teacher")]
     public async Task<IActionResult> DeleteSubject(Guid subjectId)
     {
         var userId = HttpContext.GetUserId();
@@ -62,7 +65,7 @@ public class SubjectController : Controller
     }
 
     [HttpGet("student")]
-    [Authorize]
+    [Authorize(Roles = "Student")]
     public async Task<IActionResult> GetSubjectForStudent()
     {
         var studentId = HttpContext.GetUserId();

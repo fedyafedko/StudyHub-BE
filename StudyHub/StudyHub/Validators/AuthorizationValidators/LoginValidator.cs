@@ -10,7 +10,7 @@ public class LoginValidator : AbstractValidator<LoginUserDTO>
         RuleFor(dto => dto.Email)
             .NotEmpty()
             .EmailAddress()
-            .WithMessage("Your email is not real");
+            .WithMessage("Your email is invalid");
 
         RuleFor(dto => dto.Password)
             .NotEmpty()

@@ -10,6 +10,6 @@ public class ForgotPasswordValidator : AbstractValidator<ForgotPasswordRequest>
         RuleFor(request => request.Email)
             .NotEmpty()
             .EmailAddress()
-            .WithMessage("Your email is not real");
+            .WithMessage("Your email is invalid");
     }
 }

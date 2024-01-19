@@ -10,7 +10,7 @@ public class RegisterValidator :AbstractValidator<RegisterUserDTO>
         RuleFor(dto => dto.Email)
             .NotEmpty()
             .EmailAddress()
-            .WithMessage("Your email is not real");
+            .WithMessage("Your email is invalid");
 
         RuleFor(dto => dto.FullName)
             .NotEmpty()

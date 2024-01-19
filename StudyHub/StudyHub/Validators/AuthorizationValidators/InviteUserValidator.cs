@@ -9,6 +9,6 @@ public class InviteUserValidator : AbstractValidator<InviteUsersRequest>
     {
         RuleFor(request => request.Emails)
             .NotEmpty()
-            .ForEach(email => email.EmailAddress().WithMessage("Some of emails is not real"));
+            .ForEach(email => email.EmailAddress().WithMessage("Some of those emails is invalid"));
     }
 }

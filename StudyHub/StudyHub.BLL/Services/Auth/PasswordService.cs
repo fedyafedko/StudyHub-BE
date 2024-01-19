@@ -26,32 +26,32 @@ public class PasswordService : IPasswordService
         _emailService = emailService;
     }
 
-    public async Task<bool> ForgotPasswordAsync(ForgotPasswordRequest dto)
+    public async Task<bool> ForgotPasswordAsync(ForgotPasswordRequest request)
     {
-        var user = await _userManager.FindByEmailAsync(dto.Email)
-            ?? throw new NotFoundException($"User with this email does not exist. Email: {dto.Email}");
+        var user = await _userManager.FindByEmailAsync(request.Email)
+            ?? throw new NotFoundException($"User with this email does not exist. Email: {request.Email}");
 
         var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
         var uri = string.Format(_messageSettings.AcceptInvitationUrl, user.Email, token);
 
-        var emailSent = await _emailService.SendAsync(user.Email!,
-            new ResetPasswordMessage { Recipient = user.Email!, ResetPasswordUri = uri });
+        var emailSent = await _emailService.SendAsync(request.Email,
+            new ResetPasswordMessage { Recipient = request.Email, ResetPasswordUri = uri });
 
         return emailSent;
     }
 
-    public async Task<bool> ResetPasswordAsync(ResetPasswordRequest dto)
+    public async Task<bool> ResetPasswordAsync(ResetPasswordRequest request)
     {
-        var user = await _userManager.FindByEmailAsync(dto.Email)
-            ?? throw new NotFoundException($"Unable to find user by specified email. Email: {dto.Email}");
+        var user = await _userManager.FindByEmailAsync(request.Email)
+            ?? throw new NotFoundException($"Unable to find user by specified email. Email: {request.Email}");
 
-        var isSamePassword = await _userManager.CheckPasswordAsync(user, dto.NewPassword);
+        var isSamePassword = await _userManager.CheckPasswordAsync(user, request.NewPassword);
 
         if (isSamePassword)
             throw new IncorrectParametersException("New password have to differ from the old one");
 
-        var result = await _userManager.ResetPasswordAsync(user, dto.ResetToken, dto.NewPassword);
+        var result = await _userManager.ResetPasswordAsync(user, request.ResetToken, request.NewPassword);
 
         if (!result.Succeeded)
             throw new UserManagerException("Unable to reset password", result.Errors);

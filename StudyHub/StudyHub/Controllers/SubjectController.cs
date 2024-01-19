@@ -55,21 +55,11 @@ public class SubjectController : Controller
         return Ok(result);
     }
 
-    [HttpGet("teacher")]
-    [Authorize(Roles = "Teacher")]
-    public async Task<IActionResult> GetSubjectForTeacher()
-    {
-        var teacherId = HttpContext.GetUserId();
-        var result = await _subjectService.GetSubjectsForTeacherAsync(teacherId);
-        return Ok(result);
-    }
-
-    [HttpGet("student")]
-    [Authorize(Roles = "Student")]
-    public async Task<IActionResult> GetSubjectForStudent()
+    [HttpGet("[action]")]
+    public async Task<IActionResult> GetSubjectForUser()
     {
         var studentId = HttpContext.GetUserId();
-        var result = await _subjectService.GetSubjectsForStudentAsync(studentId);
+        var result = await _subjectService.GetSubjectsForUserAsync(studentId);
         return Ok(result);
     }
 

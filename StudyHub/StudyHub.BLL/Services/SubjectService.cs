@@ -59,23 +59,19 @@ public class SubjectService : ISubjectService
         return _mapper.Map<SubjectDTO>(entity);
     }
 
-    public async Task<List<SubjectDTO>> GetSubjectsForStudentAsync(Guid studentId)
+    public async Task<List<SubjectDTO>> GetSubjectsForUserAsync(Guid userId, string userRole)
     {
-        var student = await _userManager.FindByIdAsync(studentId)
-            ?? throw new NotFoundException($"Unable to find entity with such key: {studentId}");
-            
-        var subjects = _mapper
-            .Map<List<SubjectDTO>>(student.Subjects);
+        var user = await _userManager.Users
+            .Include(u => u.TeacherSubjects)
+            .Include(u => u.Subjects)
+            .FirstOrDefaultAsync(u => u.Id == userId)
+            ?? throw new NotFoundException($"Unable to find entity with such key: {userId}");
+
+        var subjects = userRole == "Student" 
+            ? _mapper.Map<List<SubjectDTO>>(user.Subjects) 
+            : _mapper.Map<List<SubjectDTO>>(user.TeacherSubjects);
 
         return subjects.ToList();
-    }
-
-    public async Task<List<SubjectDTO>> GetSubjectsForTeacherAsync(Guid teacherId)
-    {
-        var subjects = await _subjectRepository.Where(x => x.TeacherId == teacherId).ToListAsync()
-            ?? throw new NotFoundException($"Unable to find entity with such key: {teacherId}");
-
-        return _mapper.Map<List<SubjectDTO>>(subjects);
     }
 
     public async Task<SubjectDTO> UpdateSubjectAsync(Guid userId, Guid subjectId, UpdateSubjectDTO dto)

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
 
 namespace RealtorAPI.Extensions;
 
@@ -12,5 +13,15 @@ public static class HttpContextExtension
             throw new Exception("Unauthorized");
 
         return new Guid(claim.Value);
+    }
+
+    public static string GetUserRole(this HttpContext context)
+    {
+        var claim = context.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+
+        if (claim == null)
+            throw new Exception("Unauthorized");
+
+        return claim.Value;
     }
 }

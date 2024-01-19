@@ -15,11 +15,8 @@ public class ResetPasswordValidator : AbstractValidator<ResetPasswordRequest>
 
         RuleFor(request => request.NewPassword)
             .NotEmpty()
-            .MinimumLength(8).WithMessage("Your password length must be at least 8.")
-            .Matches(ValidationRegexes.UpperCaseRegexes).WithMessage("Your password must contain at least one uppercase letter.")
-            .Matches(ValidationRegexes.LowerCaseRegexes).WithMessage("Your password must contain at least one lowercase letter.")
-            .Matches(ValidationRegexes.NumberRegexes).WithMessage("Your password must contain at least one number.")
-            .Matches(ValidationRegexes.SymbolsRegexes).WithMessage("Your password must contain at least one (!? *.).");
+            .Matches(ValidationRegexes.PasswordRegex)
+            .WithMessage("Your password must be 8 minimum length and must contain at least one uppercase and lowercase letter, one number and one special symbol");
 
         RuleFor(request => request.ConfimPassword)
             .NotEmpty()

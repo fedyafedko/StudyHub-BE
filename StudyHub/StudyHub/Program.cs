@@ -10,7 +10,6 @@ using StudyHub.BLL.Services;
 using StudyHub.BLL.Services.Auth;
 using StudyHub.BLL.Services.Interfaces;
 using StudyHub.BLL.Services.Interfaces.Auth;
-using StudyHub.Common.Models;
 using StudyHub.DAL.EF;
 using StudyHub.DAL.Repositories;
 using StudyHub.DAL.Repositories.Interfaces;
@@ -23,19 +22,18 @@ using StudyHub.Seeding.Extentions;
 using StudyHub.Validators.AssignmentTaskOptionValidators;
 using System.Text;
 using Hangfire;
-using StudyHub.Hangfire;
 using StudyHub.Hangfire.Extensions;
-using StudyHub.BLL.Configs;
+using StudyHub.Common.Configs;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using StudyHub.Utility;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
-builder.Services.Configure<GoogleAuthConfig>(builder.Configuration.GetSection("GoogleAuth"));
-builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
-builder.Services.Configure<HangfireConfig>(builder.Configuration.GetSection("HangfireConfig"));
-builder.Services.Configure<UserInvitationConfig>(builder.Configuration.GetSection("UserInvitationConfig"));
+builder.Services.AddConfig<JwtConfig>(builder.Configuration);
+builder.Services.AddConfig<GoogleAuthConfig>(builder.Configuration);
+builder.Services.AddConfig<EmailConfig>(builder.Configuration);
+builder.Services.AddConfig<HangfireConfig>(builder.Configuration);
+builder.Services.AddConfig<UserInvitationConfig>(builder.Configuration);
 
 builder.Services.AddAutoMapper(typeof(AssignmentTaskProfile));
 

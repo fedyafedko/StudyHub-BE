@@ -11,7 +11,7 @@ public static class FluentEmailExtension
         SmtpClient client = new SmtpClient
         {
             Credentials = new NetworkCredential(emailSettings["DefaultFromEmail"], emailSettings["Password"]),
-            Host = emailSettings["SMTPSetting:Host"]!,
+            Host = emailSettings["Host"]!,
             Port = 587,
             DeliveryMethod = SmtpDeliveryMethod.Network,
             EnableSsl = true,

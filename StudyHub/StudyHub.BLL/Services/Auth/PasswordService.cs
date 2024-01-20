@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using StudyHub.BLL.Services.Interfaces.Auth;
+using StudyHub.Common.Configs;
 using StudyHub.Common.Exceptions;
-using StudyHub.Common.Models;
 using StudyHub.Common.Requests;
 using StudyHub.Entities;
 using StudyHub.FluentEmail.MessageBase;
@@ -13,16 +13,16 @@ namespace StudyHub.BLL.Services.Auth;
 public class PasswordService : IPasswordService
 {
     private readonly UserManager<User> _userManager;
-    private readonly EmailSettings _messageSettings;
+    private readonly EmailConfig _emailConfig;
     private readonly IEmailService _emailService;
 
     public PasswordService(
         UserManager<User> userManager,
-        IOptions<EmailSettings> messageSettings,
+        IOptions<EmailConfig> emailConfig,
         IEmailService emailService)
     {
         _userManager = userManager;
-        _messageSettings = messageSettings.Value;
+        _emailConfig = emailConfig.Value;
         _emailService = emailService;
     }
 
@@ -33,7 +33,7 @@ public class PasswordService : IPasswordService
 
         var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-        var uri = string.Format(_messageSettings.AcceptInvitationUrl, user.Email, token);
+        var uri = string.Format(_emailConfig.AcceptInvitationUrl, user.Email, token);
 
         var emailSent = await _emailService.SendAsync(request.Email,
             new ResetPasswordMessage { Recipient = request.Email, ResetPasswordUri = uri });

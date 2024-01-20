@@ -5,9 +5,9 @@ using Google.Apis.Auth.OAuth2.Flows;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using StudyHub.BLL.Services.Interfaces.Auth;
+using StudyHub.Common.Configs;
 using StudyHub.Common.DTO.AuthDTO;
 using StudyHub.Common.Exceptions;
-using StudyHub.Common.Models;
 using StudyHub.DAL.Repositories.Interfaces;
 using StudyHub.Entities;
 

@@ -1,6 +1,6 @@
-﻿namespace StudyHub.Common.Models;
+﻿namespace StudyHub.Common.Configs;
 
-public class JwtSettings
+public class JwtConfig : ConfigBase
 {
     public string Secret { get; set; } = string.Empty;
     public TimeSpan AccessTokenLifeTime { get; set; }

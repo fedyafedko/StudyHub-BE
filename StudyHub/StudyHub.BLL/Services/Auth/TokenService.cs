@@ -3,8 +3,8 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using StudyHub.BLL.Extensions;
 using StudyHub.BLL.Services.Interfaces.Auth;
+using StudyHub.Common.Configs;
 using StudyHub.Common.Exceptions;
-using StudyHub.Common.Models;
 using StudyHub.DAL.Repositories.Interfaces;
 using StudyHub.Entities;
 using System.IdentityModel.Tokens.Jwt;
@@ -16,18 +16,18 @@ namespace StudyHub.BLL.Services.Auth;
 
 public class TokenService : ITokenService
 {
-    private readonly JwtSettings _settings;
+    private readonly JwtConfig _jwtConfig;
     private readonly UserManager<User> _userManager;
     private readonly TokenValidationParameters _tokenValidationParametrs;
     private readonly IRepository<RefreshToken> _refreshTokenRepository;
 
-    public TokenService(IOptions<JwtSettings> settings, 
+    public TokenService(IOptions<JwtConfig> jwtConfig, 
         TokenValidationParameters tokenValidationParametrs,
         IRepository<RefreshToken> refreshTokenRepository, 
         UserManager<User> userManager)
     {
         _refreshTokenRepository = refreshTokenRepository;
-        _settings = settings.Value;
+        _jwtConfig = jwtConfig.Value;
         _userManager = userManager;
         _tokenValidationParametrs = tokenValidationParametrs;
     }
@@ -35,7 +35,7 @@ public class TokenService : ITokenService
     public async Task<string> GenerateJwtTokenAsync(User user)
     {
         var jwtTokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.UTF8.GetBytes(_settings.Secret);
+        var key = Encoding.UTF8.GetBytes(_jwtConfig.Secret);
 
         var claims = new List<Claim>
         {
@@ -52,11 +52,11 @@ public class TokenService : ITokenService
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.Add(_settings.AccessTokenLifeTime),
+            Expires = DateTime.UtcNow.Add(_jwtConfig.AccessTokenLifeTime),
             SigningCredentials =
                 new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
-            Issuer = _settings.Issuer,
-            Audience = _settings.Audience
+            Issuer = _jwtConfig.Issuer,
+            Audience = _jwtConfig.Audience
         };
 
         var token = jwtTokenHandler.CreateToken(tokenDescriptor);
@@ -71,7 +71,7 @@ public class TokenService : ITokenService
             UserId = user.Id,
             Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
             CreationDate = DateTime.UtcNow,
-            ExpiryDate = DateTime.Now.Add(_settings.RefreshTokenLifeTime),
+            ExpiryDate = DateTime.Now.Add(_jwtConfig.RefreshTokenLifeTime),
             Used = true,
             Invalidated = false,
         };

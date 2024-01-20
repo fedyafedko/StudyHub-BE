@@ -23,12 +23,11 @@ using StudyHub.Seeding.Extentions;
 using StudyHub.Validators.AssignmentTaskOptionValidators;
 using System.Text;
 using Hangfire;
-using StudyHub.Hangfire.Services;
-using StudyHub.Hangfire.Abstractions;
 using StudyHub.Hangfire;
 using StudyHub.Hangfire.Extensions;
-using Hangfire.SqlServer;
 using StudyHub.BLL.Configs;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using StudyHub.Utility;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,6 +40,7 @@ builder.Services.Configure<UserInvitationConfig>(builder.Configuration.GetSectio
 builder.Services.AddAutoMapper(typeof(AssignmentTaskProfile));
 
 builder.Services.AddControllers(cfg => cfg.Filters.Add(typeof(ExceptionFilter)));
+builder.Services.AddControllers(options => options.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer())));
 
 // DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(opt =>

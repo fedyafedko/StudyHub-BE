@@ -29,11 +29,11 @@ using StudyHub.Utility;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddConfig<JwtConfig>(builder.Configuration);
-builder.Services.AddConfig<GoogleAuthConfig>(builder.Configuration);
-builder.Services.AddConfig<EmailConfig>(builder.Configuration);
-builder.Services.AddConfig<HangfireConfig>(builder.Configuration);
-builder.Services.AddConfig<UserInvitationConfig>(builder.Configuration);
+builder.Services.AddConfig<JwtConfig>();
+builder.Services.AddConfig<GoogleAuthConfig>();
+builder.Services.AddConfig<EmailConfig>();
+builder.Services.AddConfig<HangfireConfig>();
+builder.Services.AddConfig<UserInvitationConfig>();
 
 builder.Services.AddAutoMapper(typeof(AssignmentTaskProfile));
 
@@ -82,7 +82,7 @@ builder.Services.AddValidatorsFromAssemblyContaining<CreateAssignmentTaskOptionV
 var tokenValidationParameters = new TokenValidationParameters
 {
     ValidateIssuerSigningKey = true,
-    IssuerSigningKey = new SymmetricSecurityKey(key: Encoding.UTF8.GetBytes(builder.Configuration.GetValue<string>("JwtSettings:Secret")!)),
+    IssuerSigningKey = new SymmetricSecurityKey(key: Encoding.UTF8.GetBytes(builder.Configuration.GetValue<string>("JwtConfig:Secret")!)),
     ValidateIssuer = false,
     ValidateAudience = false,
     RequireExpirationTime = false,

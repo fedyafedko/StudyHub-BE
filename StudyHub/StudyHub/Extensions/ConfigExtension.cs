@@ -4,9 +4,14 @@ namespace StudyHub.Extensions;
 
 public static class ConfigExtension
 {
-    public static IServiceCollection AddConfig<T>(this IServiceCollection services, IConfiguration configuration)
-        where T : ConfigBase
+    public static IServiceCollection AddConfig<T>(this IServiceCollection services)
+            where T : ConfigBase, new()
     {
-        return services.Configure<T>(configuration.GetSection(typeof(T).Name));
+        IConfiguration configuration = services.BuildServiceProvider().GetRequiredService<IConfiguration>();
+        T configInstance = new T();
+        services.Configure<T>(configuration.GetSection(typeof(T).Name));
+        configuration.GetSection(typeof(T).Name).Bind(configInstance);
+        services.AddSingleton<T>(configInstance);
+        return services;
     }
 }

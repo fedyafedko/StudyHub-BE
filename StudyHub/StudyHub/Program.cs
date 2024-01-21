@@ -29,11 +29,12 @@ using StudyHub.Utility;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddConfig<JwtConfig>();
-builder.Services.AddConfig<GoogleAuthConfig>();
-builder.Services.AddConfig<EmailConfig>();
-builder.Services.AddConfig<HangfireConfig>();
-builder.Services.AddConfig<UserInvitationConfig>();
+builder.Services.ConfigsAssembly(builder.Configuration, opt => opt
+       .AddConfig<JwtConfig>()
+       .AddConfig<GoogleAuthConfig>()
+       .AddConfig<EmailConfig>()
+       .AddConfig<HangfireConfig>()
+       .AddConfig<UserInvitationConfig>());
 
 builder.Services.AddAutoMapper(typeof(AssignmentTaskProfile));
 

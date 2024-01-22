@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StudyHub.DAL.EF;
 
@@ -11,9 +12,11 @@ using StudyHub.DAL.EF;
 namespace StudyHub.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240122215250_UpdateTaskOptional")]
+    partial class UpdateTaskOptional
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -165,7 +168,7 @@ namespace StudyHub.DAL.Migrations
 
                     b.HasIndex("TaskOptionsId");
 
-                    b.ToTable("StudentAnswerTaskOption", (string)null);
+                    b.ToTable("StudentAnswerTaskOption");
                 });
 
             modelBuilder.Entity("StudyHub.Entities.Assignment", b =>
@@ -197,7 +200,7 @@ namespace StudyHub.DAL.Migrations
 
                     b.HasIndex("SubjectId");
 
-                    b.ToTable("Assignments", (string)null);
+                    b.ToTable("Assignments");
                 });
 
             modelBuilder.Entity("StudyHub.Entities.AssignmentTask", b =>
@@ -216,7 +219,7 @@ namespace StudyHub.DAL.Migrations
 
                     b.HasIndex("AssignmentId");
 
-                    b.ToTable("AssignmentTasks", (string)null);
+                    b.ToTable("AssignmentTasks");
                 });
 
             modelBuilder.Entity("StudyHub.Entities.InvitedUser", b =>
@@ -242,7 +245,7 @@ namespace StudyHub.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("InvitedUsers", (string)null);
+                    b.ToTable("InvitedUsers");
                 });
 
             modelBuilder.Entity("StudyHub.Entities.RefreshToken", b =>
@@ -272,7 +275,7 @@ namespace StudyHub.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RefreshTokens", (string)null);
+                    b.ToTable("RefreshTokens");
                 });
 
             modelBuilder.Entity("StudyHub.Entities.StartingTimeRecord", b =>
@@ -299,7 +302,7 @@ namespace StudyHub.DAL.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("StartingTimeRecords", (string)null);
+                    b.ToTable("StartingTimeRecords");
                 });
 
             modelBuilder.Entity("StudyHub.Entities.StudentAnswer", b =>
@@ -327,7 +330,7 @@ namespace StudyHub.DAL.Migrations
 
                     b.HasIndex("TaskVariantId");
 
-                    b.ToTable("StudentAnswers", (string)null);
+                    b.ToTable("StudentAnswers");
                 });
 
             modelBuilder.Entity("StudyHub.Entities.Subject", b =>
@@ -347,7 +350,7 @@ namespace StudyHub.DAL.Migrations
 
                     b.HasIndex("TeacherId");
 
-                    b.ToTable("Subjects", (string)null);
+                    b.ToTable("Subjects");
                 });
 
             modelBuilder.Entity("StudyHub.Entities.TaskOption", b =>
@@ -369,7 +372,7 @@ namespace StudyHub.DAL.Migrations
 
                     b.HasIndex("TaskVariantId");
 
-                    b.ToTable("TaskOptions", (string)null);
+                    b.ToTable("TaskOptions");
                 });
 
             modelBuilder.Entity("StudyHub.Entities.TaskVariant", b =>
@@ -389,7 +392,7 @@ namespace StudyHub.DAL.Migrations
 
                     b.HasIndex("AssignmentTaskId");
 
-                    b.ToTable("TaskVariants", (string)null);
+                    b.ToTable("TaskVariants");
                 });
 
             modelBuilder.Entity("StudyHub.Entities.User", b =>
@@ -488,7 +491,7 @@ namespace StudyHub.DAL.Migrations
 
                     b.HasIndex("SubjectsId");
 
-                    b.ToTable("SubjectUser", (string)null);
+                    b.ToTable("SubjectUser");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>

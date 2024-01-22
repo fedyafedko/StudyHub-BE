@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using StudyHub.DAL.Configurations;
 using StudyHub.Entities;
 
 namespace StudyHub.DAL.EF;
@@ -21,21 +22,7 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Subject>()
-            .HasMany(subject => subject.Students)
-            .WithMany(user => user.Subjects);
-
-        modelBuilder.Entity<Subject>()
-            .HasOne(subject => subject.Teacher)
-            .WithMany(user => user.TeacherSubjects);
-
-        modelBuilder.Entity<TaskOption>()
-            .HasOne(variant => variant.TaskVariantChoiceOption)
-            .WithMany(options => options.ChoiceOption);
-
-        modelBuilder.Entity<TaskOption>()
-           .HasOne(variant => variant.TaskVariantOpenEnded)
-           .WithMany(options => options.OpenEndedOption);
+        new SubjectConfiguration().Configure(modelBuilder.Entity<Subject>());
 
         base.OnModelCreating(modelBuilder);
     }

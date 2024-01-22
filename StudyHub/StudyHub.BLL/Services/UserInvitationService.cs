@@ -1,14 +1,13 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
-using StudyHub.BLL.Configs;
+using StudyHub.Common.Configs;
 using StudyHub.BLL.Extensions;
 using StudyHub.BLL.Services.Interfaces;
 using StudyHub.BLL.Services.Interfaces.Auth;
 using StudyHub.Common;
 using StudyHub.Common.DTO.UserInvitation;
 using StudyHub.Common.Exceptions;
-using StudyHub.Common.Models;
 using StudyHub.Common.Requests;
 using StudyHub.DAL.Repositories.Interfaces;
 using StudyHub.Entities;
@@ -25,7 +24,7 @@ public class UserInvitationService : IUserInvitationService
     private readonly IEmailService _emailService;
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<IdentityRole<Guid>> _roleManager;
-    private readonly EmailSettings _messageSettings;
+    private readonly EmailConfig _emailConfig;
     private readonly UserInvitationConfig _userInvitationConfig;
     private readonly IMapper _mapper;
 
@@ -35,7 +34,7 @@ public class UserInvitationService : IUserInvitationService
         UserManager<User> userManager,
         RoleManager<IdentityRole<Guid>> roleManager,
         IEncryptService encryptService,
-        IOptions<EmailSettings> messageSettings,
+        IOptions<EmailConfig> emailConfig,
         IOptions<UserInvitationConfig> userInvitationConfig,
         IMapper mapper)
     {
@@ -43,7 +42,7 @@ public class UserInvitationService : IUserInvitationService
         _emailService = emailService;
         _userManager = userManager;
         _roleManager = roleManager;
-        _messageSettings = messageSettings.Value;
+        _emailConfig = emailConfig.Value;
         _encryptService = encryptService;
         _userInvitationConfig = userInvitationConfig.Value;
         _mapper = mapper;
@@ -87,7 +86,7 @@ public class UserInvitationService : IUserInvitationService
 
             var encodedToken = HttpUtility.UrlEncode(tokenRaw);
 
-            var url = string.Format(_messageSettings.AcceptInvitationUrl, request.Role, encodedToken);
+            var url = string.Format(_emailConfig.AcceptInvitationUrl, request.Role, encodedToken);
 
             var userMessage = new InviteUserMessage
             {

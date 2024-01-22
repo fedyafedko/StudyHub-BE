@@ -1,6 +1,6 @@
-﻿namespace StudyHub.Common.Models;
+﻿namespace StudyHub.Common.Configs;
 
-public class GoogleAuthConfig
+public class GoogleAuthConfig : ConfigBase
 {
     public string ClientId { get; set; } = string.Empty;
     public string ClientSecret { get; set; } = string.Empty;

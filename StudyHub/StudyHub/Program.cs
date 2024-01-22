@@ -10,7 +10,6 @@ using StudyHub.BLL.Services;
 using StudyHub.BLL.Services.Auth;
 using StudyHub.BLL.Services.Interfaces;
 using StudyHub.BLL.Services.Interfaces.Auth;
-using StudyHub.Common.Models;
 using StudyHub.DAL.EF;
 using StudyHub.DAL.Repositories;
 using StudyHub.DAL.Repositories.Interfaces;
@@ -23,19 +22,19 @@ using StudyHub.Seeding.Extentions;
 using StudyHub.Validators.AssignmentTaskOptionValidators;
 using System.Text;
 using Hangfire;
-using StudyHub.Hangfire;
 using StudyHub.Hangfire.Extensions;
-using StudyHub.BLL.Configs;
+using StudyHub.Common.Configs;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using StudyHub.Utility;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
-builder.Services.Configure<GoogleAuthConfig>(builder.Configuration.GetSection("GoogleAuth"));
-builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
-builder.Services.Configure<HangfireConfig>(builder.Configuration.GetSection("HangfireConfig"));
-builder.Services.Configure<UserInvitationConfig>(builder.Configuration.GetSection("UserInvitationConfig"));
+builder.Services.ConfigsAssembly(builder.Configuration, opt => opt
+       .AddConfig<JwtConfig>()
+       .AddConfig<GoogleAuthConfig>()
+       .AddConfig<EmailConfig>()
+       .AddConfig<HangfireConfig>()
+       .AddConfig<UserInvitationConfig>());
 
 builder.Services.AddAutoMapper(typeof(AssignmentTaskProfile));
 
@@ -84,7 +83,7 @@ builder.Services.AddValidatorsFromAssemblyContaining<CreateAssignmentTaskOptionV
 var tokenValidationParameters = new TokenValidationParameters
 {
     ValidateIssuerSigningKey = true,
-    IssuerSigningKey = new SymmetricSecurityKey(key: Encoding.UTF8.GetBytes(builder.Configuration.GetValue<string>("JwtSettings:Secret")!)),
+    IssuerSigningKey = new SymmetricSecurityKey(key: Encoding.UTF8.GetBytes(builder.Configuration.GetValue<string>("JwtConfig:Secret")!)),
     ValidateIssuer = false,
     ValidateAudience = false,
     RequireExpirationTime = false,

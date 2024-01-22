@@ -1,6 +1,6 @@
 ﻿using FluentEmail.Core;
 using Microsoft.Extensions.Options;
-using StudyHub.Common.Models;
+using StudyHub.Common.Configs;
 using StudyHub.FluentEmail.MessageBase;
 using StudyHub.FluentEmail.Services.Interfaces;
 
@@ -10,19 +10,19 @@ public class EmailService : IEmailService
 {
     private readonly IFluentEmail _fluentEmail;
     private readonly IFluentEmailFactory _fluentEmailFactory;
-    private readonly EmailSettings _messageSettings;
+    private readonly EmailConfig _emailConfig;
 
-    public EmailService(IFluentEmail fluentEmail, IOptions<EmailSettings> messageSettings, IFluentEmailFactory fluentEmailFactory)
+    public EmailService(IFluentEmail fluentEmail, IOptions<EmailConfig> emailConfig, IFluentEmailFactory fluentEmailFactory)
     {
         _fluentEmail = fluentEmail;
-        _messageSettings = messageSettings.Value;
+        _emailConfig = emailConfig.Value;
         _fluentEmailFactory = fluentEmailFactory;
     }
 
     public async Task<bool> SendAsync<T>(string to, T message)
         where T : EmailMessageBase
     {
-        var path = $@"{Directory.GetCurrentDirectory()}{_messageSettings.MessagePath}\{message.TemplateName}.cshtml";
+        var path = $@"{Directory.GetCurrentDirectory()}{_emailConfig.MessagePath}\{message.TemplateName}.cshtml";
 
         var sendEmail = await _fluentEmail
                   .To(to)
@@ -38,7 +38,7 @@ public class EmailService : IEmailService
     {
         foreach (var item in message)
         {
-            var path = $@"{Directory.GetCurrentDirectory()}{_messageSettings.MessagePath}\{item.TemplateName}.cshtml";
+            var path = $@"{Directory.GetCurrentDirectory()}{_emailConfig.MessagePath}\{item.TemplateName}.cshtml";
             var sendEmail = await _fluentEmailFactory
                  .Create()
                  .To(item.Recipient)

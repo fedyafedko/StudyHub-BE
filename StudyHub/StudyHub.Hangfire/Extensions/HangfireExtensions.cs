@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using StudyHub.Common.Configs;
 using StudyHub.Hangfire.Abstractions;
 using StudyHub.Hangfire.Jobs;
 

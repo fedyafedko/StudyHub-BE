@@ -7,11 +7,11 @@ public static class FluentEmailExtension
 {
     public static void AddFluentEmail(this IServiceCollection services, ConfigurationManager configuration)
     {
-        var emailSettings = configuration.GetSection("EmailSettings");
+        var emailSettings = configuration.GetSection("EmailConfig");
         SmtpClient client = new SmtpClient
         {
             Credentials = new NetworkCredential(emailSettings["DefaultFromEmail"], emailSettings["Password"]),
-            Host = emailSettings["SMTPSetting:Host"]!,
+            Host = emailSettings["Host"]!,
             Port = 587,
             DeliveryMethod = SmtpDeliveryMethod.Network,
             EnableSsl = true,

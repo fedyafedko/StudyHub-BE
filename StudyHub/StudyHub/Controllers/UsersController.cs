@@ -11,10 +11,12 @@ namespace StudyHub.Controllers;
 public class UsersController : Controller
 {
     private readonly IUserInvitationService _userInvitingService;
+    private readonly IGetStudentService _getStudentService;
 
-    public UsersController(IUserInvitationService userInvitingService)
+    public UsersController(IUserInvitationService userInvitingService, IGetStudentService getStudentService)
     {
         _userInvitingService = userInvitingService;
+        _getStudentService = getStudentService;
     }
 
     [HttpPost("invite")]
@@ -24,5 +26,12 @@ public class UsersController : Controller
         var userId = HttpContext.GetUserId();
 
         return await _userInvitingService.InviteManyAsync(userId, dto) ? NoContent() : BadRequest();
+    }
+
+    [HttpGet("[action]")]
+    public async Task<IActionResult> SearchStudent([FromQuery] SearchRequest request)
+    {
+        var result = await _getStudentService.GetStudents(request);
+        return Ok(result);
     }
 }

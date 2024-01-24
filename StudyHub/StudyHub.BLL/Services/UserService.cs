@@ -8,20 +8,17 @@ using StudyHub.Entities;
 
 namespace StudyHub.BLL.Services;
 
-public class GetStudentService : IGetStudentService
+public class UserService : IUserService
 {
     private readonly UserManager<User> _userManager;
     private readonly IPaginationService _paginationService;
-    private readonly IMapper _mapper;
 
-    public GetStudentService(
+    public UserService(
         UserManager<User> userManager,
-        IPaginationService paginationService,
-        IMapper mapper)
+        IPaginationService paginationService)
     {
         _userManager = userManager;
         _paginationService = paginationService;
-        _mapper = mapper;
     }
 
     public async Task<PageList> GetStudents(SearchRequest request)
@@ -38,13 +35,19 @@ public class GetStudentService : IGetStudentService
     private List<User> SearchStudent(IEnumerable<User> users, SearchRequest request)
     {
         if (!string.IsNullOrEmpty(request.FullName))
-            users = users.Where(u => u.FullName.ToLower().Contains(request.FullName.ToLower()));
+            users = users.Where(u => u.FullName
+                .ToLower()
+                .Contains(request.FullName.ToLower()));
 
         if (!string.IsNullOrEmpty(request.Group))
-            users = users.Where(u => u.Group != null && u.Group.ToLower().Contains(request.Group.ToLower()));
+            users = users.Where(u => u.Group != null && u.Group
+                .ToLower()
+                .Contains(request.Group.ToLower()));
 
         if (!string.IsNullOrEmpty(request.Email))
-            users = users.Where(u => u.Email != null && u.Email.ToLower().Contains(request.Email.ToLower()));
+            users = users.Where(u => u.Email != null && u.Email
+                .ToLower()
+                .Contains(request.Email.ToLower()));
         
         return users.ToList();
     }

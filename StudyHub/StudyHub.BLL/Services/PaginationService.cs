@@ -16,20 +16,16 @@ public class PaginationService : IPaginationService
 
     public PageList Pagination(List<User> users, int page, int pageSize)
     {
-        var pageList = new PageList();
         var pageUsers = users.Skip((page - 1) * pageSize).Take(pageSize);
 
-        pageList.TotalCount = users.Count;
-        pageList.TotalPages = (int)Math.Ceiling((decimal)users.Count / pageSize);
-        pageList.Users = _mapper.Map<List<UserDTO>>(pageUsers);
+        var pageList = new PageList
+        {
+            TotalCount = users.Count,
+            TotalPages = (int)Math.Ceiling((decimal)users.Count / pageSize),
+            Users = _mapper.Map<List<UserDTO>>(pageUsers)
+        };
 
         return pageList;
     }
 }
 
-public class PageList
-{
-    public List<UserDTO> Users { get; set; } = null!;
-    public int TotalCount { get; set; }
-    public int TotalPages { get; set; }
-}

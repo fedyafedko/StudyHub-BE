@@ -20,11 +20,6 @@ public class UserProfile : Profile
         CreateMap<GoogleJsonWebSignature.Payload, User>()
             .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Email));
 
-        CreateMap<User, UserDTO>()
-            .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
-            .ForMember(dest => dest.Telegram, opt => opt.MapFrom(src => src.Telegram))
-            .ForMember(dest => dest.Group, opt => opt.MapFrom(src => src.Group))
-            .ForMember(dest => dest.Course, opt => opt.MapFrom(src => src.Course))
-            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email));
+        CreateMap<User, UserDTO>();
     }
 }

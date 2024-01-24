@@ -3,15 +3,15 @@
 namespace StudyHub.BLL.Extensions;
 public static class PaginationExtension
 {
-    public static PageList<UserDTO> Pagination(this List<UserDTO> users, int page, int pageSize)
+    public static PageList<T> Pagination<T>(this List<T> items, int page, int pageSize)
     {
-        var pageUsers = users.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+        var pageUsers = items.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
-        var pageList = new PageList<UserDTO>()
+        var pageList = new PageList<T>()
         {
-            TotalCount = users.Count,
-            TotalPages = (int)Math.Ceiling((decimal)users.Count / pageSize),
-            Users = pageUsers
+            TotalCount = items.Count,
+            TotalPages = (int)Math.Ceiling((decimal)items.Count / pageSize),
+            Items = pageUsers
         };
 
         return pageList;

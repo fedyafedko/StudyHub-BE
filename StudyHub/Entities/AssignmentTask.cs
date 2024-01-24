@@ -4,10 +4,11 @@ namespace StudyHub.Entities;
 
 public class AssignmentTask : EntityBase
 {
+    public int MaxMark { get; set; }
+
     [ForeignKey(nameof(Assignment))]
     public Guid AssignmentId { get; set; }
-    public string Label { get; set; } = string.Empty;
-    public int Mark { get; set; }
+
     public Assignment Assignment { get; set; } = null!;
-    public List<AssignmentTaskOptionBase> Options { get; set; } = null!;
+    public List<TaskVariant> TaskVariants { get; set; } = null!;
 }

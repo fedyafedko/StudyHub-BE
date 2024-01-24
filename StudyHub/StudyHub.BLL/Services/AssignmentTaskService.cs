@@ -57,7 +57,7 @@ public class AssignmentTaskService : IAssignmentTaskService
     public async Task<List<AssignmentTaskDTO>> GetAssignmentTaskAsync(Guid assignmentId)
     {
         var result = await _assignmentTaskRepository
-            .Include(assignmentTask => assignmentTask.Options)
+            .Include(assignmentTask => assignmentTask.TaskVariants)
             .Where(assignmentTask => assignmentTask.AssignmentId == assignmentId)
             .ToListAsync();
 
@@ -70,7 +70,7 @@ public class AssignmentTaskService : IAssignmentTaskService
     public async Task<AssignmentTaskDTO> UpdateAssignmentTaskAsync(Guid assignmentTaskId, UpdateAssignmentTaskDTO dto)
     {
         var entity = await _assignmentTaskRepository
-            .Include(assignmentTask => assignmentTask.Options)
+            .Include(assignmentTask => assignmentTask.TaskVariants)
             .FirstOrDefaultAsync(assignmentTask => assignmentTask.Id == assignmentTaskId)
             ?? throw new NotFoundException($"Unable to find entity with such key {assignmentTaskId}");
 

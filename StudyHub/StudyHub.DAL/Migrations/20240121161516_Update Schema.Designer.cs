@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StudyHub.DAL.EF;
 
@@ -11,9 +12,11 @@ using StudyHub.DAL.EF;
 namespace StudyHub.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240121161516_Update Schema")]
+    partial class UpdateSchema
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -362,12 +365,17 @@ namespace StudyHub.DAL.Migrations
                     b.Property<string>("Label")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("TaskVariantId")
+                    b.Property<Guid>("TaskVariantChoiceOptionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("TaskVariantOpenEndedId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TaskVariantId");
+                    b.HasIndex("TaskVariantChoiceOptionId");
+
+                    b.HasIndex("TaskVariantOpenEndedId");
 
                     b.ToTable("TaskOptions");
                 });
@@ -414,9 +422,6 @@ namespace StudyHub.DAL.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
-
-                    b.Property<string>("Faculty")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FullName")
                         .IsRequired()
@@ -633,13 +638,21 @@ namespace StudyHub.DAL.Migrations
 
             modelBuilder.Entity("StudyHub.Entities.TaskOption", b =>
                 {
-                    b.HasOne("StudyHub.Entities.TaskVariant", "TaskVariant")
-                        .WithMany("TaskOption")
-                        .HasForeignKey("TaskVariantId")
+                    b.HasOne("StudyHub.Entities.TaskVariant", "TaskVariantChoiceOption")
+                        .WithMany("ChoiceOption")
+                        .HasForeignKey("TaskVariantChoiceOptionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("TaskVariant");
+                    b.HasOne("StudyHub.Entities.TaskVariant", "TaskVariantOpenEnded")
+                        .WithMany("OpenEndedOption")
+                        .HasForeignKey("TaskVariantOpenEndedId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TaskVariantChoiceOption");
+
+                    b.Navigation("TaskVariantOpenEnded");
                 });
 
             modelBuilder.Entity("StudyHub.Entities.TaskVariant", b =>
@@ -696,9 +709,11 @@ namespace StudyHub.DAL.Migrations
 
             modelBuilder.Entity("StudyHub.Entities.TaskVariant", b =>
                 {
-                    b.Navigation("StudentAnswers");
+                    b.Navigation("ChoiceOption");
 
-                    b.Navigation("TaskOption");
+                    b.Navigation("OpenEndedOption");
+
+                    b.Navigation("StudentAnswers");
                 });
 
             modelBuilder.Entity("StudyHub.Entities.User", b =>

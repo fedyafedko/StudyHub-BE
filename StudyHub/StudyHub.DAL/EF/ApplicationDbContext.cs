@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using StudyHub.DAL.Configurations;
 using StudyHub.Entities;
 
 namespace StudyHub.DAL.EF;
@@ -22,7 +21,7 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        new SubjectConfiguration().Configure(modelBuilder.Entity<Subject>());
+        modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);
 
         base.OnModelCreating(modelBuilder);
     }

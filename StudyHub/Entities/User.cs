@@ -9,6 +9,7 @@ public class User : IdentityUser<Guid>
     public string? Telegram { get; set; } = null;
     public string? Group { get; set; } = null;
     public string? Course { get; set; } = null;
+    public string? Faculty { get; set; } = null;
 
     [ForeignKey(nameof(RefreshToken))]
     public Guid RefreshTokenId { get; set; }

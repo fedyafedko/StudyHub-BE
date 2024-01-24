@@ -1,8 +1,8 @@
 ﻿namespace StudyHub.Common.DTO.User;
 
-public class PageList
+public class PageList<T>
 {
-    public List<UserDTO> Users { get; set; } = null!;
+    public List<T> Users { get; set; } = null!;
     public int TotalCount { get; set; }
     public int TotalPages { get; set; }
 }

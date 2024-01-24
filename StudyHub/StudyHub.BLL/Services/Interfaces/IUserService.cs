@@ -5,5 +5,5 @@ namespace StudyHub.BLL.Services.Interfaces;
 
 public interface IUserService
 {
-    Task<PageList> GetStudents(SearchRequest request);
+    Task<PageList<UserDTO>> GetStudents(SearchRequest request);
 }

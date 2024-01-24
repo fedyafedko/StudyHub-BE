@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using StudyHub.BLL.Extensions;
 using StudyHub.BLL.Services.Interfaces;
 using StudyHub.Common;
 using StudyHub.Common.DTO.User;
@@ -11,23 +12,23 @@ namespace StudyHub.BLL.Services;
 public class UserService : IUserService
 {
     private readonly UserManager<User> _userManager;
-    private readonly IPaginationService _paginationService;
+    private readonly IMapper _mapper;
 
     public UserService(
         UserManager<User> userManager,
-        IPaginationService paginationService)
+        IMapper mapper)
     {
         _userManager = userManager;
-        _paginationService = paginationService;
+        _mapper = mapper;
     }
 
-    public async Task<PageList> GetStudents(SearchRequest request)
+    public async Task<PageList<UserDTO>> GetStudents(SearchRequest request)
     {
         var users = await _userManager.GetUsersInRoleAsync(UserRole.Student.Value);
 
         var searchUsers = SearchStudent(users, request);
 
-        var result = _paginationService.Pagination(searchUsers, request.Page, request.PageSize);
+        var result = searchUsers.Pagination(_mapper, request.Page, request.PageSize);
 
         return result;
     }

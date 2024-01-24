@@ -26,9 +26,9 @@ public class UserService : IUserService
     {
         var users = await _userManager.GetUsersInRoleAsync(UserRole.Student.Value);
 
-        var searchUsers = SearchStudent(users, request);
+        var searchUsers = _mapper.Map<List<UserDTO>>(SearchStudent(users, request));
 
-        var result = searchUsers.Pagination(_mapper, request.Page, request.PageSize);
+        var result = searchUsers.Pagination(request.Page, request.PageSize);
 
         return result;
     }

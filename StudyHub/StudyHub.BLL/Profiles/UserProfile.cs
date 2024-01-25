@@ -2,6 +2,7 @@
 using Google.Apis.Auth;
 using StudyHub.Common.DTO;
 using StudyHub.Common.DTO.AuthDTO;
+using StudyHub.Common.DTO.User;
 using StudyHub.Common.DTO.UserInvitation;
 using StudyHub.Entities;
 
@@ -18,5 +19,7 @@ public class UserProfile : Profile
 
         CreateMap<GoogleJsonWebSignature.Payload, User>()
             .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Email));
+
+        CreateMap<User, UserDTO>();
     }
 }

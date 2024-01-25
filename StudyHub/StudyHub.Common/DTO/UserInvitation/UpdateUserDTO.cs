@@ -1,4 +1,5 @@
 ﻿namespace StudyHub.Common.DTO.UserInvitation;
+
 public class UpdateUserDTO
 {
     public string FullName { get; set; } = string.Empty;

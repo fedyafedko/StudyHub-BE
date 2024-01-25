@@ -8,5 +8,5 @@ namespace StudyHub.BLL.Services.Interfaces;
 public interface IUserService
 {
     Task<PageList<StudentDTO>> GetStudents(SearchRequest request);
-    Task<UserDTO> EditAsync(Guid userId, UpdateUserDTO dto);
+    Task<UserDTO> UpdateUserAsync(Guid userId, UpdateUserDTO dto);
 }

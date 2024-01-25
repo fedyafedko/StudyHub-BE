@@ -36,7 +36,7 @@ public class UserService : IUserService
         return result;
     }
 
-    public async Task<UserDTO> EditAsync(Guid userId, UpdateUserDTO dto)
+    public async Task<UserDTO> UpdateUserAsync(Guid userId, UpdateUserDTO dto)
     {
         var user = await _userManager.FindByIdAsync(userId.ToString())
             ?? throw new NotFoundException("User with such ID does not exist in the database");

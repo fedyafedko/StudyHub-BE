@@ -38,10 +38,10 @@ public class UsersController : Controller
     }
 
     [HttpPut("me")]
-    public async Task<IActionResult> Edit(UpdateUserDTO dto)
+    public async Task<IActionResult> UpdateUser(UpdateUserDTO dto)
     {
         var userId = HttpContext.GetUserId();
-        var result = await _userService.EditAsync(userId, dto);
+        var result = await _userService.UpdateUserAsync(userId, dto);
         return Ok(result);
     }
 }

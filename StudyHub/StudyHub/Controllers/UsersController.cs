@@ -37,9 +37,10 @@ public class UsersController : Controller
         return Ok(result);
     }
 
-    [HttpPut("[action]")]
-    public async Task<IActionResult> Edit(Guid userId, UpdateUserDTO dto)
+    [HttpPut("me")]
+    public async Task<IActionResult> Edit(UpdateUserDTO dto)
     {
+        var userId = HttpContext.GetUserId();
         var result = await _userService.EditAsync(userId, dto);
         return Ok(result);
     }

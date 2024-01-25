@@ -15,6 +15,6 @@ public class UpdateUserValidator : AbstractValidator<UpdateUserDTO>
         RuleFor(x => x.Telegram)
             .NotEmpty()
             .Matches(ValidationRegexes.Telegram)
-            .WithMessage("{PropertyName} must contain @.");
+            .WithMessage("Invalid {PropertyName}.");
     }
 }

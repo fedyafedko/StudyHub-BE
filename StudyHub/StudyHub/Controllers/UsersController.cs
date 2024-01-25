@@ -2,12 +2,14 @@
 using Microsoft.AspNetCore.Mvc;
 using RealtorAPI.Extensions;
 using StudyHub.BLL.Services.Interfaces;
+using StudyHub.Common.DTO.UserInvitation;
 using StudyHub.Common.Requests;
 
 namespace StudyHub.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class UsersController : Controller
 {
     private readonly IUserInvitationService _userInvitingService;
@@ -32,6 +34,13 @@ public class UsersController : Controller
     public async Task<IActionResult> SearchStudent([FromQuery] SearchRequest request)
     {
         var result = await _userService.GetStudents(request);
+        return Ok(result);
+    }
+
+    [HttpPut("[action]")]
+    public async Task<IActionResult> Edit(Guid userId, UpdateUserDTO dto)
+    {
+        var result = await _userService.EditAsync(userId, dto);
         return Ok(result);
     }
 }

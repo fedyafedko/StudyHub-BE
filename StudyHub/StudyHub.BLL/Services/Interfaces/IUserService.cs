@@ -1,9 +1,12 @@
 ﻿using StudyHub.Common.DTO.User;
+using StudyHub.Common.DTO.User.Student;
+using StudyHub.Common.DTO.UserInvitation;
 using StudyHub.Common.Requests;
 
 namespace StudyHub.BLL.Services.Interfaces;
 
 public interface IUserService
 {
-    Task<PageList<UserDTO>> GetStudents(SearchRequest request);
+    Task<PageList<StudentDTO>> GetStudents(SearchRequest request);
+    Task<UserDTO> EditAsync(Guid userId, UpdateUserDTO dto);
 }

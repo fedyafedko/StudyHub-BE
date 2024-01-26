@@ -1,4 +1,7 @@
 ﻿using StudyHub.Common.DTO.Subject;
+using StudyHub.Common.DTO.User;
+using StudyHub.Common.DTO.User.Student;
+using StudyHub.Common.Requests;
 
 namespace StudyHub.BLL.Services.Interfaces;
 
@@ -13,4 +16,6 @@ public interface ISubjectService
     Task<bool> DeleteSubjectAsync(Guid userId, Guid subjectId);
 
     Task<List<SubjectDTO>> GetSubjectsForUserAsync(Guid userId);
+
+    Task<List<StudentDTO>> AddStudentToSubjectAsync(Guid subjectId, AddStudentSubjectRequest request);
 }

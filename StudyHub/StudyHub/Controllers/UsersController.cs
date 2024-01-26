@@ -33,7 +33,7 @@ public class UsersController : Controller
     [HttpGet("[action]")]
     public async Task<IActionResult> SearchStudent([FromQuery] SearchRequest request)
     {
-        var result = await _userService.GetStudents(request);
+        var result = await _userService.GetStudentsAsync(request);
         return Ok(result);
     }
 

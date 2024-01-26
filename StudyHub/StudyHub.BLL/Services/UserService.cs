@@ -25,7 +25,7 @@ public class UserService : IUserService
         _mapper = mapper;
     }
 
-    public async Task<PageList<StudentDTO>> GetStudents(SearchRequest request)
+    public async Task<PageList<StudentDTO>> GetStudentsAsync(SearchRequest request)
     {
         var users = await _userManager.GetUsersInRoleAsync(UserRole.Student.Value);
 

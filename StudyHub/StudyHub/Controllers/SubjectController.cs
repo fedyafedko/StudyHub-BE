@@ -25,9 +25,9 @@ public class SubjectController : Controller
 
     [HttpPost("[action]")]
     [Authorize(Roles = "Teacher")]
-    public async Task<IActionResult> AddStudent(Guid subjectId, AddStudentSubjectRequest request)
+    public async Task<IActionResult> AddStudents(Guid subjectId, AddStudentsToSubjectRequest request)
     {
-        var result = await _subjectService.AddStudentToSubjectAsync(subjectId, request);
+        var result = await _subjectService.AddStudentsToSubjectAsync(subjectId, request);
         return Ok(result);
     }
 

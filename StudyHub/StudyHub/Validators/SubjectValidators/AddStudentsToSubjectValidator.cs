@@ -3,9 +3,9 @@ using StudyHub.Common.Requests;
 
 namespace StudyHub.Validators.SubjectValidators;
 
-public class AddSutdentSubjectValidator : AbstractValidator<AddStudentSubjectRequest>
+public class AddStudentsToSubjectValidator : AbstractValidator<AddStudentsToSubjectRequest>
 {
-    public AddSutdentSubjectValidator()
+    public AddStudentsToSubjectValidator()
     {
         RuleFor(x => x.Emails)
             .NotEmpty()

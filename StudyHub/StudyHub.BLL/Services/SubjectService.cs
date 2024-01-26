@@ -29,7 +29,7 @@ public class SubjectService : ISubjectService
         _mapper = mapper;
     }
 
-    public async Task<List<StudentDTO>> AddStudentToSubjectAsync(Guid subjectId, AddStudentSubjectRequest request)
+    public async Task<List<StudentDTO>> AddStudentsToSubjectAsync(Guid subjectId, AddStudentsToSubjectRequest request)
     {
         var users = new List<User>();
 

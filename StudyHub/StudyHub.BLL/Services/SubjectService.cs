@@ -31,26 +31,22 @@ public class SubjectService : ISubjectService
 
     public async Task<List<StudentDTO>> AddStudentsToSubjectAsync(Guid subjectId, AddStudentsToSubjectRequest request)
     {
-        var users = new List<User>();
+        var subject = await _subjectRepository.FirstOrDefaultAsync(s => s.Id == subjectId)
+            ?? throw new NotFoundException("Subject not found with the specified Id");
 
         foreach (var email in request.Emails)
         {
             var user = await _userManager.FindByEmailAsync(email)
                 ?? throw new NotFoundException($"Student not found with the specified email: {email}");
 
-            users.Add(user);
+            user.Subjects ??= new List<Subject>(); 
+
+            user.Subjects.Add(subject);
+
+            await _userManager.UpdateAsync(user);
         }
 
-        var subject = await _subjectRepository.FirstOrDefaultAsync(s => s.Id == subjectId)
-            ?? throw new NotFoundException("Subject not found with the specified Id");
-
-        subject.Students ??= new List<User>();
-
-        subject.Students.AddRange(users);
-
-        await _subjectRepository.SaveChangesAsync();
-
-        return _mapper.Map<List<StudentDTO>>(users);
+        return _mapper.Map<List<StudentDTO>>(subject.Students);
     }
 
     public async Task<SubjectDTO> AddSubjectAsync(CreateSubjectDTO dto)

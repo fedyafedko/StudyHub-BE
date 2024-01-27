@@ -67,6 +67,7 @@ builder.Services.AddScoped<IUserInvitationService, UserInvitationService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<IEncryptService, EncryptService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 // Fluent Email
 builder.Services.AddFluentEmail(builder.Configuration);

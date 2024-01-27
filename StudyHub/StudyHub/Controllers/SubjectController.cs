@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using RealtorAPI.Extensions;
 using StudyHub.BLL.Services.Interfaces;
+using StudyHub.BLL.Services.Interfaces.Assignment;
 using StudyHub.Common.DTO.Subject;
 
 namespace StudyHub.Controllers;
@@ -26,7 +27,8 @@ public class SubjectController : Controller
     [Authorize(Roles = "Teacher")]
     public async Task<IActionResult> InsertSubject(CreateSubjectDTO dto)
     {
-        var result = await _subjectService.AddSubjectAsync(dto);
+        var userId = HttpContext.GetUserId();
+        var result = await _subjectService.AddSubjectAsync(userId, dto);
         return Ok(result);
     }
 

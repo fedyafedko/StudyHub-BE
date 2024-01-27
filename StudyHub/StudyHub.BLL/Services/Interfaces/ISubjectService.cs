@@ -4,7 +4,7 @@ namespace StudyHub.BLL.Services.Interfaces;
 
 public interface ISubjectService
 {
-    Task<SubjectDTO> AddSubjectAsync(CreateSubjectDTO dto);
+    Task<SubjectDTO> AddSubjectAsync(Guid teacherId, CreateSubjectDTO dto);
 
     Task<SubjectDTO> GetSubjectAsync(Guid subjectId);
 

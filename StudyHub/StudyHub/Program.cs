@@ -26,6 +26,9 @@ using StudyHub.Hangfire.Extensions;
 using StudyHub.Common.Configs;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using StudyHub.Utility;
+using StudyHub.BLL.Services.Interfaces.Assignment;
+using StudyHub.BLL.Services.Assignments;
+using Microsoft.OpenApi.Any;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,6 +58,7 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<ISubjectService, SubjectService>();
 builder.Services.AddScoped<IAssignmentTaskService, AssignmentTaskService>();
 builder.Services.AddScoped<IAssignmentService, AssignmentService>();
+builder.Services.AddScoped<IVariantService, VariantService>();
 builder.Services.AddScoped<IOptionsService, OptionsService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
@@ -79,7 +83,7 @@ builder.Services.AddIdentity<User, IdentityRole<Guid>>()
 // Validators
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
-builder.Services.AddValidatorsFromAssemblyContaining<CreateAssignmentTaskOptionValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateTaskOptionValidator>();
 var tokenValidationParameters = new TokenValidationParameters
 {
     ValidateIssuerSigningKey = true,
@@ -130,6 +134,11 @@ builder.Services.AddSwaggerGen(c =>
             }
         }
     );
+    c.MapType<TimeSpan>(() => new OpenApiSchema
+    {
+        Type = "string",
+        Example = new OpenApiString("00:00:00")
+    });
 });
 
 // CORS

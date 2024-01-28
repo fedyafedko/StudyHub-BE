@@ -51,6 +51,7 @@ public class AssignmentTaskService : IAssignmentTaskService
     {
         var result = await _assignmentTaskRepository
             .Include(assignmentTask => assignmentTask.TaskVariants)
+            .ThenInclude(taskVariant => taskVariant.TaskOption)
             .Where(assignmentTask => assignmentTask.AssignmentId == assignmentId)
             .ToListAsync();
 

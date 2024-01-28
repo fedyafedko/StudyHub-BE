@@ -2,6 +2,6 @@
 
 public class UpdateTaskOptionDTO
 {
-    public string Label { get; set; } = string.Empty;
+    public string? Label { get; set; } = null;
     public bool? IsCorrect { get; set; }
 }

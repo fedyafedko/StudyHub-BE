@@ -29,10 +29,16 @@ public class SubjectService : ISubjectService
         _mapper = mapper;
     }
 
-    public async Task<List<StudentDTO>> AddStudentsToSubjectAsync(Guid subjectId, AddStudentsToSubjectRequest request)
+    public async Task<List<StudentDTO>> AddStudentsToSubjectAsync(
+        Guid subjectId,
+        Guid teacherId,
+        AddStudentsToSubjectRequest request)
     {
         var subject = await _subjectRepository.FirstOrDefaultAsync(s => s.Id == subjectId)
             ?? throw new NotFoundException("Subject not found with the specified Id");
+
+        if (subject.TeacherId != teacherId)
+            throw new RestrictedAccessException("You are not the owner and do not have permission to perform this action.");
 
         foreach (var email in request.Emails)
         {

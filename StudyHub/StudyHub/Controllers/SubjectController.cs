@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using RealtorAPI.Extensions;
 using StudyHub.BLL.Services.Interfaces;
 using StudyHub.Common.DTO.Subject;
+using StudyHub.Common.Requests;
 
 namespace StudyHub.Controllers;
 
@@ -20,6 +21,15 @@ public class SubjectController : Controller
     {
         _subjectService = subjectService;
         _assignmentService = assignmentService;
+    }
+
+    [HttpPost("[action]")]
+    [Authorize(Roles = "Teacher")]
+    public async Task<IActionResult> AddStudents(Guid subjectId, AddStudentsToSubjectRequest request)
+    {
+        var teacherId = HttpContext.GetUserId();
+        var result = await _subjectService.AddStudentsToSubjectAsync(subjectId, teacherId, request);
+        return Ok(result);
     }
 
     [HttpPost]

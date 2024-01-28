@@ -3,7 +3,7 @@ using StudyHub.Common.Requests;
 
 namespace StudyHub.Validators.SubjectValidators;
 
-public class AddStudentsToSubjectValidator : AbstractValidator<AddStudentsToSubjectRequest>
+public class AddStudentsToSubjectValidator : AbstractValidator<StudentsToSubjectRequest>
 {
     public AddStudentsToSubjectValidator()
     {

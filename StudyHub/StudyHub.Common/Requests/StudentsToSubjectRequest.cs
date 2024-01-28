@@ -1,6 +1,6 @@
 ﻿namespace StudyHub.Common.Requests;
 
-public class AddStudentsToSubjectRequest
+public class StudentsToSubjectRequest
 {
     public List<string> Emails { get; set; } = null!;
 }

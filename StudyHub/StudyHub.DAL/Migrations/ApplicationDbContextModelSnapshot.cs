@@ -165,7 +165,7 @@ namespace StudyHub.DAL.Migrations
 
                     b.HasIndex("TaskOptionsId");
 
-                    b.ToTable("StudentAnswerTaskOption");
+                    b.ToTable("StudentAnswerTaskOption", (string)null);
                 });
 
             modelBuilder.Entity("StudyHub.Entities.Assignment", b =>
@@ -197,7 +197,7 @@ namespace StudyHub.DAL.Migrations
 
                     b.HasIndex("SubjectId");
 
-                    b.ToTable("Assignments");
+                    b.ToTable("Assignments", (string)null);
                 });
 
             modelBuilder.Entity("StudyHub.Entities.AssignmentTask", b =>
@@ -216,7 +216,7 @@ namespace StudyHub.DAL.Migrations
 
                     b.HasIndex("AssignmentId");
 
-                    b.ToTable("AssignmentTasks");
+                    b.ToTable("AssignmentTasks", (string)null);
                 });
 
             modelBuilder.Entity("StudyHub.Entities.InvitedUser", b =>
@@ -242,7 +242,7 @@ namespace StudyHub.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("InvitedUsers");
+                    b.ToTable("InvitedUsers", (string)null);
                 });
 
             modelBuilder.Entity("StudyHub.Entities.RefreshToken", b =>
@@ -272,7 +272,7 @@ namespace StudyHub.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RefreshTokens");
+                    b.ToTable("RefreshTokens", (string)null);
                 });
 
             modelBuilder.Entity("StudyHub.Entities.StartingTimeRecord", b =>
@@ -299,7 +299,7 @@ namespace StudyHub.DAL.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("StartingTimeRecords");
+                    b.ToTable("StartingTimeRecords", (string)null);
                 });
 
             modelBuilder.Entity("StudyHub.Entities.StudentAnswer", b =>
@@ -327,7 +327,7 @@ namespace StudyHub.DAL.Migrations
 
                     b.HasIndex("TaskVariantId");
 
-                    b.ToTable("StudentAnswers");
+                    b.ToTable("StudentAnswers", (string)null);
                 });
 
             modelBuilder.Entity("StudyHub.Entities.Subject", b =>
@@ -347,7 +347,7 @@ namespace StudyHub.DAL.Migrations
 
                     b.HasIndex("TeacherId");
 
-                    b.ToTable("Subjects");
+                    b.ToTable("Subjects", (string)null);
                 });
 
             modelBuilder.Entity("StudyHub.Entities.TaskOption", b =>
@@ -369,7 +369,7 @@ namespace StudyHub.DAL.Migrations
 
                     b.HasIndex("TaskVariantId");
 
-                    b.ToTable("TaskOptions");
+                    b.ToTable("TaskOptions", (string)null);
                 });
 
             modelBuilder.Entity("StudyHub.Entities.TaskVariant", b =>
@@ -389,7 +389,7 @@ namespace StudyHub.DAL.Migrations
 
                     b.HasIndex("AssignmentTaskId");
 
-                    b.ToTable("TaskVariants");
+                    b.ToTable("TaskVariants", (string)null);
                 });
 
             modelBuilder.Entity("StudyHub.Entities.User", b =>
@@ -491,7 +491,7 @@ namespace StudyHub.DAL.Migrations
 
                     b.HasIndex("SubjectsId");
 
-                    b.ToTable("SubjectUser");
+                    b.ToTable("SubjectUser", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>

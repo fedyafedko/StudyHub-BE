@@ -1,4 +1,5 @@
 ﻿using StudyHub.Common.DTO.AssignmentTaskOption;
+using StudyHub.Common.DTO.TaskVariant;
 
 namespace StudyHub.Common.DTO.AssignmentTask;
 
@@ -6,7 +7,6 @@ public class AssignmentTaskDTO
 {
     public Guid Id { get; set; }
     public Guid AssignmentId { get; set; }
-    public string Label { get; set; } = string.Empty;
-    public int Mark { get; set; }
-    public List<AssignmentTaskOptionDTO> Options { get; set; } = new List<AssignmentTaskOptionDTO>();
+    public int MaxMark { get; set; }
+    public List<TaskVariantDTO> TaskVariants { get; set; } = new List<TaskVariantDTO>();
 }

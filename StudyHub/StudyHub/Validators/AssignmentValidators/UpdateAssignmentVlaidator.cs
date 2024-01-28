@@ -9,14 +9,21 @@ public class UpdateAssignmentVlaidator : AbstractValidator<UpdateAssignmentDTO>
     {
         RuleFor(x => x.Title)
             .NotEmpty();
+
         RuleFor(x => x.MaxMark)
             .GreaterThan(0);
-        RuleFor(x => x.StartDate)
-            .NotEmpty().WithMessage("StartDate is required.")
+
+        RuleFor(x => x.OpeningDate)
+            .NotEmpty().WithMessage("OpeningDate is required.")
             .GreaterThan(DateTime.Now);
-        RuleFor(x => x.FinishDate)
-            .NotEmpty().WithMessage("FinishDate is required.")
+
+        RuleFor(x => x.ClosingDate)
+            .NotEmpty().WithMessage("ClosingDate is required.")
             .GreaterThan(DateTime.Now)
-            .GreaterThan(x => x.StartDate);
+            .GreaterThan(x => x.OpeningDate);
+
+        RuleFor(x => x.Duration)
+            .NotEmpty().WithMessage("Duration is required.")
+            .LessThanOrEqualTo(x => x.ClosingDate - x.OpeningDate).WithMessage("Duration has to be less or equal to open time of assignment"); 
     }
 }

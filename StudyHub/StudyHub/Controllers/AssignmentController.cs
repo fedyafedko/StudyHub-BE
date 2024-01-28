@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using StudyHub.BLL.Services.Interfaces;
+using StudyHub.BLL.Services.Interfaces.Assignment;
 using StudyHub.Common.DTO.Assignment;
 
 namespace StudyHub.Controllers;

@@ -1,6 +1,6 @@
 ﻿using StudyHub.Common.DTO.AssignmentTask;
 
-namespace StudyHub.BLL.Services.Interfaces;
+namespace StudyHub.BLL.Services.Interfaces.Assignment;
 
 public interface IAssignmentTaskService
 {

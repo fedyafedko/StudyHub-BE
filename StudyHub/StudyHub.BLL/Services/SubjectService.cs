@@ -122,7 +122,7 @@ public class SubjectService : ISubjectService
         return _mapper.Map<List<StudentDTO>>(subject.Students);
     }
 
-    public async Task<bool> DeleteStudentsSubjectAsync(
+    public async Task<bool> DeleteStudentsFromSubjectAsync(
         Guid subjectId,
         Guid teacherId,
         StudentsToSubjectRequest request)
@@ -135,6 +135,7 @@ public class SubjectService : ISubjectService
         if (subject.TeacherId != teacherId)
             throw new RestrictedAccessException("You are not the owner and do not have permission to perform this action.");
 
+        // To Do: Fix bug with exception when student not found
         foreach (var email in request.Emails)
         {
             var user = await _userManager.FindByEmailAsync(email)

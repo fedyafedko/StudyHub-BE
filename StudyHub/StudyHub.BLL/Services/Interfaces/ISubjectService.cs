@@ -17,6 +17,6 @@ public interface ISubjectService
     Task<List<SubjectDTO>> GetSubjectsForUserAsync(Guid userId);
 
     Task<List<StudentDTO>> AddStudentsToSubjectAsync(Guid subjectId, Guid teacherId, StudentsToSubjectRequest request);
-    Task<bool> DeleteStudentsSubjectAsync(Guid subjectId, Guid teacherId, StudentsToSubjectRequest request);
+    Task<bool> DeleteStudentsFromSubjectAsync(Guid subjectId, Guid teacherId, StudentsToSubjectRequest request);
     Task<List<StudentDTO>> GetStudentsForSubjectAsync(Guid subjectId);
 }

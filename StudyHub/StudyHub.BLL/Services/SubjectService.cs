@@ -102,7 +102,7 @@ public class SubjectService : ISubjectService
         StudentsToSubjectRequest request)
     {
         var subject = await _subjectRepository.FirstOrDefaultAsync(s => s.Id == subjectId)
-            ?? throw new NotFoundException("Subject not found with the specified Id");
+            ?? throw new NotFoundException($"Subject not found with this ID: {subjectId}");
 
         if (subject.TeacherId != teacherId)
             throw new RestrictedAccessException("You are not the owner and do not have permission to perform this action.");
@@ -130,7 +130,7 @@ public class SubjectService : ISubjectService
         var subject = await _subjectRepository
                 .Include(s => s.Students)
                 .FirstOrDefaultAsync(s => s.Id == subjectId)
-            ?? throw new NotFoundException("Subject not found with the specified Id");
+            ?? throw new NotFoundException($"Subject not found with this ID: {subjectId}");
 
         if (subject.TeacherId != teacherId)
             throw new RestrictedAccessException("You are not the owner and do not have permission to perform this action.");
@@ -153,7 +153,7 @@ public class SubjectService : ISubjectService
         var subject = await _subjectRepository
                 .Include(s => s.Students)
                 .FirstOrDefaultAsync(s => s.Id == subjectId)
-            ?? throw new NotFoundException("Subject not found with the specified Id");
+            ?? throw new NotFoundException($"Subject not found with this ID: {subjectId}");
 
         return _mapper.Map<List<StudentDTO>>(subject.Students);
     }

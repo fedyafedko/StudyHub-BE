@@ -1,7 +1,6 @@
-﻿using FluentValidation;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using StudyHub.BLL.Services.Interfaces;
+using StudyHub.BLL.Services.Interfaces.Assignment;
 using StudyHub.Common.DTO.AssignmentTask;
 using StudyHub.Validators.AssignmentTaskValidators;
 
@@ -13,16 +12,13 @@ namespace StudyHub.Controllers;
 public class AssignmentTaskController : Controller
 {
     private readonly IAssignmentTaskService _assignmentTaskService;
-    private readonly CreateAssignmentTaskValidator _createAssignmentTaskValidator;
-    private readonly UpdateAssignmentTaskValidator _updateAssignmentTaskValidator;
+    private readonly UpdateTaskVariantValidator _updateAssignmentTaskValidator;
 
     public AssignmentTaskController(
         IAssignmentTaskService serviceTask,
-        CreateAssignmentTaskValidator createAssignmentTaskValidator,
-        UpdateAssignmentTaskValidator updateAssignmentValidator)
+        UpdateTaskVariantValidator updateAssignmentValidator)
     {
         _assignmentTaskService = serviceTask;
-        _createAssignmentTaskValidator = createAssignmentTaskValidator;
         _updateAssignmentTaskValidator = updateAssignmentValidator;
     }
 
@@ -30,8 +26,6 @@ public class AssignmentTaskController : Controller
     [Authorize(Roles = "Teacher")]
     public async Task<IActionResult> InsertAssigmentTask(CreateAssignmentTaskDTO dto)
     {
-        _createAssignmentTaskValidator.ValidateAndThrow(dto);
-
         var result = await _assignmentTaskService.AddAssignmentTaskAsync(dto);
         return Ok(result);
     }
@@ -47,16 +41,14 @@ public class AssignmentTaskController : Controller
     [Authorize(Roles = "Teacher")]
     public async Task<IActionResult> UpdateAssigmentTask(Guid assignmentTaskId, [FromBody] UpdateAssignmentTaskDTO dto)
     {
-        _updateAssignmentTaskValidator.ValidateAndThrow(dto);
-
         var result = await _assignmentTaskService.UpdateAssignmentTaskAsync(assignmentTaskId, dto);
         return Ok(result);
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{assignmentTaskId}")]
     [Authorize(Roles = "Teacher")]
-    public async Task<IActionResult> DeleteAssignmentTask(Guid id)
+    public async Task<IActionResult> DeleteAssignmentTask(Guid assignmentTaskId)
     {
-        return await _assignmentTaskService.DeleteAssignmentTaskAsync(id) ? NoContent() : NotFound();
+        return await _assignmentTaskService.DeleteAssignmentTaskAsync(assignmentTaskId) ? NoContent() : NotFound();
     }
 }

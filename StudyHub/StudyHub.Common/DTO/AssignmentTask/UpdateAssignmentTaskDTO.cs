@@ -1,10 +1,9 @@
-﻿using StudyHub.Common.DTO.AssignmentTaskOption;
+﻿using StudyHub.Common.DTO.TaskVariant;
 
 namespace StudyHub.Common.DTO.AssignmentTask;
 
 public class UpdateAssignmentTaskDTO
 {
-    public string Label { get; set; } = string.Empty;
-    public int Mark { get; set; }
-    public List<UpdateAssignmentTaskOptionDTO> Options { get; set; } = null!;
+    public int MaxMark { get; set; }
+    public List<UpdateTaskVariantDTO> TaskVariants { get; set; } = null!;
 }

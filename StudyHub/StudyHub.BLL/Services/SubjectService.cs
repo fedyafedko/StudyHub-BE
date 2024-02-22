@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using StudyHub.BLL.Extensions;
 using StudyHub.BLL.Services.Interfaces;
 using StudyHub.Common.DTO.Subject;
-using StudyHub.Common.DTO.User;
 using StudyHub.Common.DTO.User.Student;
 using StudyHub.Common.Exceptions;
 using StudyHub.Common.Requests;
@@ -55,12 +54,14 @@ public class SubjectService : ISubjectService
         return _mapper.Map<List<StudentDTO>>(subject.Students);
     }
 
-    public async Task<SubjectDTO> AddSubjectAsync(CreateSubjectDTO dto)
+    public async Task<SubjectDTO> AddSubjectAsync(Guid teacherId, CreateSubjectDTO dto)
     {
-        var teacher = await _userManager.FindByIdAsync(dto.TeacherId)
-            ?? throw new NotFoundException($"Teacher not found in the database with this ID: {dto.TeacherId}");
+        var teacher = await _userManager.FindByIdAsync(teacherId)
+            ?? throw new NotFoundException($"Teacher not found in the database with this ID: {teacherId}");
 
         var entity = _mapper.Map<Subject>(dto);
+
+        entity.Teacher = teacher;
 
         await _subjectRepository.InsertAsync(entity);
 

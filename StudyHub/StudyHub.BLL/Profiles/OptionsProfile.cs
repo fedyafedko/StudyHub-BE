@@ -8,6 +8,8 @@ public class OptionsProfile : Profile
 {
     public OptionsProfile()
     {
-
+        CreateMap<TaskOption, TaskOptionDTO>();
+        CreateMap<CreateTaskOptionDTO, TaskOption>();
+        CreateMap<UpdateTaskOptionDTO, TaskOption>();
     }
 }

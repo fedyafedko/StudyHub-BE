@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using StudyHub.BLL.Services.Interfaces;
+using StudyHub.BLL.Services.Interfaces.Assignment;
 using StudyHub.Common.DTO.Assignment;
 using StudyHub.Common.Exceptions;
 using StudyHub.DAL.Repositories.Interfaces;
 using StudyHub.Entities;
 
-namespace StudyHub.BLL.Services;
+namespace StudyHub.BLL.Services.Assignments;
 
 public class AssignmentService : IAssignmentService
 {
@@ -24,16 +24,17 @@ public class AssignmentService : IAssignmentService
         _mapper = mapper;
     }
 
-    public async Task<AssignmentDTO> CreateAssignmentAsync(CreateAssignmentDTO dto)
+    public async Task<AssignmentDTO> CreateAssignmentAsync(CreateAssignmentDTO assignment)
     {
-        var entity = _mapper.Map<Assignment>(dto);
+        var entity = _mapper.Map<Assignment>(assignment);
 
-        var subject = await _subjectRepository.FirstOrDefaultAsync(x => x.Id == dto.SubjectId)
-            ?? throw new NotFoundException($"Subject not found in the database with this Id: {dto.SubjectId}");
+        var subject = await _subjectRepository.FirstOrDefaultAsync(x => x.Id == assignment.SubjectId)
+            ?? throw new NotFoundException($"Subject not found in the database with this Id: {assignment.SubjectId}");
 
         await _assignmentRepository.InsertAsync(entity);
 
         var result = _mapper.Map<AssignmentDTO>(entity);
+
         return result;
     }
 
@@ -65,12 +66,12 @@ public class AssignmentService : IAssignmentService
         return _mapper.Map<List<AssignmentDTO>>(entity.Assignments);
     }
 
-    public async Task<AssignmentDTO> UpdateAssignmentAsync(Guid assignmentId, UpdateAssignmentDTO dto)
+    public async Task<AssignmentDTO> UpdateAssignmentAsync(Guid assignmentId, UpdateAssignmentDTO assignment)
     {
         var entity = await _assignmentRepository.FirstOrDefaultAsync(x => x.Id == assignmentId)
-            ?? throw new NotFoundException($"Unable to find entity with such key: {assignmentId}");          
+            ?? throw new NotFoundException($"Unable to find entity with such key: {assignmentId}");
 
-        _mapper.Map(dto, entity);
+        _mapper.Map(assignment, entity);
 
         await _assignmentRepository.UpdateAsync(entity);
 

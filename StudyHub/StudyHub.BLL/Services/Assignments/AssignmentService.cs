@@ -71,6 +71,9 @@ public class AssignmentService : IAssignmentService
         var entity = await _assignmentRepository.FirstOrDefaultAsync(x => x.Id == assignmentId)
             ?? throw new NotFoundException($"Unable to find entity with such key: {assignmentId}");
 
+        if (entity.OpeningDate <= DateTime.Now)
+            throw new ExpiredException($"Unable to update this assignment with current Id because its already started: {assignmentId}");
+
         _mapper.Map(assignment, entity);
 
         await _assignmentRepository.UpdateAsync(entity);

@@ -59,18 +59,4 @@ public class VariantService : IVariantService
 
         return _mapper.Map<List<TaskVariantDTO>>(result);
     }
-
-    public async Task<TaskVariantDTO> UpdateTaskVariantAsync(Guid taskVariantId, UpdateTaskVariantDTO taskVariant)
-    {
-        var entity = await _taskVariantRepository
-            .Include(taskVariant => taskVariant.TaskOption)
-            .FirstOrDefaultAsync(taskVariant => taskVariant.Id == taskVariantId)
-            ?? throw new NotFoundException($"Task variant with this Id is not found: {taskVariantId}");
-
-        _mapper.Map(taskVariant, entity);
-
-        await _taskVariantRepository.UpdateAsync(entity);
-
-        return _mapper.Map<TaskVariantDTO>(entity);
-    }
 }

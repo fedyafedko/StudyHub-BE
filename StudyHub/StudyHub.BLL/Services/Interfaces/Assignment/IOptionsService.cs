@@ -7,7 +7,5 @@ public interface IOptionsService
 {
     Task<List<TaskOptionDTO>> AddTaskOptionsAsync(Guid taskVariantId, List<CreateTaskOptionDTO> dto);
 
-    Task<TaskOptionDTO> UpdateTaskOptionsAsync(Guid optionId, UpdateTaskOptionDTO dto);
-
     Task<bool> DeleteTaskOptionsAsync(Guid optionId);
 }

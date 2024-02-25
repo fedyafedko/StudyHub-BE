@@ -30,18 +30,6 @@ public class OptionsService : IOptionsService
         return _mapper.Map<List<TaskOptionDTO>>(options);
     }
 
-    public async Task<TaskOptionDTO> UpdateTaskOptionsAsync(Guid optionId, UpdateTaskOptionDTO taskOptions)
-    {
-        var entity = await _taskOptionRepository.FirstOrDefaultAsync(x => x.Id == optionId)
-            ?? throw new NotFoundException($"Unable to find entity with this key: {optionId}");
-
-        _mapper.Map(taskOptions, entity);
-
-        await _taskOptionRepository.UpdateAsync(entity);
-
-        return _mapper.Map<TaskOptionDTO>(entity);
-    }
-
     public async Task<bool> DeleteTaskOptionsAsync(Guid optionId)
     {
         var entity = await _taskOptionRepository.FirstOrDefaultAsync(x => x.Id == optionId)

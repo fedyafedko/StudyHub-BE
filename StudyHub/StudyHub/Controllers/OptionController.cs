@@ -25,14 +25,6 @@ public class OptionController : Controller
         return Ok(result);
     }
 
-    [HttpPut("optionId")]
-    [Authorize(Roles = "Teacher")]
-    public async Task<IActionResult> UpdateOption(Guid optionId, UpdateTaskOptionDTO taskOptions)
-    {
-        var result = await _optionService.UpdateTaskOptionsAsync(optionId, taskOptions);
-        return Ok(result);
-    }
-
     [HttpDelete("optionId")]
     [Authorize(Roles = "Teacher")]
     public async Task<IActionResult> DeleteVariant(Guid optionId)

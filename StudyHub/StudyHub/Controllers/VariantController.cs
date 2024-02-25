@@ -33,14 +33,6 @@ public class VariantController : Controller
         return Ok(result);
     }
 
-    [HttpPut("{taskVariantId}")]
-    [Authorize(Roles = "Teacher")]
-    public async Task<IActionResult> UpdateVariant(Guid taskVariantId, UpdateTaskVariantDTO taskVariant)
-    {
-        var result = await _variantService.UpdateTaskVariantAsync(taskVariantId, taskVariant);
-        return Ok(result);
-    }
-
     [HttpDelete("{taskVariantId}")]
     [Authorize(Roles = "Teacher")]
     public async Task<IActionResult> DeleteVariant(Guid taskVariantId)

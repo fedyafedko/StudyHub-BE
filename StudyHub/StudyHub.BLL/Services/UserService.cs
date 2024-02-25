@@ -1,13 +1,18 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using StudyHub.BLL.Extensions;
 using StudyHub.BLL.Services.Interfaces;
 using StudyHub.Common;
+using StudyHub.Common.Configs;
 using StudyHub.Common.DTO.User;
 using StudyHub.Common.DTO.User.Student;
 using StudyHub.Common.DTO.UserInvitation;
 using StudyHub.Common.Exceptions;
 using StudyHub.Common.Requests;
+using StudyHub.Common.Response;
 using StudyHub.Entities;
 
 namespace StudyHub.BLL.Services;
@@ -15,14 +20,20 @@ namespace StudyHub.BLL.Services;
 public class UserService : IUserService
 {
     private readonly UserManager<User> _userManager;
+    private readonly AvatarConfig _avatarConfig;
+    private readonly IWebHostEnvironment _env;
     private readonly IMapper _mapper;
 
     public UserService(
         UserManager<User> userManager,
+        IOptions<AvatarConfig> avatarConfig,
+        IWebHostEnvironment env,
         IMapper mapper)
     {
         _userManager = userManager;
+        _env = env;
         _mapper = mapper;
+        _avatarConfig = avatarConfig.Value;
     }
 
     public async Task<PageList<StudentDTO>> GetStudentsAsync(SearchRequest request)
@@ -46,6 +57,46 @@ public class UserService : IUserService
         await _userManager.UpdateAsync(user);
 
         return _mapper.Map<UserDTO>(user);
+    }
+
+    public async Task<AvatarResponse> UploadAvatarAsync(Guid userId, IFormFile avatar)
+    {
+        var contetntPath = _env.ContentRootPath;
+        var path = Path.Combine(contetntPath, _avatarConfig.Folder);
+
+        if (!Directory.Exists(path))
+            Directory.CreateDirectory(path);
+
+        var ext = Path.GetExtension(avatar.FileName);
+
+        if (!_avatarConfig.FileExtensions.Contains(ext))
+            throw new IncorrectParametersException("Invalid file extension");
+
+        var newFileName = $"{userId}{ext}";
+        var filePath = Path.Combine(path, newFileName);
+
+        using var stream = new FileStream(filePath, FileMode.Create);
+        await avatar.CopyToAsync(stream);
+
+        var result = new AvatarResponse
+        {
+            Path = string.Format(_avatarConfig.Path, newFileName)
+        };
+
+        return result;
+    }
+
+    public async Task<bool> DeleteAvatarAsync(string avatar)
+    {
+        var wwwPath = _env.ContentRootPath;
+        var path = Path.Combine(wwwPath, _avatarConfig.Folder, avatar);
+
+        if (!File.Exists(path))
+            throw new NotFoundException("File not found");
+
+        await Task.Run(() => File.Delete(path));
+
+        return true;
     }
 
     private List<User> SearchStudent(IEnumerable<User> users, SearchRequest request)

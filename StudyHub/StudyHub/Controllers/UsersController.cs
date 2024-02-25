@@ -44,4 +44,19 @@ public class UsersController : Controller
         var result = await _userService.UpdateUserAsync(userId, dto);
         return Ok(result);
     }
+
+    [HttpPost("me/avatar")]
+    public async Task<IActionResult> UploadAvatar(IFormFile avatar)
+    {
+        var userId = HttpContext.GetUserId();
+        var result = await _userService.UploadAvatarAsync(userId, avatar);
+        return Ok(result);
+    }
+
+    [HttpDelete("me/avatar")]
+    public async Task<IActionResult> DeleteAvatar(string avatar)
+    {
+        var result = await _userService.DeleteAvatarAsync(avatar);
+        return result ? NoContent() : NotFound();
+    }
 }

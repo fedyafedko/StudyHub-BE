@@ -21,19 +21,19 @@ public class UserService : IUserService
 {
     private readonly UserManager<User> _userManager;
     private readonly AvatarConfig _avatarConfig;
-    private readonly IWebHostEnvironment _env;
     private readonly IMapper _mapper;
+    private readonly IWebHostEnvironment _env;
 
     public UserService(
         UserManager<User> userManager,
         IOptions<AvatarConfig> avatarConfig,
-        IWebHostEnvironment env,
-        IMapper mapper)
+        IMapper mapper,
+        IWebHostEnvironment env)
     {
         _userManager = userManager;
-        _env = env;
         _mapper = mapper;
         _avatarConfig = avatarConfig.Value;
+        _env = env;
     }
 
     public async Task<PageList<StudentDTO>> GetStudentsAsync(SearchRequest request)
@@ -61,8 +61,8 @@ public class UserService : IUserService
 
     public async Task<AvatarResponse> UploadAvatarAsync(Guid userId, IFormFile avatar)
     {
-        var contetntPath = _env.ContentRootPath;
-        var path = Path.Combine(contetntPath, _avatarConfig.Folder);
+        var contentPath = _env.ContentRootPath;
+        var path = Path.Combine(contentPath, _avatarConfig.Folder);
 
         if (!Directory.Exists(path))
             Directory.CreateDirectory(path);
@@ -86,15 +86,17 @@ public class UserService : IUserService
         return result;
     }
 
-    public async Task<bool> DeleteAvatarAsync(string avatar)
+    public bool DeleteAvatar(Guid userId)
     {
-        var wwwPath = _env.ContentRootPath;
-        var path = Path.Combine(wwwPath, _avatarConfig.Folder, avatar);
+        var contentPath = _env.ContentRootPath;
+        var path = Path.Combine(contentPath, _avatarConfig.Folder);
 
-        if (!File.Exists(path))
+        var file = Directory.GetFiles(path).FirstOrDefault(x => x.Contains(userId.ToString()));
+
+        if (!File.Exists(file))
             throw new NotFoundException("File not found");
 
-        await Task.Run(() => File.Delete(path));
+        File.Delete(file);
 
         return true;
     }

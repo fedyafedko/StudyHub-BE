@@ -54,9 +54,10 @@ public class UsersController : Controller
     }
 
     [HttpDelete("me/avatar")]
-    public async Task<IActionResult> DeleteAvatar(string avatar)
+    public IActionResult DeleteAvatar()
     {
-        var result = await _userService.DeleteAvatarAsync(avatar);
+        var userId = HttpContext.GetUserId();
+        var result = _userService.DeleteAvatar(userId);
         return result ? NoContent() : NotFound();
     }
 }

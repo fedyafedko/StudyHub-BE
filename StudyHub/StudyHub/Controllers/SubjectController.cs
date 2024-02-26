@@ -74,7 +74,7 @@ public class SubjectController : Controller
         return Ok(result);
     }
 
-    [HttpPost("[action]")]
+    [HttpPost("students")]
     [Authorize(Roles = "Teacher")]
     public async Task<IActionResult> AddStudentsToSubject(Guid subjectId, StudentsToSubjectRequest request)
     {
@@ -83,7 +83,7 @@ public class SubjectController : Controller
         return Ok(result);
     }
 
-    [HttpDelete("[action]/{subjectId}")]
+    [HttpDelete("students/{subjectId}")]
     [Authorize(Roles = "Teacher")]
     public async Task<IActionResult> DeleteStudentsFromSubject(Guid subjectId, StudentsToSubjectRequest request)
     {

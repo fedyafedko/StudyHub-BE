@@ -57,6 +57,11 @@ public class StudentAnswerService : IStudentAnswerService
 
         await InsertAnswersAsync(studentId, inserts);
 
+        studentAnswers = await _studentAnswerRepository
+            .Where(x => x.StudentId == studentId)
+            .Include(x => x.TaskOptions)
+            .ToListAsync();
+
         studentAnswers = _mapper.MapList(dto.AnswerVariants, studentAnswers);
 
         studentAnswers.ForEach(x => x.TaskOptions = new List<TaskOption>());

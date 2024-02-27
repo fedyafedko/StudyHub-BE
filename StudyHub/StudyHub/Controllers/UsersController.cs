@@ -44,4 +44,12 @@ public class UsersController : Controller
         var result = await _userService.UpdateUserAsync(userId, dto);
         return Ok(result);
     }
+
+    [HttpGet("me")]
+    public async Task<IActionResult> GetUser()
+    {
+        var userId = HttpContext.GetUserId();
+        var result = await _userService.GetUserAsync(userId);
+        return Ok(result);
+    }
 }

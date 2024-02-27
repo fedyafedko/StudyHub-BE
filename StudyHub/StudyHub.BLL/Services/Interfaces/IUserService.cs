@@ -9,4 +9,5 @@ public interface IUserService
 {
     Task<PageList<StudentDTO>> GetStudentsAsync(SearchRequest request);
     Task<UserDTO> UpdateUserAsync(Guid userId, UpdateUserDTO dto);
+    Task<UserDTO> GetUserAsync(Guid userId);
 }

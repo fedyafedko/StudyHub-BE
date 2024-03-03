@@ -92,7 +92,7 @@ public class SubjectController : Controller
         return result ? NoContent() : NotFound();
     }
 
-    [HttpGet("[action]/{subjectId}")]
+    [HttpGet("{subjectId}/students")]
     [Authorize(Roles = "Teacher")]
     public async Task<IActionResult> GetStudentsForSubject(Guid subjectId)
     {

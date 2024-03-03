@@ -44,4 +44,8 @@
 	  <ProjectReference Include="..\StudyHub.Seeding\StudyHub.Seeding.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Uploads\" />
+	</ItemGroup>
+
 </Project>

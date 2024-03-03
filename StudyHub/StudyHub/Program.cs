@@ -29,6 +29,7 @@ using StudyHub.Utility;
 using StudyHub.BLL.Services.Interfaces.Assignment;
 using StudyHub.BLL.Services.Assignments;
 using Microsoft.OpenApi.Any;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,7 +38,8 @@ builder.Services.ConfigsAssembly(builder.Configuration, opt => opt
        .AddConfig<GoogleAuthConfig>()
        .AddConfig<EmailConfig>()
        .AddConfig<HangfireConfig>()
-       .AddConfig<UserInvitationConfig>());
+       .AddConfig<UserInvitationConfig>()
+       .AddConfig<AvatarConfig>());
 
 builder.Services.AddAutoMapper(typeof(AssignmentTaskProfile));
 
@@ -162,6 +164,11 @@ await app.ApplySeedingAsync();
 app.SetupHangfire();
 
 app.UseHttpsRedirection();
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Uploads")),
+    RequestPath = "/Uploads"
+});
 app.UseCors(
     opt => opt.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 

@@ -5,6 +5,7 @@ using StudyHub.BLL.Services.Interfaces;
 using StudyHub.BLL.Services.Interfaces.Assignment;
 using StudyHub.Common.DTO.Subject;
 using StudyHub.Common.Requests;
+using System;
 
 namespace StudyHub.Controllers;
 
@@ -22,15 +23,6 @@ public class SubjectController : Controller
     {
         _subjectService = subjectService;
         _assignmentService = assignmentService;
-    }
-
-    [HttpPost("[action]")]
-    [Authorize(Roles = "Teacher")]
-    public async Task<IActionResult> AddStudents(Guid subjectId, AddStudentsToSubjectRequest request)
-    {
-        var teacherId = HttpContext.GetUserId();
-        var result = await _subjectService.AddStudentsToSubjectAsync(subjectId, teacherId, request);
-        return Ok(result);
     }
 
     [HttpPost]
@@ -79,6 +71,32 @@ public class SubjectController : Controller
     public async Task<IActionResult> GetAssignmentBySubjectId(Guid subjectId)
     {
         var result = await _assignmentService.GetAssignmentsBySubjectIdAsync(subjectId);
+        return Ok(result);
+    }
+
+    [HttpPost("{subjectId}/students")]
+    [Authorize(Roles = "Teacher")]
+    public async Task<IActionResult> AddStudentsToSubject(Guid subjectId, StudentsToSubjectRequest request)
+    {
+        var teacherId = HttpContext.GetUserId();
+        var result = await _subjectService.AddStudentsToSubjectAsync(subjectId, teacherId, request);
+        return Ok(result);
+    }
+
+    [HttpDelete("{subjectId}/students")]
+    [Authorize(Roles = "Teacher")]
+    public async Task<IActionResult> DeleteStudentsFromSubject(Guid subjectId, StudentsToSubjectRequest request)
+    {
+        var teacherId = HttpContext.GetUserId();
+        var result = await _subjectService.DeleteStudentsFromSubjectAsync(subjectId, teacherId, request);
+        return result ? NoContent() : NotFound();
+    }
+
+    [HttpGet("{subjectId}/students")]
+    [Authorize(Roles = "Teacher")]
+    public async Task<IActionResult> GetStudentsForSubject(Guid subjectId)
+    {
+        var result = await _subjectService.GetStudentsForSubjectAsync(subjectId);
         return Ok(result);
     }
 }

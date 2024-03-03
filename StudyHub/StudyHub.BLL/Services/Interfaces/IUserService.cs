@@ -13,4 +13,5 @@ public interface IUserService
     Task<UserDTO> UpdateUserAsync(Guid userId, UpdateUserDTO dto);
     Task<AvatarResponse> UploadAvatarAsync(Guid userId, IFormFile avatar);
     bool DeleteAvatar(Guid userId);
+    Task<UserDTO> GetUserAsync(Guid userId);
 }

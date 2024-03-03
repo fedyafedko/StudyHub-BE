@@ -60,4 +60,12 @@ public class UsersController : Controller
         var result = _userService.DeleteAvatar(userId);
         return result ? NoContent() : NotFound();
     }
+
+    [HttpGet("me")]
+    public async Task<IActionResult> GetUser()
+    {
+        var userId = HttpContext.GetUserId();
+        var result = await _userService.GetUserAsync(userId);
+        return Ok(result);
+    }
 }

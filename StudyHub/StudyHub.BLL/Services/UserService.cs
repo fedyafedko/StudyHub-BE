@@ -47,6 +47,14 @@ public class UserService : IUserService
         return result;
     }
 
+    public async Task<UserDTO> GetUserAsync(Guid userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId)
+            ?? throw new NotFoundException($"User with such ID does not exist in the database");
+
+        return _mapper.Map<UserDTO>(user);
+    }
+
     public async Task<UserDTO> UpdateUserAsync(Guid userId, UpdateUserDTO dto)
     {
         var user = await _userManager.FindByIdAsync(userId.ToString())
@@ -62,25 +70,30 @@ public class UserService : IUserService
     public async Task<AvatarResponse> UploadAvatarAsync(Guid userId, IFormFile avatar)
     {
         var contentPath = _env.ContentRootPath;
-        var path = Path.Combine(contentPath, _avatarConfig.Folder);
+        var userDirectory = Path.Combine(contentPath, _avatarConfig.Folder, userId.ToString());
 
-        if (!Directory.Exists(path))
-            Directory.CreateDirectory(path);
+        if (!Directory.Exists(userDirectory))
+            Directory.CreateDirectory(userDirectory);
 
         var ext = Path.GetExtension(avatar.FileName);
 
-        if (!_avatarConfig.FileExtensions.Contains(ext))
+        if (!_avatarConfig.FileExtensions.Contains(ext.ToLower()))
             throw new IncorrectParametersException("Invalid file extension");
 
-        var newFileName = $"{userId}{ext}";
-        var filePath = Path.Combine(path, newFileName);
+        var oldAvatar = Directory.GetFiles(userDirectory).FirstOrDefault();
+        if (!string.IsNullOrEmpty(oldAvatar))
+            File.Delete(oldAvatar);
+
+        var uniqueSuffix = DateTime.UtcNow.Ticks;
+        var newFileName = $"avatar_{uniqueSuffix}{ext}";
+        var filePath = Path.Combine(userDirectory, newFileName);
 
         using var stream = new FileStream(filePath, FileMode.Create);
         await avatar.CopyToAsync(stream);
 
         var result = new AvatarResponse
         {
-            Path = string.Format(_avatarConfig.Path, newFileName)
+            Path = string.Format(_avatarConfig.Path, userId, newFileName)
         };
 
         return result;
@@ -89,14 +102,19 @@ public class UserService : IUserService
     public bool DeleteAvatar(Guid userId)
     {
         var contentPath = _env.ContentRootPath;
-        var path = Path.Combine(contentPath, _avatarConfig.Folder);
+        var path = Path.Combine(contentPath, _avatarConfig.Folder, userId.ToString());
 
         var file = Directory.GetFiles(path).FirstOrDefault(x => x.Contains(userId.ToString()));
 
-        if (!File.Exists(file))
+        if (!Directory.Exists(path))
             throw new NotFoundException("File not found");
 
-        File.Delete(file);
+        var avatar = Directory.GetFiles(path).FirstOrDefault();
+
+        if(string.IsNullOrEmpty(avatar))
+            throw new NotFoundException("File not found");
+
+        File.Delete(avatar);
 
         return true;
     }

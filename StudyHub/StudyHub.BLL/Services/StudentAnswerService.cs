@@ -47,7 +47,7 @@ public class StudentAnswerService : IStudentAnswerService
             throw new TimeOverException("Time is over");
 
         var studentAnswers = await _studentAnswerRepository
-            .Where(x => x.StudentId == studentId)
+            .Where(x => x.StudentId == studentId && x.TaskVariant.AssignmentTask.AssignmentId == dto.AssignmentId)
             .Include(x => x.TaskOptions)
             .ToListAsync();
 
@@ -58,11 +58,18 @@ public class StudentAnswerService : IStudentAnswerService
         await InsertAnswersAsync(studentId, inserts);
 
         studentAnswers = await _studentAnswerRepository
-            .Where(x => x.StudentId == studentId)
+            .Where(x => x.StudentId == studentId && x.TaskVariant.AssignmentTask.AssignmentId == dto.AssignmentId)
             .Include(x => x.TaskOptions)
             .ToListAsync();
 
-        studentAnswers = _mapper.MapList(dto.AnswerVariants, studentAnswers);
+        foreach (var studentAnswer in studentAnswers)
+        {
+            var answerVariant = dto.AnswerVariants.FirstOrDefault(d => d.TaskVariantId == studentAnswer.TaskVariantId);
+            if (answerVariant != null)
+            {
+                studentAnswer.Answer = answerVariant.Answer;
+            }
+        }
 
         studentAnswers.ForEach(x => x.TaskOptions = new List<TaskOption>());
 
@@ -72,6 +79,7 @@ public class StudentAnswerService : IStudentAnswerService
 
         return true;
     }
+
     private async Task<bool> InsertAnswersAsync(Guid studentId, List<AnswerVariantDTO> dto)
     {
         var answers = _mapper.Map<List<StudentAnswer>>(dto);

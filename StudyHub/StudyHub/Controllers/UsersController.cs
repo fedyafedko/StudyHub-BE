@@ -26,8 +26,8 @@ public class UsersController : Controller
     public async Task<IActionResult> InviteUsers(InviteUsersRequest dto)
     {
         var userId = HttpContext.GetUserId();
-
-        return await _userInvitingService.InviteManyAsync(userId, dto) ? NoContent() : BadRequest();
+        var result = await _userInvitingService.InviteManyAsync(userId, dto);
+        return Ok(result);
     }
 
     [HttpGet("[action]")]

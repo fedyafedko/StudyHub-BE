@@ -89,7 +89,7 @@ public class SubjectController : Controller
     {
         var teacherId = HttpContext.GetUserId();
         var result = await _subjectService.DeleteStudentsFromSubjectAsync(subjectId, teacherId, request);
-        return result ? NoContent() : NotFound();
+        return Ok(result);
     }
 
     [HttpGet("{subjectId}/students")]

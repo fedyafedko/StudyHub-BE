@@ -4,7 +4,6 @@ using StudyHub.DAL.Repositories.Interfaces;
 using StudyHub.Entities;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using StudyHub.BLL.Extensions;
 using StudyHub.Common.Exceptions;
 
 namespace StudyHub.BLL.Services;
@@ -84,8 +83,11 @@ public class StudentAnswerService : IStudentAnswerService
     {
         var answers = _mapper.Map<List<StudentAnswer>>(dto);
 
-        answers.ForEach(x => x.StudentId = studentId);
-        answers.ForEach(x => x.TaskOptions ??= new List<TaskOption>());
+        answers.ForEach(x =>
+        {
+            x.StudentId = studentId;
+            x.TaskOptions ??= new List<TaskOption>();
+        });
 
         var result = ProcessStudentAnswers(answers, dto);
 

@@ -10,13 +10,21 @@ namespace StudyHub.BLL.Services.Assignments;
 
 public class OptionsService : IOptionsService
 {
-    private readonly IMapper _mapper;
     private readonly IRepository<TaskOption> _taskOptionRepository;
+    private readonly IRepository<StudentAnswer> _studentAnswerRepository;
+    private readonly IRepository<TaskVariant> _taskVariantRepository;
+    private readonly IMapper _mapper;
 
-    public OptionsService(IMapper mapper, IRepository<TaskOption> taskOptionsRepository)
+    public OptionsService(
+        IRepository<TaskOption> taskOptionsRepository,
+        IRepository<StudentAnswer> studentAnswerRepository,
+        IMapper mapper,
+        IRepository<TaskVariant> taskVariantRepository)
     {
-        _mapper = mapper;
         _taskOptionRepository = taskOptionsRepository;
+        _studentAnswerRepository = studentAnswerRepository;
+        _mapper = mapper;
+        _taskVariantRepository = taskVariantRepository;
     }
 
     public async Task<List<TaskOptionDTO>> AddTaskOptionsAsync(Guid taskVariantId, List<CreateTaskOptionDTO> taskOptions)
@@ -48,5 +56,69 @@ public class OptionsService : IOptionsService
            ?? throw new NotFoundException($"Unable to find entity with this key: {optionId}");
 
         return await _taskOptionRepository.DeleteAsync(entity);
+    }
+
+    public async Task<bool> CalculatingChoicesMark(Guid studentId, Guid assignmentId)
+    {
+        var studentAnswers = await _studentAnswerRepository
+            .Include(x => x.TaskOptions)
+            .ThenInclude(x => x.TaskVariant)
+            .Where(x => x.TaskVariant.AssignmentTask.AssignmentId == assignmentId && x.StudentId == studentId)
+            .ToListAsync()
+            ?? throw new NotFoundException($"Unable to find entity with this key: {studentId}");
+
+        foreach (var item in studentAnswers)
+        {
+            var taskVariant = _taskVariantRepository
+                .Include(x => x.AssignmentTask)
+                .Include(x => x.TaskOption)
+                .FirstOrDefault(x => x.Id == item.TaskVariantId)
+                ?? throw new NotFoundException($"Unable to find entity with this key: {item.TaskVariantId}");
+
+            var trueOptions = taskVariant.TaskOption.Where(x => x.IsCorrect == true).Count();
+
+            if (trueOptions == 1)
+                item.Mark = CalculateMarkForSingleOption(taskVariant, item);
+
+            else if (trueOptions > 1)
+                item.Mark = CalculateMarkForMultipleOptions(taskVariant, item);
+        }
+
+        var result = await _studentAnswerRepository.UpdateManyAsync(studentAnswers);
+
+        return result;
+    }
+
+    private double CalculateMarkForSingleOption(TaskVariant taskVariant, StudentAnswer studentAnswer)
+    {
+        var mark = 0.0;
+
+        studentAnswer.TaskOptions.ForEach(option =>
+        {
+            if (option.IsCorrect == true)
+                mark += taskVariant.AssignmentTask.MaxMark;
+        });
+
+        return mark;
+    }
+    private double CalculateMarkForMultipleOptions(TaskVariant taskVariant, StudentAnswer studentAnswer)
+    {
+        var mark = 0.0;
+
+        var trueOptions = taskVariant.TaskOption.Where(x => x.IsCorrect == true).Count();
+        var falseOptions = taskVariant.TaskOption.Where(x => x.IsCorrect == false).Count();
+
+        var trueMark = taskVariant.AssignmentTask.MaxMark / (double)trueOptions;
+        var falseMark = taskVariant.AssignmentTask.MaxMark / (double)falseOptions;
+
+        foreach (var option in studentAnswer.TaskOptions)
+        {
+            if (option.IsCorrect == true)
+                mark += trueMark;
+            else
+                mark -= falseMark;
+        }
+
+        return mark;
     }
 }

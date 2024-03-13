@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RealtorAPI.Extensions;
 using StudyHub.BLL.Services.Interfaces.Assignment;
 using StudyHub.Common.DTO.AssignmentTaskOption;
 
@@ -38,5 +39,13 @@ public class OptionController : Controller
     public async Task<IActionResult> DeleteVariant(Guid optionId)
     {
         return await _optionService.DeleteTaskOptionsAsync(optionId) ? NoContent() : NotFound();
+    }
+
+    [HttpPost("mark")]
+    public async Task<IActionResult> CalculatingChoicesMark(Guid assignmentId)
+    {
+        var studentId = HttpContext.GetUserId();
+        var result = await _optionService.CalculatingChoicesMark(studentId, assignmentId);
+        return Ok(result);
     }
 }

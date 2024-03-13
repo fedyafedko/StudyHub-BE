@@ -5,8 +5,8 @@ namespace StudyHub.Entities;
 
 public class StudentAnswer : EntityBase
 {
-    public string Answer { get; set; } = null!;
-    public int Mark { get; set; }
+    public string? Answer { get; set; } = null!;
+    public double Mark { get; set; }
 
     [ForeignKey(nameof(TaskVariant))]
     public Guid TaskVariantId { get; set; }

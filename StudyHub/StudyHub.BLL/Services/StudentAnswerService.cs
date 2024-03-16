@@ -35,12 +35,12 @@ public class StudentAnswerService : IStudentAnswerService
         var startTime = await _startingTimeRepository.FirstOrDefaultAsync(x => x.StudentId == studentId)
             ?? throw new NotFoundException("Starting time not found");
 
-        var duraction = await _assignmentRepository
+        var duration = await _assignmentRepository
             .Where(x => x.Id == dto.AssignmentId)
             .Select(x => x.Duration)
             .FirstOrDefaultAsync();
 
-        var isTimeOver = DateTime.Now - startTime.StartTime < duraction;
+        var isTimeOver = DateTime.Now - startTime.StartTime < duration;
 
         if (!isTimeOver)
             throw new TimeOverException("Time is over");

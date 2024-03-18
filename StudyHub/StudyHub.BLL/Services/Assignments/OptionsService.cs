@@ -103,21 +103,9 @@ public class OptionsService : IOptionsService
     }
     private double CalculateMarkForMultipleOptions(TaskVariant taskVariant, StudentAnswer studentAnswer)
     {
-        var mark = 0.0;
-
-        var trueOptions = taskVariant.TaskOption.Where(x => x.IsCorrect == true).Count();
-        var falseOptions = taskVariant.TaskOption.Where(x => x.IsCorrect == false).Count();
-
-        var trueMark = taskVariant.AssignmentTask.MaxMark / (double)trueOptions;
-        var falseMark = taskVariant.AssignmentTask.MaxMark / (double)falseOptions;
-
-        foreach (var option in studentAnswer.TaskOptions)
-        {
-            if (option.IsCorrect == true)
-                mark += trueMark;
-            else
-                mark -= falseMark;
-        }
+        var countOfFalseOptions = studentAnswer.TaskOptions.Where(x => x.IsCorrect == false).Count();
+        
+        var mark = taskVariant.AssignmentTask.MaxMark - taskVariant.AssignmentTask.MaxMark * ((double)countOfFalseOptions/(double)studentAnswer.TaskOptions.Count());
 
         return mark;
     }

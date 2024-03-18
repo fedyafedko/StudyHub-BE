@@ -86,7 +86,7 @@ public class UserInvitationService : IUserInvitationService
 
             var encodedToken = HttpUtility.UrlEncode(tokenRaw);
 
-            var url = string.Format(_emailConfig.AcceptInvitationUrl, request.Role, encodedToken);
+            var url = string.Format(_emailConfig.AcceptInvitationUrl, encodedToken);
 
             var userMessage = new InviteUserMessage
             {

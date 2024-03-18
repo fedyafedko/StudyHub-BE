@@ -80,7 +80,7 @@ public class SubjectController : Controller
     {
         var teacherId = HttpContext.GetUserId();
         var result = await _subjectService.AddStudentsToSubjectAsync(subjectId, teacherId, request);
-        return result.Success != null ? Ok(result) : NotFound();
+        return result.Success != null ? Ok(result) : BadRequest("An error occurred while adding students to the subject.");
     }
 
     [HttpDelete("{subjectId}/students")]
@@ -89,7 +89,7 @@ public class SubjectController : Controller
     {
         var teacherId = HttpContext.GetUserId();
         var result = await _subjectService.DeleteStudentsFromSubjectAsync(subjectId, teacherId, request);
-        return result.Success != null ? Ok(result) : NotFound();
+        return result.Success != null ? Ok(result) : BadRequest("An error occurred while adding students to the subject.");
     }
 
     [HttpGet("{subjectId}/students")]

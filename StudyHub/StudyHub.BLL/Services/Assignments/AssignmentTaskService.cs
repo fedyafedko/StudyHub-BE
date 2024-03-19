@@ -63,15 +63,14 @@ public class AssignmentTaskService : IAssignmentTaskService
 
     public async Task<AssignmentTaskDTO> UpdateAssignmentTaskAsync(Guid assignmentTaskId, UpdateAssignmentTaskDTO assignmentTask)
     {
-        var assignment = await _assignmentRepository.SingleAsync(assignment => assignment.Tasks.FirstOrDefault(task => task.Id == assignmentTaskId)!.Id == assignmentTaskId);
-
-        if(assignment.OpeningDate <= DateTime.Now)
-            throw new ExpiredException($"Unable to update this assignment task with current Id because its already started: {assignmentTaskId}");
-
         var entity = await _assignmentTaskRepository
+            .Include(assignmentTask => assignmentTask.Assignment)
             .Include(assignmentTask => assignmentTask.TaskVariants)
             .FirstOrDefaultAsync(assignmentTask => assignmentTask.Id == assignmentTaskId)
             ?? throw new NotFoundException($"Unable to find entity with such key {assignmentTaskId}");
+
+        if (entity.Assignment.OpeningDate <= DateTime.Now)
+            throw new ExpiredException($"Unable to update this assignment task with current Id because its already started: {assignmentTaskId}");
 
         _mapper.Map(assignmentTask, entity);
 

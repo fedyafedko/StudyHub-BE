@@ -15,11 +15,11 @@ public class CreateAssignmentValidator : AbstractValidator<CreateAssignmentDTO>
 
         RuleFor(x => x.OpeningDate)
             .NotEmpty().WithMessage("OpeningDate is required.")
-            .GreaterThan(DateTime.Now).WithMessage($"OpeningDate must be greater than {DateTime.Now}");
+            .GreaterThan(DateTime.Now).WithMessage($"OpeningDate must be greater than now");
 
         RuleFor(x => x.ClosingDate)
             .NotEmpty().WithMessage("ClosingDate is required.")
-            .GreaterThan(DateTime.Now).WithMessage($"ClosingDate must be greater than {DateTime.Now}")
+            .GreaterThan(DateTime.Now).WithMessage($"ClosingDate must be greater than now")
             .GreaterThan(x => x.OpeningDate).WithMessage($"ClosingDate must be greater than OpeningDate");
 
         RuleFor(x => x.Duration)

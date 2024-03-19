@@ -10,6 +10,7 @@ using StudyHub.Common.DTO.AuthDTO;
 using StudyHub.Common.Exceptions;
 using StudyHub.DAL.Repositories.Interfaces;
 using StudyHub.Entities;
+using System.Web;
 
 namespace StudyHub.BLL.Services.Auth;
 
@@ -30,9 +31,15 @@ public class GoogleAuthService : AuthService, IGoogleAuthService
         _googleConfig = googleConfig.Value;
     }
 
-    public async Task<AuthSuccessDTO> GoogleRegisterAsync(string authorizationCode)
+    public async Task<AuthSuccessDTO> GoogleRegisterAsync(string authorizationCode, string token)
     {
         var payload = await GetGooglePayloadAsync(authorizationCode);
+
+        var invitedUser = _invitedUserRepository.FirstOrDefault(e => e.Email == payload.Email)
+            ?? throw new NotFoundException($"User with this email wasn't invited: {payload.Email}");
+
+        if (!_encryptService.Verify(HttpUtility.UrlDecode(token), invitedUser.Token))
+            throw new InvalidTokenException($"This token isn't correct: {token}");
 
         var user = await _userManager.FindByEmailAsync(payload.Email);
 
@@ -45,6 +52,13 @@ public class GoogleAuthService : AuthService, IGoogleAuthService
 
         if (!createdUserResult.Succeeded)
             throw new UserManagerException("Unable to authenticate given user", createdUserResult.Errors);
+
+        var roleResult = await _userManager.AddToRoleAsync(user, invitedUser.Role);
+
+        if (!roleResult.Succeeded)
+            throw new UserManagerException($"User manager operation failed:\n", roleResult.Errors);
+            
+        await _invitedUserRepository.DeleteAsync(invitedUser);
 
         return await GetAuthTokensAsync(user);
     }

@@ -124,7 +124,7 @@ public class StudentAnswerService : IStudentAnswerService
         return result;
     }
 
-    private async Task<bool> ValidateAndThrowStudentAnswersAsync(StudentAnswerDTO dto)
+    private async Task ValidateAndThrowStudentAnswersAsync(StudentAnswerDTO dto)
     {
         foreach (var item in dto.AnswerVariants)
         {
@@ -141,7 +141,5 @@ public class StudentAnswerService : IStudentAnswerService
             if (!result)
                 throw new ValidationException("TaskOption does not belong to this variant.");
         }
-
-        return true;
     }
 }

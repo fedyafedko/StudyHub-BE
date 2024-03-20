@@ -33,7 +33,7 @@ public class StudentAnswerService : IStudentAnswerService
 
     public async Task<bool> UpsertStudentAnswerAsync(Guid studentId, StudentAnswerDTO dto)
     {
-        await ValidateStudentAnswersAsync(dto);
+        await ValidateAndThrowStudentAnswersAsync(dto);
 
         var startTime = await _startingTimeRepository.FirstOrDefaultAsync(x => x.StudentId == studentId)
             ?? throw new NotFoundException("Starting time not found");
@@ -124,7 +124,7 @@ public class StudentAnswerService : IStudentAnswerService
         return result;
     }
 
-    private async Task<bool> ValidateStudentAnswersAsync(StudentAnswerDTO dto)
+    private async Task<bool> ValidateAndThrowStudentAnswersAsync(StudentAnswerDTO dto)
     {
         foreach (var item in dto.AnswerVariants)
         {

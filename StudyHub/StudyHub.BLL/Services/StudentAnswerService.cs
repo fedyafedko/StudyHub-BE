@@ -33,10 +33,7 @@ public class StudentAnswerService : IStudentAnswerService
 
     public async Task<bool> UpsertStudentAnswerAsync(Guid studentId, StudentAnswerDTO dto)
     {
-        var validate = await ValidateStudentAnswersAsync(dto);
-
-        if(!validate)
-            throw new ValidationException("TaskOption does not belong to this variant.");
+        await ValidateStudentAnswersAsync(dto);
 
         var startTime = await _startingTimeRepository.FirstOrDefaultAsync(x => x.StudentId == studentId)
             ?? throw new NotFoundException("Starting time not found");
@@ -142,7 +139,7 @@ public class StudentAnswerService : IStudentAnswerService
             var result = options.All(x => x.TaskVariantId == item.TaskVariantId);
 
             if (!result)
-                return false;
+                throw new ValidationException("TaskOption does not belong to this variant.");
         }
 
         return true;

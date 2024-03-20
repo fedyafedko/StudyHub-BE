@@ -70,6 +70,7 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<IEncryptService, EncryptService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IStudentAnswerService, StudentAnswerService>();
 
 // Fluent Email
 builder.Services.AddFluentEmail(builder.Configuration);

@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RealtorAPI.Extensions;
+using StudyHub.BLL.Services.Interfaces;
 using StudyHub.BLL.Services.Interfaces.Assignment;
 using StudyHub.Common.DTO.Assignment;
+using StudyHub.Common.DTO.User.Student;
 
 namespace StudyHub.Controllers;
 
@@ -11,10 +14,17 @@ namespace StudyHub.Controllers;
 public class AssignmentController : Controller
 {
     private readonly IAssignmentService _assignmentService;
+    private readonly IStudentAnswerService _studentAnswerService;
+    private readonly IOptionsService _optionService;
 
-    public AssignmentController(IAssignmentService assignmentService)
+    public AssignmentController(
+        IAssignmentService assignmentService,
+        IStudentAnswerService studentAnswerService,
+        IOptionsService optionService)
     {
         _assignmentService = assignmentService;
+        _studentAnswerService = studentAnswerService;
+        _optionService = optionService;
     }
 
     [HttpPost]
@@ -45,5 +55,16 @@ public class AssignmentController : Controller
     {
         var result = await _assignmentService.GetAssignmentByIdAsync(assignmentId);
         return Ok(result);
+    }
+
+    [HttpPut("student-answer")]
+    public async Task<IActionResult> UpsertStudentAnswer(StudentAnswerDTO dto)
+    {
+        var studentId = HttpContext.GetUserId();
+
+        await _studentAnswerService.UpsertStudentAnswerAsync(studentId, dto);
+        await _optionService.CalculatingChoicesMark(studentId, dto.AssignmentId);
+
+        return Ok();
     }
 }

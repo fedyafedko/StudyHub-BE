@@ -40,12 +40,4 @@ public class OptionController : Controller
     {
         return await _optionService.DeleteTaskOptionsAsync(optionId) ? NoContent() : NotFound();
     }
-
-    [HttpPost("mark")]
-    public async Task<IActionResult> CalculatingChoicesMark(Guid assignmentId)
-    {
-        var studentId = HttpContext.GetUserId();
-        var result = await _optionService.CalculatingChoicesMark(studentId, assignmentId);
-        return Ok(result);
-    }
 }

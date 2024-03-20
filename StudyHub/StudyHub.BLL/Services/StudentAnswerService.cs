@@ -5,6 +5,7 @@ using StudyHub.Entities;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using StudyHub.Common.Exceptions;
+using System.ComponentModel.DataAnnotations;
 
 namespace StudyHub.BLL.Services;
 
@@ -32,6 +33,11 @@ public class StudentAnswerService : IStudentAnswerService
 
     public async Task<bool> UpsertStudentAnswerAsync(Guid studentId, StudentAnswerDTO dto)
     {
+        var validate = await ValidateStudentAnswersAsync(dto);
+
+        if(!validate)
+            throw new ValidationException("TaskOption does not belong to this variant.");
+
         var startTime = await _startingTimeRepository.FirstOrDefaultAsync(x => x.StudentId == studentId)
             ?? throw new NotFoundException("Starting time not found");
 
@@ -119,5 +125,26 @@ public class StudentAnswerService : IStudentAnswerService
         var result = choiceOptions.Concat(openEnded).ToList();
 
         return result;
+    }
+
+    private async Task<bool> ValidateStudentAnswersAsync(StudentAnswerDTO dto)
+    {
+        foreach (var item in dto.AnswerVariants)
+        {
+            if (item.TaskOptionIds == null)
+                continue;
+
+            var query = _taskOptionRepository
+                .Where(x => item.TaskOptionIds.Contains(x.Id));
+
+            var options = await query.ToListAsync();
+
+            var result = options.All(x => x.TaskVariantId == item.TaskVariantId);
+
+            if (!result)
+                return false;
+        }
+
+        return true;
     }
 }

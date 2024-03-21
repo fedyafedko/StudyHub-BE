@@ -7,6 +7,7 @@ using StudyHub.Common.Requests;
 using StudyHub.Entities;
 using StudyHub.FluentEmail.MessageBase;
 using StudyHub.FluentEmail.Services.Interfaces;
+using System.Web;
 
 namespace StudyHub.BLL.Services.Auth;
 
@@ -33,7 +34,7 @@ public class PasswordService : IPasswordService
 
         var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-        var uri = string.Format(_callbackUrisConfig.ResetPasswordUri, user.Email, token);
+        var uri = string.Format(_callbackUrisConfig.ResetPasswordUri, user.Email, HttpUtility.UrlEncode(token));
 
         var emailSent = await _emailService.SendAsync(request.Email,
             new ResetPasswordMessage { Recipient = request.Email, ResetPasswordUri = uri });
@@ -51,7 +52,9 @@ public class PasswordService : IPasswordService
         if (isSamePassword)
             throw new IncorrectParametersException("New password have to differ from the old one");
 
-        var result = await _userManager.ResetPasswordAsync(user, request.ResetToken, request.NewPassword);
+        var decodedToken = HttpUtility.UrlDecode(request.ResetToken);
+
+        var result = await _userManager.ResetPasswordAsync(user, decodedToken, request.NewPassword);
 
         if (!result.Succeeded)
             throw new UserManagerException("Unable to reset password", result.Errors);

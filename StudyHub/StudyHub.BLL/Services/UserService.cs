@@ -49,10 +49,26 @@ public class UserService : IUserService
 
     public async Task<UserDTO> GetUserAsync(Guid userId)
     {
-        var user = await _userManager.FindByIdAsync(userId)
+        var entity = await _userManager.FindByIdAsync(userId)
             ?? throw new NotFoundException($"User with such ID does not exist in the database");
+        var user = _mapper.Map<UserDTO>(entity);
 
-        return _mapper.Map<UserDTO>(user);
+        var role = await _userManager.GetRolesAsync(entity);
+        user.Role = role.FirstOrDefault();
+        var path = Path.Combine(_env.ContentRootPath, _avatarConfig.Folder, userId.ToString());
+
+        if (!Directory.Exists(path))
+        {
+            user.Avatar = null;
+        }
+        else
+        {
+            var file = Directory.GetFiles(path).FirstOrDefault(x => x.Contains(userId.ToString()));
+            var fileName = Path.GetFileName(file);
+            user.Avatar = string.Format(_avatarConfig.Path, userId, fileName);
+        }
+
+        return user;
     }
 
     public async Task<UserDTO> UpdateUserAsync(Guid userId, UpdateUserDTO dto)

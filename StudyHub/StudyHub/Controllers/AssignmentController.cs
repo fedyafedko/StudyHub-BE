@@ -63,4 +63,14 @@ public class AssignmentController : Controller
 
         return Ok();
     }
+
+    [HttpGet("[action]")]
+    public async Task<IActionResult> NextAssignment()
+    {
+        var studentId = HttpContext.GetUserId();
+
+        var result = await _assignmentService.GetNextAssignmentAsync(studentId);
+
+        return Ok(result);
+    }
 }

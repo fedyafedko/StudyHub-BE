@@ -13,16 +13,16 @@ namespace StudyHub.BLL.Services.Auth;
 public class PasswordService : IPasswordService
 {
     private readonly UserManager<User> _userManager;
-    private readonly EmailConfig _emailConfig;
+    private readonly CallbackUrisConfig _callbackUrisConfig;
     private readonly IEmailService _emailService;
 
     public PasswordService(
         UserManager<User> userManager,
-        IOptions<EmailConfig> emailConfig,
+        IOptions<CallbackUrisConfig> callbackUrisConfig,
         IEmailService emailService)
     {
         _userManager = userManager;
-        _emailConfig = emailConfig.Value;
+        _callbackUrisConfig = callbackUrisConfig.Value;
         _emailService = emailService;
     }
 
@@ -33,7 +33,7 @@ public class PasswordService : IPasswordService
 
         var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-        var uri = string.Format(_emailConfig.AcceptInvitationUrl, user.Email, token);
+        var uri = string.Format(_callbackUrisConfig.ResetPasswordUri, user.Email, token);
 
         var emailSent = await _emailService.SendAsync(request.Email,
             new ResetPasswordMessage { Recipient = request.Email, ResetPasswordUri = uri });

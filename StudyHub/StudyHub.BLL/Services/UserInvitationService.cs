@@ -24,7 +24,7 @@ public class UserInvitationService : IUserInvitationService
     private readonly IEmailService _emailService;
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<IdentityRole<Guid>> _roleManager;
-    private readonly EmailConfig _emailConfig;
+    private readonly CallbackUrisConfig _callbackUrisConfig;
     private readonly UserInvitationConfig _userInvitationConfig;
     private readonly IMapper _mapper;
 
@@ -34,7 +34,7 @@ public class UserInvitationService : IUserInvitationService
         UserManager<User> userManager,
         RoleManager<IdentityRole<Guid>> roleManager,
         IEncryptService encryptService,
-        IOptions<EmailConfig> emailConfig,
+        IOptions<CallbackUrisConfig> callbackUrisConfig,
         IOptions<UserInvitationConfig> userInvitationConfig,
         IMapper mapper)
     {
@@ -42,10 +42,10 @@ public class UserInvitationService : IUserInvitationService
         _emailService = emailService;
         _userManager = userManager;
         _roleManager = roleManager;
-        _emailConfig = emailConfig.Value;
         _encryptService = encryptService;
         _userInvitationConfig = userInvitationConfig.Value;
         _mapper = mapper;
+        _callbackUrisConfig = callbackUrisConfig.Value;
     }
 
     public async Task ClearExpiredInvitationsAsync()
@@ -86,7 +86,7 @@ public class UserInvitationService : IUserInvitationService
 
             var encodedToken = HttpUtility.UrlEncode(tokenRaw);
 
-            var url = string.Format(_emailConfig.AcceptInvitationUrl, request.Role, encodedToken);
+            var url = string.Format(_callbackUrisConfig.AcceptInvitationUri, encodedToken);
 
             var userMessage = new InviteUserMessage
             {

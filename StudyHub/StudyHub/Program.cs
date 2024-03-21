@@ -38,6 +38,7 @@ builder.Services.ConfigsAssembly(builder.Configuration, opt => opt
        .AddConfig<GoogleAuthConfig>()
        .AddConfig<EmailConfig>()
        .AddConfig<HangfireConfig>()
+       .AddConfig<CallbackUrisConfig>()
        .AddConfig<UserInvitationConfig>()
        .AddConfig<AvatarConfig>());
 

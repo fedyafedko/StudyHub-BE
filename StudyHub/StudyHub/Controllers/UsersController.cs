@@ -27,7 +27,7 @@ public class UsersController : Controller
     {
         var userId = HttpContext.GetUserId();
         var result = await _userInvitingService.InviteManyAsync(userId, dto);
-        return result.Success == null ? Ok(result) : NotFound();
+        return result.Success != null ? Ok(result) : BadRequest("An error occurred while inviting students.");
     }
 
     [HttpGet("[action]")]

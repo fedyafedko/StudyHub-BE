@@ -14,6 +14,7 @@ using StudyHub.Entities;
 using StudyHub.FluentEmail.MessageBase;
 using StudyHub.FluentEmail.Services.Interfaces;
 using System.Web;
+using StudyHub.Common.Response;
 
 namespace StudyHub.BLL.Services;
 
@@ -56,7 +57,7 @@ public class UserInvitationService : IUserInvitationService
         await _invitedUserRepository.DeleteManyAsync(expired);
     }
 
-    public async Task<bool> InviteManyAsync(Guid userId, InviteUsersRequest request)
+    public async Task<StudentResultResponse> InviteManyAsync(Guid userId, InviteUsersRequest request)
     {
         var user = await _userManager.FindByIdAsync(userId)
             ?? throw new NotFoundException($"Unable to find user entity with this key: {userId}");
@@ -64,13 +65,12 @@ public class UserInvitationService : IUserInvitationService
         var roles = await _userManager.GetRolesAsync(user);
 
         if (!IsValidRoleToAdd(roles.First(), request.Role))
-        {
             throw new IncorrectParametersException($"Specified user unable to invite users with role: {request.Role}.");
-        }
 
         var invitedUsers = new List<InvitedUser>();
 
         var usersMessage = new List<InviteUserMessage>();
+        var response = new StudentResultResponse();
 
         foreach (var email in request.Emails)
         {
@@ -80,7 +80,10 @@ public class UserInvitationService : IUserInvitationService
                 throw new NotFoundException($"Role {request.Role} doesn't exist");
 
             if (await _userManager.FindByEmailAsync(email) != null)
-                throw new IncorrectParametersException($"User with email {email} already exists.");
+            {
+                response.Failed.Add(email);
+                continue;
+            }
 
             string tokenRaw = GenerateTokenExtension.GenerateToken();
 
@@ -107,6 +110,7 @@ public class UserInvitationService : IUserInvitationService
             var invitedUser = _mapper.Map<InvitedUser>(registration);
 
             invitedUsers.Add(invitedUser);
+            response.Success.Add(email);
         }
 
         var IsEmailSend = await _emailService.SendManyAsync(usersMessage);
@@ -116,7 +120,7 @@ public class UserInvitationService : IUserInvitationService
 
         var result = await _invitedUserRepository.InsertManyAsync(invitedUsers);
 
-        return result;
+        return response;
     }
 
     private bool IsValidRoleToAdd(string requestingUserRole, string userToAddRole)

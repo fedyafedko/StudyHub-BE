@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Azure;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using StudyHub.BLL.Extensions;
@@ -7,6 +8,7 @@ using StudyHub.Common.DTO.Subject;
 using StudyHub.Common.DTO.User.Student;
 using StudyHub.Common.Exceptions;
 using StudyHub.Common.Requests;
+using StudyHub.Common.Response;
 using StudyHub.DAL.Repositories.Interfaces;
 using StudyHub.Entities;
 
@@ -96,7 +98,7 @@ public class SubjectService : ISubjectService
         return _mapper.Map<SubjectDTO>(entity);
     }
 
-    public async Task<List<StudentDTO>> AddStudentsToSubjectAsync(
+    public async Task<StudentResultResponse> AddStudentsToSubjectAsync(
         Guid subjectId,
         Guid teacherId,
         StudentsToSubjectRequest request)
@@ -107,22 +109,30 @@ public class SubjectService : ISubjectService
         if (subject.TeacherId != teacherId)
             throw new RestrictedAccessException("You are not the owner and do not have permission to perform this action.");
 
+        var response = new StudentResultResponse();
+
         foreach (var email in request.Emails)
         {
-            var user = await _userManager.FindByEmailAsync(email)
-                ?? throw new NotFoundException($"Student not found with the specified email: {email}");
+            var user = await _userManager.FindByEmailAsync(email);
 
+            if(user == null)
+            {
+                response.Failed.Add(email);
+                continue;
+            }
+                
             user.Subjects ??= new List<Subject>();
 
             user.Subjects.Add(subject);
 
             await _userManager.UpdateAsync(user);
+            response.Success.Add(email);
         }
 
-        return _mapper.Map<List<StudentDTO>>(subject.Students);
+        return response;
     }
 
-    public async Task<bool> DeleteStudentsFromSubjectAsync(
+    public async Task<StudentResultResponse> DeleteStudentsFromSubjectAsync(
         Guid subjectId,
         Guid teacherId,
         StudentsToSubjectRequest request)
@@ -135,18 +145,25 @@ public class SubjectService : ISubjectService
         if (subject.TeacherId != teacherId)
             throw new RestrictedAccessException("You are not the owner and do not have permission to perform this action.");
 
-        // To Do: Fix bug with exception when student not found
+        var response = new StudentResultResponse();
+
         foreach (var email in request.Emails)
         {
-            var user = await _userManager.FindByEmailAsync(email)
-                ?? throw new NotFoundException($"Student not found with the specified email: {email}");
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if (user == null)
+            {
+                response.Failed.Add(email);
+                continue;
+            }
 
             subject.Students.Remove(user);
 
             await _subjectRepository.UpdateAsync(subject);
+            response.Success.Add(email);
         }
 
-        return true;
+        return response;
     }
 
     public async Task<List<StudentDTO>> GetStudentsForSubjectAsync(Guid subjectId)

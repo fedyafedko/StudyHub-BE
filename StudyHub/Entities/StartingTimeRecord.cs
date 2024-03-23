@@ -6,6 +6,7 @@ public class StartingTimeRecord : EntityBase
 {
     public DateTime StartTime { get; set; }
     public bool IsFinished { get; set; }
+    public double Mark { get; set; }
 
     [ForeignKey(nameof(Student))]
     public Guid StudentId { get; set; }

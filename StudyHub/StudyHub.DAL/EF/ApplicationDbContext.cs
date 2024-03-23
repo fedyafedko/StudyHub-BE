@@ -13,6 +13,7 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
     public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
     public DbSet<StartingTimeRecord> StartingTimeRecords { get; set; } = null!;
     public DbSet<StudentAnswer> StudentAnswers { get; set; } = null!;
+    public DbSet<StudentSubject> StudentSubjects { get; set; } = null!;
     public DbSet<Subject> Subjects { get; set; } = null!;
     public DbSet<TaskOption> TaskOptions { get; set; } = null!;
     public DbSet<TaskVariant> TaskVariants { get; set; } = null!;

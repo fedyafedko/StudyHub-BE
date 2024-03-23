@@ -10,6 +10,6 @@ public class Subject : EntityBase
     public Guid TeacherId { get; set; }
 
     public User Teacher { get; set; } = null!;
-    public List<User> Students { get; set; } = null!;
+    public List<StudentSubject> StudentSubjects { get; set; } = null!;
     public List<Assignment> Assignments { get; set; } = null!;
 }

@@ -75,7 +75,7 @@ public class SubjectService : ISubjectService
 
         var roles = await _userManager.GetRolesAsync(user);
 
-        var subjects = roles.First() == "Student" 
+        var subjects = roles.First() == "Student"
             ? user.Subjects
             : user.TeacherSubjects;
 
@@ -115,12 +115,12 @@ public class SubjectService : ISubjectService
         {
             var user = await _userManager.FindByEmailAsync(email);
 
-            if(user == null)
+            if (user == null)
             {
                 response.Failed.Add(email);
                 continue;
             }
-                
+
             user.Subjects ??= new List<Subject>();
 
             user.Subjects.Add(subject);

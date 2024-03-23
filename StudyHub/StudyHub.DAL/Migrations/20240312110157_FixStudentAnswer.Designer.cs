@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StudyHub.DAL.EF;
 
@@ -11,9 +12,11 @@ using StudyHub.DAL.EF;
 namespace StudyHub.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240312110157_FixStudentAnswer")]
+    partial class FixStudentAnswer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -180,8 +183,8 @@ namespace StudyHub.DAL.Migrations
                     b.Property<TimeSpan>("Duration")
                         .HasColumnType("time");
 
-                    b.Property<double>("MaxMark")
-                        .HasColumnType("float");
+                    b.Property<int>("MaxMark")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("OpeningDate")
                         .HasColumnType("datetime2");
@@ -209,8 +212,8 @@ namespace StudyHub.DAL.Migrations
                     b.Property<Guid>("AssignmentId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<double>("MaxMark")
-                        .HasColumnType("float");
+                    b.Property<int>("MaxMark")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

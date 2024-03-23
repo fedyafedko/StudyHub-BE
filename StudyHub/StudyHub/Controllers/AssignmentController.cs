@@ -15,13 +15,16 @@ public class AssignmentController : Controller
 {
     private readonly IAssignmentService _assignmentService;
     private readonly IStudentAnswerService _studentAnswerService;
+    private readonly IOptionsService _optionService;
 
     public AssignmentController(
         IAssignmentService assignmentService,
-        IStudentAnswerService studentAnswerService)
+        IStudentAnswerService studentAnswerService,
+        IOptionsService optionService)
     {
         _assignmentService = assignmentService;
         _studentAnswerService = studentAnswerService;
+        _optionService = optionService;
     }
 
     [HttpPost]
@@ -60,6 +63,7 @@ public class AssignmentController : Controller
         var studentId = HttpContext.GetUserId();
 
         await _studentAnswerService.UpsertStudentAnswerAsync(studentId, dto);
+        await _optionService.CalculatingChoicesMark(studentId, dto.AssignmentId);
 
         return Ok();
     }

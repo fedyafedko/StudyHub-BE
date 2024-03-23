@@ -10,4 +10,6 @@ public interface IOptionsService
     Task<TaskOptionDTO> UpdateTaskOptionsAsync(Guid optionId, UpdateTaskOptionDTO dto);
 
     Task<bool> DeleteTaskOptionsAsync(Guid optionId);
+
+    Task<bool> CalculatingChoicesMark(Guid studentId, Guid assignmentId);
 }

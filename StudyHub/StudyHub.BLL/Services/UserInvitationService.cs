@@ -106,8 +106,6 @@ public class UserInvitationService : IUserInvitationService
 
             var invitedUser = _mapper.Map<InvitedUser>(registration);
 
-            string dog = "dog";
-
             invitedUsers.Add(invitedUser);
             invitedUsers.ForEach(i =>
             {

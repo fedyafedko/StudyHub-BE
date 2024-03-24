@@ -191,4 +191,24 @@ public class SubjectService : ISubjectService
 
         return _mapper.Map<List<StudentDTO>>(students);
     }
+
+    public async Task<bool> AddMarkForStudent(Guid teacherId, MarkForSubjectRequest request)
+    {
+        var subject = await _subjectRepository
+                .FirstOrDefaultAsync(s => s.Id == request.SubjectId)
+            ?? throw new NotFoundException($"Subject not found with this ID: {request.SubjectId}");
+
+        if (subject.TeacherId != teacherId)
+            throw new RestrictedAccessException("You are not the owner and do not have permission to perform this action.");
+
+        var studentSubject = await _studentSubjectsRepository
+                .FirstOrDefaultAsync(s => s.StudentId == request.StudentId && s.SubjectId == request.SubjectId)
+            ?? throw new NotFoundException($"The student does not belong to this subject");
+
+        studentSubject.Mark = request.Mark;
+
+        var result = await _studentSubjectsRepository.UpdateAsync(studentSubject);
+
+        return result;
+    } 
 }

@@ -62,9 +62,9 @@ public class AssignmentController : Controller
     {
         var studentId = HttpContext.GetUserId();
 
-        await _studentAnswerService.UpsertStudentAnswerAsync(studentId, dto);
-        await _optionService.CalculatingChoicesMark(studentId, dto.AssignmentId);
+        var result = await _studentAnswerService.UpsertStudentAnswerAsync(studentId, dto)
+            && await _optionService.CalculatingChoicesMark(studentId, dto.AssignmentId);
 
-        return Ok();
+        return result ? Ok() : BadRequest();
     }
 }

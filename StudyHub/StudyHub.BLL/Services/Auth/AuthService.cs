@@ -16,8 +16,8 @@ public class AuthService : IAuthService
     protected readonly UserManager<User> _userManager;
     protected readonly ITokenService _tokenService;
     protected readonly IMapper _mapper;
-    private readonly IEncryptService _encryptService;
-    private readonly IRepository<InvitedUser> _invitedUserRepository;
+    protected readonly IRepository<InvitedUser> _invitedUserRepository;
+    protected readonly IEncryptService _encryptService;
     private readonly IRepository<RefreshToken> _refreshTokenRepository;
 
     public AuthService(
@@ -77,7 +77,7 @@ public class AuthService : IAuthService
         var roleResult = await _userManager.AddToRoleAsync(user, role);
 
         if (!roleResult.Succeeded)
-            throw new UserManagerException($"User manager operation failed:\n", result.Errors);
+            throw new UserManagerException($"User manager operation failed:\n", roleResult.Errors);
 
         await _invitedUserRepository.DeleteAsync(invitedUser);
 

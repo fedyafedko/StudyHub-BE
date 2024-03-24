@@ -15,9 +15,9 @@ public class GoogleAuthController : Controller
     }
 
     [HttpPost("[action]")]
-    public async Task<IActionResult> GoogleRegister([FromHeader(Name = "Authorization-Code")] string authorizationCode)
+    public async Task<IActionResult> GoogleRegister([FromHeader(Name = "Authorization-Code")] string authorizationCode,[FromQuery] string token)
     {
-        var result = await _googleAuthService.GoogleRegisterAsync(authorizationCode);
+        var result = await _googleAuthService.GoogleRegisterAsync(authorizationCode, token);
         return Ok(result);
     }
 

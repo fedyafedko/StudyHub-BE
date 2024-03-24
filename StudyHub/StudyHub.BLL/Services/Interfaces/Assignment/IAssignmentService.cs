@@ -13,4 +13,5 @@ public interface IAssignmentService
     Task<AssignmentDTO> GetAssignmentByIdAsync(Guid assignmentId);
 
     Task<List<AssignmentDTO>> GetAssignmentsBySubjectIdAsync(Guid subjectId);
+    Task<bool> AddMarkForStudent(Guid studentId, Guid assignmentId);
 }

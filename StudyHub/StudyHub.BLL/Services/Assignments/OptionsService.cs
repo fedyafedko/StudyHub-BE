@@ -11,6 +11,7 @@ namespace StudyHub.BLL.Services.Assignments;
 public class OptionsService : IOptionsService
 {
     private readonly IRepository<TaskOption> _taskOptionRepository;
+    private readonly IAssignmentService _assignmentService;
     private readonly IRepository<StudentAnswer> _studentAnswerRepository;
     private readonly IRepository<TaskVariant> _taskVariantRepository;
     private readonly IMapper _mapper;
@@ -19,12 +20,14 @@ public class OptionsService : IOptionsService
         IRepository<TaskOption> taskOptionsRepository,
         IRepository<StudentAnswer> studentAnswerRepository,
         IMapper mapper,
-        IRepository<TaskVariant> taskVariantRepository)
+        IRepository<TaskVariant> taskVariantRepository,
+        IAssignmentService assignmentService)
     {
         _taskOptionRepository = taskOptionsRepository;
         _studentAnswerRepository = studentAnswerRepository;
         _mapper = mapper;
         _taskVariantRepository = taskVariantRepository;
+        _assignmentService = assignmentService;
     }
 
     public async Task<List<TaskOptionDTO>> AddTaskOptionsAsync(Guid taskVariantId, List<CreateTaskOptionDTO> taskOptions)
@@ -84,7 +87,8 @@ public class OptionsService : IOptionsService
                 item.Mark = CalculateMarkForMultipleOptions(taskVariant, item);
         }
 
-        var result = await _studentAnswerRepository.UpdateManyAsync(studentAnswers);
+        var result = await _studentAnswerRepository.UpdateManyAsync(studentAnswers)
+            && await _assignmentService.AddMarkForStudent(studentId, assignmentId);
 
         return result;
     }

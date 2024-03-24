@@ -5,7 +5,6 @@ using StudyHub.BLL.Services.Interfaces;
 using StudyHub.BLL.Services.Interfaces.Assignment;
 using StudyHub.Common.DTO.Subject;
 using StudyHub.Common.Requests;
-using System;
 
 namespace StudyHub.Controllers;
 
@@ -98,5 +97,13 @@ public class SubjectController : Controller
     {
         var result = await _subjectService.GetStudentsForSubjectAsync(subjectId);
         return Ok(result);
+    }
+
+    [HttpPut("students/mark")]
+    public async Task<IActionResult> AddMarkForStudent(MarkForSubjectRequest request)
+    {
+        var teacherId = HttpContext.GetUserId();
+        var result = await _subjectService.AddMarkForStudent(teacherId, request);
+        return result ? Ok() : BadRequest("An error occurred while adding a mark for the student.");
     }
 }

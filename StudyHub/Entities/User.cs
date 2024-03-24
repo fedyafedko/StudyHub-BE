@@ -15,7 +15,7 @@ public class User : IdentityUser<Guid>
     public Guid? RefreshTokenId { get; set; }
 
     public List<Subject> TeacherSubjects { get; set; } = null!;
-    public List<Subject> Subjects { get; set; } = null!;
+    public List<StudentSubject> StudentSubjects { get; set; } = null!;
     public List<StudentAnswer> Answers { get; set; } = null!;
     public RefreshToken? RefreshToken { get; set; }
 }

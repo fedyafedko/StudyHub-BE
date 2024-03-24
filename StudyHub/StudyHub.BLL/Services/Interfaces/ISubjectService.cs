@@ -20,4 +20,5 @@ public interface ISubjectService
     Task<StudentResultResponse> AddStudentsToSubjectAsync(Guid subjectId, Guid teacherId, StudentsToSubjectRequest request);
     Task<StudentResultResponse> DeleteStudentsFromSubjectAsync(Guid subjectId, Guid teacherId, StudentsToSubjectRequest request);
     Task<List<StudentDTO>> GetStudentsForSubjectAsync(Guid subjectId);
+    Task<bool> AddMarkForStudent(Guid teacherId, MarkForSubjectRequest request);
 }

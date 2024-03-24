@@ -17,17 +17,20 @@ namespace StudyHub.BLL.Services;
 public class SubjectService : ISubjectService
 {
     private readonly IRepository<Subject> _subjectRepository;
+    private readonly IRepository<StudentSubject> _studentSubjectsRepository;
     private readonly UserManager<User> _userManager;
     private readonly IMapper _mapper;
 
     public SubjectService(
         IRepository<Subject> subjectRepository,
         UserManager<User> userManager,
-        IMapper mapper)
+        IMapper mapper,
+        IRepository<StudentSubject> studentSubjectsRepository)
     {
         _subjectRepository = subjectRepository;
         _userManager = userManager;
         _mapper = mapper;
+        _studentSubjectsRepository = studentSubjectsRepository;
     }
 
     public async Task<SubjectDTO> AddSubjectAsync(Guid teacherId, CreateSubjectDTO dto)
@@ -69,14 +72,17 @@ public class SubjectService : ISubjectService
     {
         var user = await _userManager.Users
             .Include(u => u.TeacherSubjects)
-            .Include(u => u.Subjects)
             .FirstOrDefaultAsync(u => u.Id == userId)
             ?? throw new NotFoundException($"Unable to find entity with such key: {userId}");
 
         var roles = await _userManager.GetRolesAsync(user);
 
-        var subjects = roles.First() == "Student" 
-            ? user.Subjects
+        var subjects = roles.First() == "Student"
+            ? await _studentSubjectsRepository
+                .Include(s => s.Subject)
+                .Where(s => s.StudentId == userId)
+                .Select(s => s.Subject)
+                .ToListAsync()
             : user.TeacherSubjects;
 
         return _mapper.Map<List<SubjectDTO>>(subjects);
@@ -115,17 +121,19 @@ public class SubjectService : ISubjectService
         {
             var user = await _userManager.FindByEmailAsync(email);
 
-            if(user == null)
+            if (user == null)
             {
                 response.Failed.Add(email);
                 continue;
             }
-                
-            user.Subjects ??= new List<Subject>();
 
-            user.Subjects.Add(subject);
+            var entity = new StudentSubject
+            {
+                StudentId = user.Id,
+                SubjectId = subject.Id
+            };
 
-            await _userManager.UpdateAsync(user);
+            await _studentSubjectsRepository.InsertAsync(entity);
             response.Success.Add(email);
         }
 
@@ -138,7 +146,6 @@ public class SubjectService : ISubjectService
         StudentsToSubjectRequest request)
     {
         var subject = await _subjectRepository
-                .Include(s => s.Students)
                 .FirstOrDefaultAsync(s => s.Id == subjectId)
             ?? throw new NotFoundException($"Subject not found with this ID: {subjectId}");
 
@@ -157,9 +164,16 @@ public class SubjectService : ISubjectService
                 continue;
             }
 
-            subject.Students.Remove(user);
+            var entity = await _studentSubjectsRepository
+                .FirstOrDefaultAsync(s => s.StudentId == user.Id && s.SubjectId == subject.Id);
 
-            await _subjectRepository.UpdateAsync(subject);
+            if (entity == null)
+            {
+                response.Failed.Add(email);
+                continue;
+            }
+
+            await _studentSubjectsRepository.DeleteAsync(entity);
             response.Success.Add(email);
         }
 
@@ -168,11 +182,33 @@ public class SubjectService : ISubjectService
 
     public async Task<List<StudentDTO>> GetStudentsForSubjectAsync(Guid subjectId)
     {
-        var subject = await _subjectRepository
-                .Include(s => s.Students)
-                .FirstOrDefaultAsync(s => s.Id == subjectId)
+        var students = await _studentSubjectsRepository
+                .Include(s => s.Student)
+                .Where(s => s.SubjectId == subjectId)
+                .Select(s => s.Student)
+                .ToListAsync()
             ?? throw new NotFoundException($"Subject not found with this ID: {subjectId}");
 
-        return _mapper.Map<List<StudentDTO>>(subject.Students);
+        return _mapper.Map<List<StudentDTO>>(students);
     }
+
+    public async Task<bool> AddMarkForStudent(Guid teacherId, MarkForSubjectRequest request)
+    {
+        var subject = await _subjectRepository
+                .FirstOrDefaultAsync(s => s.Id == request.SubjectId)
+            ?? throw new NotFoundException($"Subject not found with this ID: {request.SubjectId}");
+
+        if (subject.TeacherId != teacherId)
+            throw new RestrictedAccessException("You are not the owner and do not have permission to perform this action.");
+
+        var studentSubject = await _studentSubjectsRepository
+                .FirstOrDefaultAsync(s => s.StudentId == request.StudentId && s.SubjectId == request.SubjectId)
+            ?? throw new NotFoundException($"The student does not belong to this subject");
+
+        studentSubject.Mark = request.Mark;
+
+        var result = await _studentSubjectsRepository.UpdateAsync(studentSubject);
+
+        return result;
+    } 
 }

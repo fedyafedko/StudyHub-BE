@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StudyHub.DAL.EF;
 
@@ -11,9 +12,11 @@ using StudyHub.DAL.EF;
 namespace StudyHub.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240425165107_RemoveUserIdFromRefreshToken")]
+    partial class RemoveUserIdFromRefreshToken
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -267,9 +270,6 @@ namespace StudyHub.DAL.Migrations
                     b.Property<bool>("Used")
                         .HasColumnType("bit");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
                     b.ToTable("RefreshTokens");
@@ -447,6 +447,9 @@ namespace StudyHub.DAL.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<Guid?>("RefreshTokenId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
@@ -469,6 +472,8 @@ namespace StudyHub.DAL.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.HasIndex("RefreshTokenId");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -645,6 +650,15 @@ namespace StudyHub.DAL.Migrations
                         .IsRequired();
 
                     b.Navigation("AssignmentTask");
+                });
+
+            modelBuilder.Entity("StudyHub.Entities.User", b =>
+                {
+                    b.HasOne("StudyHub.Entities.RefreshToken", "RefreshToken")
+                        .WithMany()
+                        .HasForeignKey("RefreshTokenId");
+
+                    b.Navigation("RefreshToken");
                 });
 
             modelBuilder.Entity("SubjectUser", b =>

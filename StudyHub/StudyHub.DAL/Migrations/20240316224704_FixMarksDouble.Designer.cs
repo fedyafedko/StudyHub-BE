@@ -12,8 +12,8 @@ using StudyHub.DAL.EF;
 namespace StudyHub.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240129075648_FixStudentAnswer")]
-    partial class FixStudentAnswer
+    [Migration("20240316224704_FixMarksDouble")]
+    partial class FixMarksDouble
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -183,8 +183,8 @@ namespace StudyHub.DAL.Migrations
                     b.Property<TimeSpan>("Duration")
                         .HasColumnType("time");
 
-                    b.Property<int>("MaxMark")
-                        .HasColumnType("int");
+                    b.Property<double>("MaxMark")
+                        .HasColumnType("float");
 
                     b.Property<DateTime>("OpeningDate")
                         .HasColumnType("datetime2");
@@ -212,8 +212,8 @@ namespace StudyHub.DAL.Migrations
                     b.Property<Guid>("AssignmentId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("MaxMark")
-                        .HasColumnType("int");
+                    b.Property<double>("MaxMark")
+                        .HasColumnType("float");
 
                     b.HasKey("Id");
 
@@ -314,8 +314,8 @@ namespace StudyHub.DAL.Migrations
                     b.Property<string>("Answer")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Mark")
-                        .HasColumnType("int");
+                    b.Property<double>("Mark")
+                        .HasColumnType("float");
 
                     b.Property<Guid>("StudentId")
                         .HasColumnType("uniqueidentifier");

@@ -3,7 +3,7 @@ using StudyHub.BLL.Services.Interfaces.Auth;
 
 namespace StudyHub.Controllers;
 
-[Route("google-auth")]
+[Route("api/google-auth")]
 [ApiController]
 public class GoogleAuthController : Controller
 {

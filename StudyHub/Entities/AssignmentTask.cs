@@ -4,7 +4,7 @@ namespace StudyHub.Entities;
 
 public class AssignmentTask : EntityBase
 {
-    public int MaxMark { get; set; }
+    public double MaxMark { get; set; }
 
     [ForeignKey(nameof(Assignment))]
     public Guid AssignmentId { get; set; }

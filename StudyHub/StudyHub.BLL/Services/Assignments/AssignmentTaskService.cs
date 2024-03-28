@@ -15,12 +15,12 @@ public class AssignmentTaskService : IAssignmentTaskService
     private readonly IMapper _mapper;
 
     public AssignmentTaskService(
-        IRepository<AssignmentTask> repositoryAssignmentTask,
-        IRepository<Assignment> repositoryAssignment,
+        IRepository<AssignmentTask> assignmentTaskRepository,
+        IRepository<Assignment> assignmentRepository,
         IMapper mapper)
     {
-        _assignmentTaskRepository = repositoryAssignmentTask;
-        _assignmentRepository = repositoryAssignment;
+        _assignmentTaskRepository = assignmentTaskRepository;
+        _assignmentRepository = assignmentRepository;
         _mapper = mapper;
     }
 
@@ -64,9 +64,13 @@ public class AssignmentTaskService : IAssignmentTaskService
     public async Task<AssignmentTaskDTO> UpdateAssignmentTaskAsync(Guid assignmentTaskId, UpdateAssignmentTaskDTO assignmentTask)
     {
         var entity = await _assignmentTaskRepository
+            .Include(assignmentTask => assignmentTask.Assignment)
             .Include(assignmentTask => assignmentTask.TaskVariants)
             .FirstOrDefaultAsync(assignmentTask => assignmentTask.Id == assignmentTaskId)
             ?? throw new NotFoundException($"Unable to find entity with such key {assignmentTaskId}");
+
+        if (entity.Assignment.OpeningDate <= DateTime.Now)
+            throw new ExpiredException($"Unable to update this assignment task with current Id because its already started: {assignmentTaskId}");
 
         _mapper.Map(assignmentTask, entity);
 

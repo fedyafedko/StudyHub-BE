@@ -107,11 +107,6 @@ public class UserInvitationService : IUserInvitationService
             var invitedUser = _mapper.Map<InvitedUser>(registration);
 
             invitedUsers.Add(invitedUser);
-            invitedUsers.ForEach(i =>
-            {
-                i.Id = userId;
-                i.Email = email;
-            });
         }
 
         var IsEmailSend = await _emailService.SendManyAsync(usersMessage);

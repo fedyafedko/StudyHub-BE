@@ -78,8 +78,6 @@ public class TokenService : ITokenService
 
         await _refreshTokenRepository.InsertAsync(refreshToken);
 
-        user.RefreshTokenId = refreshToken.Id;
-
         await _userManager.UpdateAsync(user);
 
         return refreshToken.Token;
